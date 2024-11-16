@@ -3,7 +3,7 @@ from PyQt5 import QtSql
 from common.auth import hash_password
 from common.model import SqliteModel
 from configs import DATABASE_NAME
-from sql.auth import CREATE_USER_TABLE_SQL, INSERT_USER_SQL, VERIFY_USER_SQL
+from sql_statements.auth import CREATE_USER_TABLE_SQL, INSERT_USER_SQL, VERIFY_USER_SQL
 
 
 class AuthModel(SqliteModel):
