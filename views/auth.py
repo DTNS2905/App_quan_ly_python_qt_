@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
-from presenters.auth_presenter import AuthPresenter
+from presenters.auth import AuthPresenter
 from ui.authentication import Ui_Dialog
+
 
 class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self):
