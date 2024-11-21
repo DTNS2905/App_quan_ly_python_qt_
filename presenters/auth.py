@@ -3,7 +3,7 @@ import bcrypt
 from common.auth import verify_password
 from common.presenter import Presenter
 from models.auth import AuthModel
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 
 class AuthPresenter(Presenter):

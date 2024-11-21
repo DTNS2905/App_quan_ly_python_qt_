@@ -1,6 +1,6 @@
 import abc
 
-from PyQt5 import QtSql
+from PyQt6 import QtSql
 
 
 class Model(abc.ABC):
@@ -26,8 +26,10 @@ class SqliteModel(Model):
 
     def init_db(self):
         query = QtSql.QSqlQuery()
-        query.exec_(self._table_create_sql)
+        query.exec(self._table_create_sql)
 
     def close_connection(self):
         self.db.close()
         QtSql.QSqlDatabase.removeDatabase("QSQLITE")
+
+

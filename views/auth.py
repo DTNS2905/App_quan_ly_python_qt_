@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets, uic
 from presenters.auth import AuthPresenter
 from ui.authentication import Ui_Dialog
 
@@ -6,7 +6,7 @@ from ui.authentication import Ui_Dialog
 class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
+        uic.loadUi('ui/authentication.ui', self)
         self.presenter = AuthPresenter(self)
 
         # Add default user

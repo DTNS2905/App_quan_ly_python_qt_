@@ -1,4 +1,4 @@
-from PyQt5 import QtSql
+from PyQt6 import QtSql
 
 from common.auth import hash_password
 from common.model import SqliteModel
@@ -15,18 +15,18 @@ class AuthModel(SqliteModel):
         super().__init__(database_name, table_create_sql)
 
     def add_user(self, username, password):
-        hashed_password = self._password_encrypt(password)
+        hashed_password = hash_password(password)
         query = QtSql.QSqlQuery()
         query.prepare(self._user_insert_sql)
         query.addBindValue(username)
         query.addBindValue(hashed_password)
-        if not query.exec_():
+        if not query.exec():
             print(f"Error adding user: {query.lastError().text()}")
 
     def verify_user(self, username):
         query = QtSql.QSqlQuery()
         query.prepare(self._user_verify_sql)
         query.addBindValue(username)
-        if query.exec_() and query.next():
+        if query.exec() and query.next():
             return query.value(0)
         return None
