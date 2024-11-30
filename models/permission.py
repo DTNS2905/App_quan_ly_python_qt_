@@ -3,8 +3,8 @@ from PyQt6 import QtSql
 from common.auth import hash_password
 from common.model import SqliteModel
 from configs import DATABASE_NAME
-from sql_statements.auth import CREATE_PERMISSION_TABLE_SQL, CREATE_PERMISSION_USER_TABLE_SQL, ADD_PERMISSION_SQL, \
-    ASSIGN_PERMISSION_SQL, VERIFY_PERMISSION_SQL, PERMISSION_USER_VIEW_SQL
+from sql_statements.permission import ADD_PERMISSION_SQL, ASSIGN_PERMISSION_SQL, VERIFY_PERMISSION_SQL, \
+    PERMISSION_USER_VIEW_SQL, CREATE_PERMISSION_TABLE_SQL, CREATE_PERMISSION_USER_TABLE_SQL
 
 
 class PermissionModel(SqliteModel):
