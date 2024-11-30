@@ -24,4 +24,3 @@ class AuthPresenter(Presenter):
 
     def add_default_user(self, username, password):
         self.model.add_user(username, password)
-        self.permission_presenter.assign_permission_to_user(user_id, "read")

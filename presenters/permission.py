@@ -1,6 +1,7 @@
 from PyQt6 import QtWidgets
 
 from common.presenter import Presenter
+from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED
 
 from models.permission import PermissionModel
 
@@ -12,15 +13,15 @@ class PermissionPresenter(Presenter):
     def handle_permission_check(self, username, permission):
         """Check if the user has the required permission and update the view."""
         if self.model.verify_permission(username, permission):
-            self.view.display_success("Quyền đã được cấp")
+            self.view.display_success(PERMISSION_GRANTED)
         else:
-            self.view.display_error("Quyền bị từ chối! Bạn không có quyền truy cập cần thiết.")
+            self.view.display_error(PERMISSION_DENIED)
 
     def assign_permission_to_user(self, user_id, permission_id):
         """Assign a permission to a user."""
         try:
             self.model.assign_permission_to_user(user_id, permission_id)
-            self.view.display_success("Gắn quyền thành công")
+            self.view.display_success(GRANT_PERMISSION_SUCCESSFULLY)
         except Exception as e:
             self.view.display_error(str(e))
 
@@ -38,7 +39,11 @@ class PermissionPresenter(Presenter):
 
     def add_default_permissions(self):
         """Add default permissions."""
-        default_permissions = ["read", "write", "execute"]
+        default_permissions = [
+            "file:view", "file:create", "file:update", "file:execute", "file:delete",
+            "folder:view", "folder:create", "folder:update", "file:delete",
+            "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
+        ]
         for permission in default_permissions:
             try:
                 self.model.add_permission(permission)
