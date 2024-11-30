@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from pathlib import Path
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from common.presenter import Presenter
@@ -96,3 +97,21 @@ class FileTreePresenter(Presenter):
                 raise Exception(f"Error removing file: {e}")
         else:
             raise Exception("File not found.")
+
+    def open_file(self, index):
+        # Get the file path from the selected index
+        file_path = self.model.get_model().filePath(index)
+
+        if os.path.isfile(file_path):
+            try:
+                # Open the file using the default application based on the platform
+                if sys.platform.startswith("win32"):
+                    os.startfile(file_path)  # Windows
+                elif sys.platform.startswith("darwin"):
+                    os.system(f'open "{file_path}"')  # macOS
+                else:
+                    os.system(f'xdg-open "{file_path}"')  # Linux
+            except Exception as e:
+                print(f"Failed to open file: {e}")
+        else:
+            print("Selected item is not a file.")

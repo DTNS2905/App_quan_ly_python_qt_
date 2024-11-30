@@ -14,14 +14,23 @@ class AuthModel(SqliteModel):
     def __init__(self, database_name=DATABASE_NAME, table_create_sql=CREATE_USER_TABLE_SQL):
         super().__init__(database_name, table_create_sql)
 
-    def add_user(self, username, password):
+    def add_user(self, username, password, is_superuser=False):
         hashed_password = hash_password(password)
         query = QtSql.QSqlQuery()
         query.prepare(self._user_insert_sql)
         query.addBindValue(username)
         query.addBindValue(hashed_password)
+        query.addBindValue(is_superuser)
         if not query.exec():
             print(f"Error adding user: {query.lastError().text()}")
+
+    def create_superuser(self, username, password):
+        # Check if the user already exists
+        if self.verify_user(username):
+            print(f"Superuser '{username}' already exists.")
+        else:
+            self.add_user(username, password, is_superuser=True)
+            print(f"Superuser '{username}' created successfully!")
 
     def verify_user(self, username):
         query = QtSql.QSqlQuery()

@@ -1,6 +1,10 @@
 from PyQt6 import QtWidgets, uic
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QLineEdit
+
 from presenters.auth import AuthPresenter
 from ui.authentication import Ui_Dialog
+import resources
 
 
 class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
@@ -15,6 +19,24 @@ class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
         # Connect login button
         self.login.clicked.connect(self.presenter.handle_login)
 
+        # Initialize toggle button for password visibility
+        self.password_visible = False  # Track visibility state
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.toggle_button.setIcon(QIcon(":/icons/icons/eye-off.svg"))
+        self.toggle_button.setCheckable(True)
+        self.toggle_button.clicked.connect(self.toggle_password_visibility)
+
     def closeEvent(self, event):
         self.presenter.close()
         event.accept()
+
+    def toggle_password_visibility(self):
+        if self.password_visible:
+            # Hide password
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+            self.toggle_button.setIcon(QIcon(":/icons/icons/eye-off.svg"))
+        else:
+            # Show password
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.toggle_button.setIcon(QIcon(":/icons/icons/eye.svg"))
+        self.password_visible = not self.password_visible
