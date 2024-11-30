@@ -17,10 +17,11 @@ class AuthPresenter(Presenter):
 
         hashed_password = self.model.verify_user(username)
         if hashed_password and self._verify_password(password, hashed_password):
-            QtWidgets.QMessageBox.information(self.view, "Login Successful", "Welcome!")
+            self.view.display_success("đang nhập thành công")
             self.view.accept()  # Close dialog and signal success
         else:
-            QtWidgets.QMessageBox.warning(self.view, "Login Failed", "Invalid username or password.")
+            self.view.display_error("Tên người dùng hoặc mật khẩu không hợp lệ")
 
     def add_default_user(self, username, password):
         self.model.add_user(username, password)
+        self.permission_presenter.assign_permission_to_user(user_id, "read")

@@ -1,10 +1,11 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QLineEdit
+from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
 from presenters.auth import AuthPresenter
 from ui.authentication import Ui_Dialog
 import resources
+from ui_components.custom_messgae_box import CustomMessageBox
 
 
 class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
@@ -40,3 +41,13 @@ class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
             self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
             self.toggle_button.setIcon(QIcon(":/icons/icons/eye.svg"))
         self.password_visible = not self.password_visible
+
+    def display_success(self, message):
+        """Display a custom success message."""
+        success_box = CustomMessageBox("Success", message, QMessageBox.Icon.Information, "Đóng", self)
+        success_box.exec()
+
+    def display_error(self, message):
+        """Display a custom error message."""
+        error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
+        error_box.exec()

@@ -22,6 +22,10 @@ class CustomMessageBox(QMessageBox):
                 font-size: 14px;
                 border-radius: 10px;
             }
+            QLabel {
+                color: black;
+                font-size: 14px;
+            }
             QPushButton {
                 background-color: #E0E0E0;
                 color: black;

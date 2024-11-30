@@ -2,7 +2,10 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from PyQt6.QtWidgets import QFileDialog, QMessageBox
+
+from PyQt6.QtCore import QPointF
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect
 from common.presenter import Presenter
 from models.file_tree import FileTreeModel
 
@@ -16,77 +19,91 @@ class FileTreePresenter(Presenter):
         self.view.set_model(self.model.get_model())
         root_index = self.model.index(str(self.model.root_path))
         self.view.update_tree_view(root_index)
+        # Customize tree view appearance
+        effect = QGraphicsDropShadowEffect()
+        effect.setOffset(QPointF(3.0, 3.0))
+        effect.setBlurRadius(25)
+        effect.setColor(QColor("#111"))
 
-    def handle_add_file(self):
-        """Handle adding a file to the root directory."""
+        self.view.treeView.setGraphicsEffect(effect)
+        self.view.treeView.setAnimated(False)
+        self.view.treeView.setIndentation(20)
+        self.view.treeView.setSortingEnabled(True)
+
+        # Enable multi-selection in the QTreeView
+        self.view.treeView.setSelectionMode(self.view.treeView.SelectionMode.ExtendedSelection )
+
+
+    def handle_add_files(self):
+        """Handle adding multiple files to the root directory."""
         try:
-            # Open file dialog to select a file
-            file_path, _ = QFileDialog.getOpenFileName(self.view, "Select a File", "", "All Files (*)")
-            if not file_path:
+            # Open file dialog to select multiple files
+            file_paths, _ = QFileDialog.getOpenFileNames(self.view, "Select Files", "", "All Files (*)")
+            if not file_paths:
                 return  # User canceled the dialog
 
-            # Copy the file to the root directory
-            file_name = Path(file_path).name
-            target_path = self.model.root_path / file_name
-            shutil.copy(file_path, target_path)
+            for file_path in file_paths:
+                file_name = Path(file_path).name
+                target_path = self.model.root_path / file_name
+
+                # Copy the file to the root directory
+                shutil.copy(file_path, target_path)
 
             # Refresh the view
             root_index = self.model.index(str(self.model.root_path))
             self.view.update_tree_view(root_index)
 
             # Notify the view about the success
-            self.view.display_success(f"File '{file_name}' added to {self.model.root_path}.")
+            self.view.display_success(f"{len(file_paths)} files added to {self.model.root_path}.")
         except Exception as e:
             # Notify the view about the failure
-            self.view.display_error(f"Failed to add file: {e}")
+            self.view.display_error(f"Failed to add files: {e}")
 
-    def handle_remove_file(self):
-        """Handle removing a selected file from the file system."""
+    def handle_remove_files(self):
+        """Handle removing multiple selected files from the file system using QTreeView."""
         try:
-            # Get the selected file index
             selected_indexes = self.view.treeView.selectedIndexes()
 
             if not selected_indexes:
-                self.view.display_error("No file selected.")
+                self.view.display_error("No files or folders selected.")
                 return
 
-            # Get the file path of the selected item
-            index = selected_indexes[0]
-            file_path = self.view.treeView.model().filePath(index)
+            # Collect unique file paths from selected indexes (to avoid duplicates)
+            file_paths = set()
+            for index in selected_indexes:
+                file_path = self.view.treeView.model().filePath(index)
+                if os.path.isfile(file_path):  # Only consider files, not directories
+                    file_paths.add(file_path)
 
-            if not file_path:
-                self.view.display_error("Could not retrieve the file path.")
+            if not file_paths:
+                self.view.display_error("No valid files selected.")
                 return
 
-            # Initialize reply and ask for confirmation
-            reply = QMessageBox.StandardButton.No  # Default value in case QMessageBox fails
-            try:
-                reply = QMessageBox.question(
-                    self.view,
-                    "Confirm Removal",
-                    f"Are you sure you want to remove {file_path}?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No
-                )
-            except Exception as e:
-                self.view.display_error(f"Failed to display confirmation dialog: {e}")
-                return
+            # Confirmation dialog for batch file deletion
+            reply = QMessageBox.question(
+                self.view,
+                "Confirm Removal",
+                f"Are you sure you want to remove {len(file_paths)} files?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
 
-            # Proceed based on user's choice
             if reply == QMessageBox.StandardButton.Yes:
-                # Remove the file
-                self.remove_file_from_directory(file_path)
+                for file_path in file_paths:
+                    try:
+                        os.remove(file_path)  # Remove each file
+                    except Exception as e:
+                        self.view.display_error(f"Error removing '{file_path}': {e}")
 
-                # Notify success
-                self.view.display_success(f"File '{file_path}' has been removed.")
+                self.view.display_success(f"Successfully removed {len(file_paths)} files.")
 
-                # Refresh the tree view
+                # Refresh the view after deletion
                 self.view.refresh_tree_view()
             else:
                 self.view.display_error("File removal cancelled.")
 
         except Exception as e:
-            self.view.display_error(f"Failed to remove file: {e}")
+            self.view.display_error(f"Failed to remove files: {e}")
 
     def remove_file_from_directory(self, file_path):
         """Remove the specified file from the directory."""
@@ -117,18 +134,30 @@ class FileTreePresenter(Presenter):
             print("Selected item is not a file.")
 
     def handle_add_folder(self):
-        """Add a new folder to the selected directory."""
-        folder_name, _ = QFileDialog.getSaveFileName(self.view, "New Folder Name", "", "Folder (*)")
-        if folder_name:
-            try:
-                # Create the folder
-                os.makedirs(folder_name)
-                self.view.display_success(f"Folder '{folder_name}' created.")
+        """Add a new folder to the selected directory under the root path."""
+        try:
+            # Prompt for the folder name instead of path
+            folder_name, ok = QInputDialog.getText(self.view, "New Folder", "Enter folder name:")
+            if not ok or not folder_name.strip():
+                self.view.display_error("No folder name provided.")
+                return
 
-                # Refresh the view to show the new folder
-                self.view.refresh_tree_view()
-            except Exception as e:
-                self.view.display_error(f"Failed to create folder: {e}")
+            # Ensure it's being created under the root path
+            target_path = self.model.root_path / folder_name.strip()
+
+            # Check if the folder already exists
+            if target_path.exists():
+                self.view.display_error(f"Folder '{target_path}' already exists.")
+                return
+
+            # Create the folder
+            os.makedirs(target_path)
+            self.view.display_success(f"Folder '{target_path}' created.")
+
+            # Refresh the view to show the new folder
+            self.view.refresh_tree_view()
+        except Exception as e:
+            self.view.display_error(f"Failed to create folder: {e}")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""

@@ -12,15 +12,15 @@ class PermissionPresenter(Presenter):
     def handle_permission_check(self, username, permission):
         """Check if the user has the required permission and update the view."""
         if self.model.verify_permission(username, permission):
-            self.view.display_success("Permission granted!")
+            self.view.display_success("Quyền đã được cấp")
         else:
-            self.view.display_error("Permission denied! You do not have the required access.")
+            self.view.display_error("Quyền bị từ chối! Bạn không có quyền truy cập cần thiết.")
 
     def assign_permission_to_user(self, user_id, permission_id):
         """Assign a permission to a user."""
         try:
             self.model.assign_permission_to_user(user_id, permission_id)
-            self.view.display_success("Permission assigned successfully!")
+            self.view.display_success("Gắn quyền thành công")
         except Exception as e:
             self.view.display_error(str(e))
 

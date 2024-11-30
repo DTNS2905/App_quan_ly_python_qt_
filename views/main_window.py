@@ -1,6 +1,6 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QColor
+from PyQt6.QtGui import QColor, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QGraphicsDropShadowEffect
 
 from presenters.file_tree import FileTreePresenter
@@ -32,31 +32,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.home_button.clicked.connect(self.change_button_style_on_click)
         self.manage_user_button.clicked.connect(self.change_button_style_on_click)
 
-        self.add_file_button.clicked.connect(self.tree_presenter.handle_add_file)
-        self.remove_file_button.clicked.connect(self.tree_presenter.handle_remove_file)
+        self.add_file_button.clicked.connect(self.tree_presenter.handle_add_files)
+        self.remove_file_button.clicked.connect(self.tree_presenter.handle_remove_files)
 
         self.add_folder_button.clicked.connect(self.tree_presenter.handle_add_folder)
         self.remove_folder_button.clicked.connect(self.tree_presenter.handle_remove_folder)
 
-        # Set treeView at FILES_ROOT_PATH
+        # Set up treeView at FILES_ROOT_PATH
         self.tree_presenter.setup_view()
         root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
         self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
         # Execute files at FILES_ROOT_PATH
         self.treeView.doubleClicked.connect(self.tree_presenter.open_file)
 
-        # Customize tree view appearance
-        effect = QGraphicsDropShadowEffect()
-        effect.setOffset(QPointF(3.0, 3.0))
-        effect.setBlurRadius(25)
-        effect.setColor(QColor("#111"))
-
-        self.treeView.setGraphicsEffect(effect)
-        self.treeView.setAnimated(False)
-        self.treeView.setIndentation(20)
-        self.treeView.setSortingEnabled(True)
-
-
+        # Add Ctrl+A shortcut for Select All in treeView
+        select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
+        select_all_shortcut.activated.connect(self.select_all_items)
 
     def set_model(self, model):
         self.treeView.setModel(model)
@@ -68,7 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_error(self, message):
         """Display a custom error message."""
-        error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
+        error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Đóng", self)
         error_box.exec()
 
     def update_tree_view(self, root_index):
@@ -93,13 +84,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for button in [self.home_button, self.manage_user_button]:
             if button == sender:
-                button .setStyleSheet("""
+                button.setStyleSheet("""
                     background-color:#6CB4EE;
                     border-top-left-radius: 15px;
                 """)
 
             # Set the new button as active and change its style
             else:
-                button .setStyleSheet("""
+                button.setStyleSheet("""
                      background-color:#FAF9F6;
             """)
+
+    def select_all_items(self):
+        """Select all items in the QTreeView."""
+        self.treeView.selectAll()
