@@ -13,9 +13,9 @@ class PermissionModel(SqliteModel):
         self._junction_table_sql = junction_table_sql
         super().__init__(database_name, table_create_sql)
 
-    def init_db(self):
-        super().init_db()  # Initialize the main table
+        self.init_junction_table()
 
+    def init_junction_table(self):
         # Create the junction table
         junction_query = QtSql.QSqlQuery()
         if not junction_query.exec(self._junction_table_sql):
@@ -51,8 +51,8 @@ class PermissionModel(SqliteModel):
 
     def fetch_user_permissions(self):
         """Fetch all usernames and their permissions."""
-        query = QtSql.QSqlQuery(PERMISSION_USER_VIEW_SQL)
-
+        query = QtSql.QSqlQuery()
+        query.prepare(PERMISSION_USER_VIEW_SQL)
         results = []
         while query.next():
             username = query.value(0)  # Username
@@ -60,3 +60,12 @@ class PermissionModel(SqliteModel):
             results.append((username, permission))
 
         return results
+
+    def add_permission(self, permission):
+        """Add a single permission to the database."""
+        query = QtSql.QSqlQuery()
+        query.prepare(ADD_PERMISSION_SQL)
+        query.addBindValue(permission)
+        if not query.exec():
+            raise Exception(f"Error adding permission '{permission}': {query.lastError().text()}")
+

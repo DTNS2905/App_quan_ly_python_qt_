@@ -107,6 +107,28 @@ padding:3px;
 border-radius:5px;
 }
 
+
+#add_folder_button::hover{
+background-color: rgb(0, 116, 0);
+}
+
+#add_folder_button{
+background-color:rgb(0, 85, 0);
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+#remove_folder_button::hover{
+background-color:rgb(200, 0, 0)
+}
+#remove_folder_button {
+background-color:rgb(170, 0, 0);
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
 #frame_4 .QPushButton {
 color:white;
 }
@@ -693,7 +715,7 @@ color: black;
           <number>0</number>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QGridLayout" name="gridLayout_2">
@@ -731,8 +753,8 @@ color: black;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>216</width>
-                <height>122</height>
+                <width>906</width>
+                <height>560</height>
                </rect>
               </property>
               <property name="sizeIncrement">
@@ -959,7 +981,7 @@ border: 0px solid black;
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
+                         <normaloff>:/icons_white/icons/icons_white/file-plus.svg</normaloff>:/icons_white/icons/icons_white/file-plus.svg</iconset>
                        </property>
                        <property name="autoDefault">
                         <bool>false</bool>
@@ -969,6 +991,17 @@ border: 0px solid black;
                        </property>
                        <property name="flat">
                         <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QPushButton" name="add_folder_button">
+                       <property name="text">
+                        <string>Thêm thư mục</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -997,13 +1030,24 @@ border: 0px solid black;
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/trash-2.svg</normaloff>:/icons_white/icons/icons_white/trash-2.svg</iconset>
+                         <normaloff>:/icons_white/icons/icons_white/file-minus.svg</normaloff>:/icons_white/icons/icons_white/file-minus.svg</iconset>
                        </property>
                        <property name="autoDefault">
                         <bool>false</bool>
                        </property>
                        <property name="flat">
                         <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QPushButton" name="remove_folder_button">
+                       <property name="text">
+                        <string>xóa thư mục</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1061,22 +1105,8 @@ border: 0px solid black;
          </widget>
          <widget class="QWidget" name="stackedWidgetPage2">
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="2" column="0">
+           <item row="0" column="0">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QTableWidget" name="user_permission_table">
-               <column>
-                <property name="text">
-                 <string>Username</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Permissions</string>
-                </property>
-               </column>
-              </widget>
-             </item>
              <item>
               <widget class="QPushButton" name="pushButton">
                <property name="text">
@@ -1092,6 +1122,20 @@ border: 0px solid black;
               </widget>
              </item>
             </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QTableWidget" name="user_permission_table">
+             <column>
+              <property name="text">
+               <string>Username</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Permissions</string>
+              </property>
+             </column>
+            </widget>
            </item>
           </layout>
          </widget>

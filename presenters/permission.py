@@ -35,3 +35,12 @@ class PermissionPresenter(Presenter):
             self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(permission))
 
         self.view.user_permission_table.resizeColumnsToContents()
+
+    def add_default_permissions(self):
+        """Add default permissions."""
+        default_permissions = ["read", "write", "execute"]
+        for permission in default_permissions:
+            try:
+                self.model.add_permission(permission)
+            except Exception as e:
+                print(f"Failed to add permission '{permission}': {e}")

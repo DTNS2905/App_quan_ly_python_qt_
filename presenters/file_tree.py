@@ -115,3 +115,48 @@ class FileTreePresenter(Presenter):
                 print(f"Failed to open file: {e}")
         else:
             print("Selected item is not a file.")
+
+    def handle_add_folder(self):
+        """Add a new folder to the selected directory."""
+        folder_name, _ = QFileDialog.getSaveFileName(self.view, "New Folder Name", "", "Folder (*)")
+        if folder_name:
+            try:
+                # Create the folder
+                os.makedirs(folder_name)
+                self.view.display_success(f"Folder '{folder_name}' created.")
+
+                # Refresh the view to show the new folder
+                self.view.refresh_tree_view()
+            except Exception as e:
+                self.view.display_error(f"Failed to create folder: {e}")
+
+    def handle_remove_folder(self):
+        """Remove the selected folder."""
+        selected_indexes = self.view.treeView.selectedIndexes()
+        if not selected_indexes:
+            self.view.display_error("No folder selected.")
+            return
+
+        index = selected_indexes[0]
+        folder_path = self.view.treeView.model().filePath(index)
+
+        if os.path.isdir(folder_path):
+            reply = QMessageBox.question(
+                self.view,
+                "Confirm Removal",
+                f"Are you sure you want to delete the folder '{folder_path}'?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                try:
+                    # Remove the folder
+                    os.rmdir(folder_path)
+                    self.view.display_success(f"Folder '{folder_path}' removed.")
+
+                    # Refresh the view to remove the deleted folder
+                    self.view.refresh_tree_view()
+                except Exception as e:
+                    self.view.display_error(f"Failed to remove folder: {e}")
+        else:
+            self.view.display_error("Selected item is not a folder.")

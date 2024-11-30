@@ -17,8 +17,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tree_presenter = FileTreePresenter(self)
         self.permission_presenter = PermissionPresenter(self)
 
-        # Track the currently active button
-        self.active_button = None
+        # Table widget
+        # Add default permission
+        self.permission_presenter.add_default_permissions()
+        self.permission_presenter.populate_table()
 
         # Connect buttons to slots
         self.home_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1))
@@ -33,10 +35,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.add_file_button.clicked.connect(self.tree_presenter.handle_add_file)
         self.remove_file_button.clicked.connect(self.tree_presenter.handle_remove_file)
 
+        self.add_folder_button.clicked.connect(self.tree_presenter.handle_add_folder)
+        self.remove_folder_button.clicked.connect(self.tree_presenter.handle_remove_folder)
+
         # Set treeView at FILES_ROOT_PATH
         self.tree_presenter.setup_view()
         root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
         self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
+        # Execute files at FILES_ROOT_PATH
         self.treeView.doubleClicked.connect(self.tree_presenter.open_file)
 
         # Customize tree view appearance
@@ -50,19 +56,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeView.setIndentation(20)
         self.treeView.setSortingEnabled(True)
 
-        self.permission_presenter.populate_table()
+
 
     def set_model(self, model):
         self.treeView.setModel(model)
 
     def display_success(self, message):
         """Display a custom success message."""
-        success_box = CustomMessageBox("Success", message, QMessageBox.Icon.DialogInformation, "Got it!", self)
+        success_box = CustomMessageBox("Success", message, QMessageBox.Icon.Information, "Đóng", self)
         success_box.exec()
 
     def display_error(self, message):
         """Display a custom error message."""
-        error_box = CustomMessageBox("error", message, QMessageBox.Icon.DialogError, "Retry", self)
+        error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
 
     def update_tree_view(self, root_index):
