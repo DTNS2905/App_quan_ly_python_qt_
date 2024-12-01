@@ -23,7 +23,7 @@ class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
         @self.login.clicked.connect
         def handle_login():
             username, permissions = self.presenter.handle_login()
-            session.SESSION = UserSession(username, permissions)
+            session.SESSION = UserSession(username, permissions, 'admin' in username)
 
         # Initialize toggle button for password visibility
         self.password_visible = False  # Track visibility state

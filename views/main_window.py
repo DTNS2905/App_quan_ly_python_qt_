@@ -18,8 +18,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Table widget
         # Add default permission
         self.permission_presenter.add_default_permissions()
-        [self.permission_presenter.model.assign_permission_to_user('admin', p)
-            for p in self.permission_presenter.ALL_PERMISSION]
         self.permission_presenter.populate_table()
 
         # Connect buttons to slots
