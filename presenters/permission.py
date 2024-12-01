@@ -14,7 +14,7 @@ class PermissionPresenter(Presenter):
     ]
 
     FOLDER_PERMISSION = [
-        "folder:view", "folder:create", "folder:update", "file:delete",
+        "folder:view", "folder:create", "folder:update", "folder:delete",
     ]
 
     PERMISSION_PERMISSION = [
@@ -45,10 +45,11 @@ class PermissionPresenter(Presenter):
         user_permissions = self.model.fetch_user_permissions()
         self.view.user_permission_table.setRowCount(0)  # Clear table
 
-        for row, (username, permission) in enumerate(user_permissions):
+        for row, user_permission in enumerate(user_permissions):
+            username, permissions = user_permission.username, user_permission.permissions
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(permission))
+            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(" ; ".join(permissions)))
 
         self.view.user_permission_table.resizeColumnsToContents()
 
@@ -60,3 +61,11 @@ class PermissionPresenter(Presenter):
                 self.model.add_permission(permission)
             except Exception as e:
                 print(f"Failed to add permission '{permission}': {e}")
+
+    def assign_all_permissions(self, username: str):
+        default_permissions = self.ALL_PERMISSION
+        for permission in default_permissions:
+            try:
+                self.model.assign_permission_to_user(username, permission)
+            except Exception as e:
+                print(f"Failed to assign permission '{permission}': {e}")

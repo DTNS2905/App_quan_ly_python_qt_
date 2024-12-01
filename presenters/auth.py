@@ -18,7 +18,8 @@ class AuthPresenter(Presenter):
         if hashed_password and self._verify_password(password, hashed_password):
             self.view.display_success("Đang nhập thành công")
             self.view.accept()  # Close dialog and signal success
-            return username, self.permission_model.get_permission_by_username(username)
+            permissions = self.permission_model.get_permission_by_username(username).permissions
+            return username, permissions
         else:
             self.view.display_error("Tên người dùng hoặc mật khẩu không hợp lệ")
 

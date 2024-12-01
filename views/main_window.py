@@ -11,13 +11,10 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Màn hình chính")
         uic.loadUi('ui/admin_dashboard.ui', self)
         self.tree_presenter = FileTreePresenter(self)
         self.permission_presenter = PermissionPresenter(self)
-
-        # Table widget
-        # Add default permission
-        self.permission_presenter.add_default_permissions()
         self.permission_presenter.populate_table()
 
         # Connect buttons to slots

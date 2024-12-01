@@ -15,15 +15,21 @@ class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
         super().__init__()
         uic.loadUi('ui/authentication.ui', self)
         self.presenter = AuthPresenter(self)
+        self.permission_presenter = PermissionPresenter(self)
 
         # Add default user
         self.presenter.add_default_user('admin', 'admin123')
+
+        # Table widget
+        # Add default permission
+        self.permission_presenter.add_default_permissions()
+        self.permission_presenter.assign_all_permissions("admin")
 
         # Connect login button
         @self.login.clicked.connect
         def handle_login():
             username, permissions = self.presenter.handle_login()
-            session.SESSION = UserSession(username, permissions, 'admin' in username)
+            session.SESSION = UserSession(username, permissions)
 
         # Initialize toggle button for password visibility
         self.password_visible = False  # Track visibility state

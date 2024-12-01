@@ -49,7 +49,6 @@ UPDATE_PERMISSION_SQL = '''
 '''
 
 PERMISSION_USER_VIEW_SQL = '''
-    CREATE VIEW IF NOT EXISTS user_permissions_view AS
     SELECT 
         u.username,
         p.permission
