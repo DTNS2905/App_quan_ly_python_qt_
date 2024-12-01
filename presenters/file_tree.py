@@ -117,7 +117,7 @@ class FileTreePresenter(Presenter):
     def remove_file_from_directory(self, file_path):
         """Remove the specified file from the directory."""
         if not session.SESSION.match_permissions("file:delete"):
-            self.view.display_error("Người dùng không có quyền xóa tệp. Vui lòng liên hệ admin")
+            self.view.display_error("PERMISSION_DENIED")
             return
 
         if os.path.exists(file_path):
@@ -152,7 +152,7 @@ class FileTreePresenter(Presenter):
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
-        if not session.SESSION.match_permissions("folder:execute"):
+        if not session.SESSION.match_permissions("folder:create"):
             self.view.display_error("Người dùng không có quyền chạy tệp. Vui lòng liên hệ admin")
             return
 

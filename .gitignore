@@ -290,3 +290,11 @@ pip-log.txt
 .idea
 
 *.db
+
+.qtcreator
+
+files_storage/*
+
+icons
+
+qt_project.pyproject
