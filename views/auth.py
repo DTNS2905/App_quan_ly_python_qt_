@@ -13,7 +13,7 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi('ui/authentication.ui', self)
+        uic.loadUi('ui/login.ui', self)
         self.presenter = AuthPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
 
