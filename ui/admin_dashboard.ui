@@ -152,16 +152,16 @@ color:black;
      <number>0</number>
     </property>
     <property name="leftMargin">
-     <number>0</number>
+     <number>3</number>
     </property>
     <property name="topMargin">
-     <number>0</number>
+     <number>3</number>
     </property>
     <property name="rightMargin">
-     <number>0</number>
+     <number>3</number>
     </property>
     <property name="bottomMargin">
-     <number>0</number>
+     <number>3</number>
     </property>
     <item>
      <widget class="QFrame" name="left_menu">
@@ -184,7 +184,7 @@ color:black;
        <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Sunken</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
        <number>1</number>
@@ -477,10 +477,10 @@ color: black;
        <enum>QFrame::Shape::Box</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Raised</enum>
+       <enum>QFrame::Shadow::Plain</enum>
       </property>
       <property name="lineWidth">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="midLineWidth">
        <number>1</number>
@@ -762,8 +762,8 @@ color: black;
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>898</width>
-                <height>558</height>
+                <width>901</width>
+                <height>560</height>
                </rect>
               </property>
               <property name="sizeIncrement">
@@ -1119,18 +1119,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1184,18 +1184,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1249,18 +1249,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>203</red>
-                          <green>201</green>
-                          <blue>196</blue>
+                          <red>250</red>
+                          <green>249</green>
+                          <blue>246</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1457,6 +1457,33 @@ border-radius:5px;
                 <property name="palette">
                  <palette>
                   <active>
+                   <colorrole role="WindowText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="ButtonText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
                    <colorrole role="Base">
                     <brush brushstyle="SolidPattern">
                      <color alpha="255">
@@ -1477,6 +1504,33 @@ border-radius:5px;
                    </colorrole>
                   </active>
                   <inactive>
+                   <colorrole role="WindowText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="ButtonText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
                    <colorrole role="Base">
                     <brush brushstyle="SolidPattern">
                      <color alpha="255">
@@ -1526,6 +1580,9 @@ border-radius:5px;
                 </property>
                 <property name="midLineWidth">
                  <number>0</number>
+                </property>
+                <property name="dragDropMode">
+                 <enum>QAbstractItemView::DragDropMode::NoDragDrop</enum>
                 </property>
                 <column>
                  <property name="text">
