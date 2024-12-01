@@ -19,12 +19,20 @@ ADD_PERMISSION_SQL = "INSERT OR IGNORE INTO permissions (permission) VALUES (?)"
 
 ASSIGN_PERMISSION_SQL = "INSERT OR IGNORE INTO user_permissions (user_id, permission_id) VALUES (?, ?)"
 
-VERIFY_PERMISSION_SQL = '''
-    SELECT p.permission
+ASSIGN_PERMISSION_BY_USERNAME_SQL = '''
+    INSERT OR IGNORE INTO user_permissions (user_id, permission_id)
+    SELECT u.id, p.id
+    FROM users u
+    JOIN permissions p ON p.permission = ?
+    WHERE u.username = ?;
+'''
+
+GET_PERMISSION_BY_USERNAME_SQL = '''
+    SELECT DISTINCT p.permission
     FROM users u
     INNER JOIN user_permissions up ON u.id = up.user_id
     INNER JOIN permissions p ON up.permission_id = p.id
-    WHERE u.username = ? AND p.permission = ?
+    WHERE u.username = ?
 '''
 
 REMOVE_PERMISSION_FROM_USER_SQL = '''

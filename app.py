@@ -1,4 +1,5 @@
 import sys
+import resources
 from PyQt6 import QtWidgets
 from views.auth import LoginDialog
 from views.main_window import MainWindow

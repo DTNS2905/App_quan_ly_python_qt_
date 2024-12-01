@@ -6,6 +6,8 @@ from pathlib import Path
 from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect
+
+from common import session
 from common.presenter import Presenter
 from models.file_tree import FileTreeModel
 
@@ -31,11 +33,14 @@ class FileTreePresenter(Presenter):
         self.view.treeView.setSortingEnabled(True)
 
         # Enable multi-selection in the QTreeView
-        self.view.treeView.setSelectionMode(self.view.treeView.SelectionMode.ExtendedSelection )
-
+        self.view.treeView.setSelectionMode(self.view.treeView.SelectionMode.ExtendedSelection)
 
     def handle_add_files(self):
         """Handle adding multiple files to the root directory."""
+        if not session.SESSION.match_permissions("file:create"):
+            self.view.display_error("Người dùng không có quyền tạo tệp. Vui lòng liên hệ admin")
+            return
+
         try:
             # Open file dialog to select multiple files
             file_paths, _ = QFileDialog.getOpenFileNames(self.view, "Select Files", "", "All Files (*)")
@@ -61,6 +66,10 @@ class FileTreePresenter(Presenter):
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
+        if not session.SESSION.match_permissions("file:delete"):
+            self.view.display_error("Người dùng không có quyền xóa tệp. Vui lòng liên hệ admin")
+            return
+
         try:
             selected_indexes = self.view.treeView.selectedIndexes()
 
@@ -107,6 +116,10 @@ class FileTreePresenter(Presenter):
 
     def remove_file_from_directory(self, file_path):
         """Remove the specified file from the directory."""
+        if not session.SESSION.match_permissions("file:delete"):
+            self.view.display_error("Người dùng không có quyền xóa tệp. Vui lòng liên hệ admin")
+            return
+
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)  # Remove the file
@@ -117,6 +130,10 @@ class FileTreePresenter(Presenter):
 
     def open_file(self, index):
         # Get the file path from the selected index
+        if not session.SESSION.match_permissions("file:execute"):
+            self.view.display_error("Người dùng không có quyền chạy tệp. Vui lòng liên hệ admin")
+            return
+
         file_path = self.model.get_model().filePath(index)
 
         if os.path.isfile(file_path):
@@ -135,6 +152,10 @@ class FileTreePresenter(Presenter):
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
+        if not session.SESSION.match_permissions("folder:execute"):
+            self.view.display_error("Người dùng không có quyền chạy tệp. Vui lòng liên hệ admin")
+            return
+
         try:
             # Prompt for the folder name instead of path
             folder_name, ok = QInputDialog.getText(self.view, "New Folder", "Enter folder name:")
@@ -161,6 +182,10 @@ class FileTreePresenter(Presenter):
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
+        if not session.SESSION.match_permissions("folder:delete"):
+            self.view.display_error("Người dùng không có quyền xóa. Vui lòng liên hệ admin")
+            return
+
         selected_indexes = self.view.treeView.selectedIndexes()
         if not selected_indexes:
             self.view.display_error("No folder selected.")

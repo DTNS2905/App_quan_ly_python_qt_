@@ -1,11 +1,9 @@
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QColor, QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox, QGraphicsDropShadowEffect
+from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtWidgets import QMessageBox
 
 from presenters.file_tree import FileTreePresenter
 from presenters.permission import PermissionPresenter
-import resources
 from configs import FILES_ROOT_PATH
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -20,6 +18,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Table widget
         # Add default permission
         self.permission_presenter.add_default_permissions()
+        [self.permission_presenter.model.assign_permission_to_user('admin', p)
+            for p in self.permission_presenter.ALL_PERMISSION]
         self.permission_presenter.populate_table()
 
         # Connect buttons to slots

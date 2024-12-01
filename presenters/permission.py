@@ -1,5 +1,6 @@
 from PyQt6 import QtWidgets
 
+from common import session
 from common.presenter import Presenter
 from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED
 
@@ -7,20 +8,34 @@ from models.permission import PermissionModel
 
 
 class PermissionPresenter(Presenter):
+
+    FILE_PERMISSIONS = [
+        "file:view", "file:create", "file:update", "file:execute", "file:delete",
+    ]
+
+    FOLDER_PERMISSION = [
+        "folder:view", "folder:create", "folder:update", "file:delete",
+    ]
+
+    PERMISSION_PERMISSION = [
+        "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
+    ]
+
+    ALL_PERMISSION = [*FILE_PERMISSIONS, *FOLDER_PERMISSION, *PERMISSION_PERMISSION]
+
+    VIEW_SCOPES = [p for p in ALL_PERMISSION if ":view" in p]
+
     def __init__(self, view):
         super().__init__(view, PermissionModel())
 
-    def handle_permission_check(self, username, permission):
-        """Check if the user has the required permission and update the view."""
-        if self.model.verify_permission(username, permission):
-            self.view.display_success(PERMISSION_GRANTED)
-        else:
-            self.view.display_error(PERMISSION_DENIED)
-
-    def assign_permission_to_user(self, user_id, permission_id):
+    def assign_permission_to_user(self, username, permission):
         """Assign a permission to a user."""
+        if not session.SESSION.match_permissions("permission:grant"):
+            self.view.display_error(PERMISSION_DENIED)
+            return
+
         try:
-            self.model.assign_permission_to_user(user_id, permission_id)
+            self.model.assign_permission_to_user(username, permission)
             self.view.display_success(GRANT_PERMISSION_SUCCESSFULLY)
         except Exception as e:
             self.view.display_error(str(e))
@@ -39,11 +54,7 @@ class PermissionPresenter(Presenter):
 
     def add_default_permissions(self):
         """Add default permissions."""
-        default_permissions = [
-            "file:view", "file:create", "file:update", "file:execute", "file:delete",
-            "folder:view", "folder:create", "folder:update", "file:delete",
-            "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
-        ]
+        default_permissions = self.ALL_PERMISSION
         for permission in default_permissions:
             try:
                 self.model.add_permission(permission)
