@@ -33,6 +33,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.add_folder_button.clicked.connect(self.tree_presenter.handle_add_folder)
         self.remove_folder_button.clicked.connect(self.tree_presenter.handle_remove_folder)
 
+        # self.add_permission_button.clicked.connect()
+        # self.remove_permission_button.clicked.connect()
+
         # Set up treeView at FILES_ROOT_PATH
         self.tree_presenter.setup_view()
         root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex

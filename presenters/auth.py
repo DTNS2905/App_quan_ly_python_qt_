@@ -1,5 +1,6 @@
 from common.auth import verify_password
 from common.presenter import Presenter
+from messages.messages import LOGIN_SUCCESS, LOGIN_ERROR
 from models.auth import AuthModel
 from models.permission import PermissionModel
 
@@ -16,12 +17,12 @@ class AuthPresenter(Presenter):
 
         hashed_password = self.model.verify_user(username)
         if hashed_password and self._verify_password(password, hashed_password):
-            self.view.display_success("Đang nhập thành công")
+            self.view.display_success(LOGIN_SUCCESS)
             self.view.accept()  # Close dialog and signal success
             permissions = self.permission_model.get_permission_by_username(username).permissions
             return username, permissions
         else:
-            self.view.display_error("Tên người dùng hoặc mật khẩu không hợp lệ")
+            self.view.display_error(LOGIN_ERROR)
 
     def add_default_user(self, username, password):
         self.model.add_user(username, password)

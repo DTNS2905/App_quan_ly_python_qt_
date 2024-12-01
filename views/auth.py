@@ -6,11 +6,10 @@ from common import session
 from common.session import UserSession
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
-from ui.authentication import Ui_Dialog
 from ui_components.custom_messgae_box import CustomMessageBox
 
 
-class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
+class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         uic.loadUi('ui/login.ui', self)

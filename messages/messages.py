@@ -2,3 +2,24 @@ GRANT_PERMISSION_SUCCESSFULLY = "Gắn quyền thành công"
 PERMISSION_DENIED = "Quyền bị từ chối! Bạn không có quyền truy cập cần thiết."
 PERMISSION_GRANTED = "Quyền đã được cấp"
 
+LOGIN_SUCCESS = "Đang nhập thành công"
+LOGIN_ERROR = "Tên người dùng hoặc mật khẩu không hợp lệ"
+
+FILE_REMOVE_SUCCESS = "xóa thành công"
+FILE_REMOVE_FAIL = "xóa tài liệu không thành công"
+FILE_REMOVE_CANCEL = "xóa tài liệu không thành công"
+ADD_FILE_ERROR = "Tài liệu không thể tạo"
+ADD_FILE_SUCCESS = "Tài liệu tạo thành công"
+SELECTED_FILE_ERROR = "Tài liệu không thể chọn"
+FILE_NOT_FOUND = "Tài liệu tìm không thấy"
+OPEN_FILE_FAIL = "Không thẻ mở tài liệu"
+FOLDER_EXISTED = "Thư mục đã tồn tại "
+FOLDER_SELECTED_FAIL = "Không phải là thự mục"
+FOLDER_SELECTED_NOT_FOUND = "Không có thư mục nào được chọn"
+FOLDER_CREATE_ERROR = "Thư mục không thể tạo"
+FOLDER_CREATE_SUCCESS = "Thư mục tạo thành công"
+FOLDER_REMOVE_ERROR = "Thư mục không thể xóa"
+FOLDER_REMOVE_SUCCESS = "Thư mục xóa thành công"
+
+
+

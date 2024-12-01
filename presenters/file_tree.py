@@ -9,6 +9,9 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDro
 
 from common import session
 from common.presenter import Presenter
+from messages.messages import PERMISSION_DENIED, ADD_FILE_SUCCESS, ADD_FILE_ERROR, SELECTED_FILE_ERROR, \
+    FILE_REMOVE_FAIL, FILE_REMOVE_SUCCESS, OPEN_FILE_FAIL, FOLDER_SELECTED_FAIL, FOLDER_CREATE_ERROR, FOLDER_EXISTED, \
+    FOLDER_SELECTED_NOT_FOUND, FOLDER_CREATE_SUCCESS, FOLDER_REMOVE_SUCCESS, FOLDER_REMOVE_ERROR, FILE_NOT_FOUND
 from models.file_tree import FileTreeModel
 
 
@@ -38,12 +41,12 @@ class FileTreePresenter(Presenter):
     def handle_add_files(self):
         """Handle adding multiple files to the root directory."""
         if not session.SESSION.match_permissions("file:create"):
-            self.view.display_error("Người dùng không có quyền tạo tệp. Vui lòng liên hệ admin")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         try:
             # Open file dialog to select multiple files
-            file_paths, _ = QFileDialog.getOpenFileNames(self.view, "Select Files", "", "All Files (*)")
+            file_paths, _ = QFileDialog.getOpenFileNames(self.view, "Chọn tài liệu", "", "Tất cả tài liệu(*)")
             if not file_paths:
                 return  # User canceled the dialog
 
@@ -59,22 +62,22 @@ class FileTreePresenter(Presenter):
             self.view.update_tree_view(root_index)
 
             # Notify the view about the success
-            self.view.display_success(f"{len(file_paths)} files added to {self.model.root_path}.")
+            self.view.display_success(f"{len(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.root_path}.")
         except Exception as e:
             # Notify the view about the failure
-            self.view.display_error(f"Failed to add files: {e}")
+            self.view.display_error(f"{ADD_FILE_ERROR}: {e}")
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
         if not session.SESSION.match_permissions("file:delete"):
-            self.view.display_error("Người dùng không có quyền xóa tệp. Vui lòng liên hệ admin")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         try:
             selected_indexes = self.view.treeView.selectedIndexes()
 
             if not selected_indexes:
-                self.view.display_error("No files or folders selected.")
+                self.view.display_error(SELECTED_FILE_ERROR)
                 return
 
             # Collect unique file paths from selected indexes (to avoid duplicates)
@@ -85,14 +88,14 @@ class FileTreePresenter(Presenter):
                     file_paths.add(file_path)
 
             if not file_paths:
-                self.view.display_error("No valid files selected.")
+                self.view.display_error(FILE_REMOVE_FAIL)
                 return
 
             # Confirmation dialog for batch file deletion
             reply = QMessageBox.question(
                 self.view,
-                "Confirm Removal",
-                f"Are you sure you want to remove {len(file_paths)} files?",
+                "Xác nhận xóa",
+                f"Bạn chắc chắn muốn xóa {len(file_paths)} ?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
@@ -102,36 +105,36 @@ class FileTreePresenter(Presenter):
                     try:
                         os.remove(file_path)  # Remove each file
                     except Exception as e:
-                        self.view.display_error(f"Error removing '{file_path}': {e}")
+                        self.view.display_error(f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
 
-                self.view.display_success(f"Successfully removed {len(file_paths)} files.")
+                self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {len(file_paths)} ")
 
                 # Refresh the view after deletion
                 self.view.refresh_tree_view()
             else:
-                self.view.display_error("File removal cancelled.")
+                self.view.display_error(FILE_REMOVE_FAIL)
 
         except Exception as e:
-            self.view.display_error(f"Failed to remove files: {e}")
+            self.view.display_error(f"{FILE_REMOVE_FAIL}:{e}")
 
     def remove_file_from_directory(self, file_path):
         """Remove the specified file from the directory."""
         if not session.SESSION.match_permissions("file:delete"):
-            self.view.display_error("PERMISSION_DENIED")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)  # Remove the file
             except Exception as e:
-                raise Exception(f"Error removing file: {e}")
+                raise Exception(f"{FILE_REMOVE_FAIL}: {e}")
         else:
-            raise Exception("File not found.")
+            raise Exception(FILE_NOT_FOUND)
 
     def open_file(self, index):
         # Get the file path from the selected index
         if not session.SESSION.match_permissions("file:execute"):
-            self.view.display_error("Người dùng không có quyền chạy tệp. Vui lòng liên hệ admin")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         file_path = self.model.get_model().filePath(index)
@@ -142,25 +145,25 @@ class FileTreePresenter(Presenter):
                 if sys.platform.startswith("win32"):
                     os.startfile(file_path)  # Windows
                 elif sys.platform.startswith("darwin"):
-                    os.system(f'open "{file_path}"')  # macOS
+                    os.system(f'Mở "{file_path}"')  # macOS
                 else:
-                    os.system(f'xdg-open "{file_path}"')  # Linux
+                    os.system(f'mở "{file_path}"')  # Linux
             except Exception as e:
-                print(f"Failed to open file: {e}")
+                print(f"{OPEN_FILE_FAIL}: {e}")
         else:
-            print("Selected item is not a file.")
+            print(FOLDER_SELECTED_FAIL)
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
         if not session.SESSION.match_permissions("folder:create"):
-            self.view.display_error("Người dùng không có quyền chạy tệp. Vui lòng liên hệ admin")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         try:
             # Prompt for the folder name instead of path
-            folder_name, ok = QInputDialog.getText(self.view, "New Folder", "Enter folder name:")
+            folder_name, ok = QInputDialog.getText(self.view, "Thư mục mới", " Điền tên thư mục:")
             if not ok or not folder_name.strip():
-                self.view.display_error("No folder name provided.")
+                self.view.display_error(FOLDER_CREATE_ERROR)
                 return
 
             # Ensure it's being created under the root path
@@ -168,27 +171,27 @@ class FileTreePresenter(Presenter):
 
             # Check if the folder already exists
             if target_path.exists():
-                self.view.display_error(f"Folder '{target_path}' already exists.")
+                self.view.display_error(f"{FOLDER_EXISTED} '{target_path}'")
                 return
 
             # Create the folder
             os.makedirs(target_path)
-            self.view.display_success(f"Folder '{target_path}' created.")
+            self.view.display_success(f"{FOLDER_CREATE_SUCCESS}:'{target_path}'")
 
             # Refresh the view to show the new folder
             self.view.refresh_tree_view()
         except Exception as e:
-            self.view.display_error(f"Failed to create folder: {e}")
+            self.view.display_error(f"{FOLDER_CREATE_ERROR}:{e}")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
         if not session.SESSION.match_permissions("folder:delete"):
-            self.view.display_error("Người dùng không có quyền xóa. Vui lòng liên hệ admin")
+            self.view.display_error(PERMISSION_DENIED)
             return
 
         selected_indexes = self.view.treeView.selectedIndexes()
         if not selected_indexes:
-            self.view.display_error("No folder selected.")
+            self.view.display_error(FOLDER_SELECTED_NOT_FOUND)
             return
 
         index = selected_indexes[0]
@@ -197,8 +200,8 @@ class FileTreePresenter(Presenter):
         if os.path.isdir(folder_path):
             reply = QMessageBox.question(
                 self.view,
-                "Confirm Removal",
-                f"Are you sure you want to delete the folder '{folder_path}'?",
+                "Xác nhận xóa",
+                f"bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
@@ -206,11 +209,11 @@ class FileTreePresenter(Presenter):
                 try:
                     # Remove the folder
                     os.rmdir(folder_path)
-                    self.view.display_success(f"Folder '{folder_path}' removed.")
+                    self.view.display_success(f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .")
 
                     # Refresh the view to remove the deleted folder
                     self.view.refresh_tree_view()
                 except Exception as e:
-                    self.view.display_error(f"Failed to remove folder: {e}")
+                    self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
         else:
-            self.view.display_error("Selected item is not a folder.")
+            self.view.display_error(FOLDER_SELECTED_FAIL)
