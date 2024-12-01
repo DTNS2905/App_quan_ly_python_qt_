@@ -1,5 +1,6 @@
 from PyQt6 import QtWidgets
 
+from common import session
 from common.presenter import Presenter
 from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED
 
@@ -7,20 +8,34 @@ from models.permission import PermissionModel
 
 
 class PermissionPresenter(Presenter):
+
+    FILE_PERMISSIONS = [
+        "file:view", "file:create", "file:update", "file:execute", "file:delete",
+    ]
+
+    FOLDER_PERMISSION = [
+        "folder:view", "folder:create", "folder:update", "folder:delete",
+    ]
+
+    PERMISSION_PERMISSION = [
+        "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
+    ]
+
+    ALL_PERMISSION = [*FILE_PERMISSIONS, *FOLDER_PERMISSION, *PERMISSION_PERMISSION]
+
+    VIEW_SCOPES = [p for p in ALL_PERMISSION if ":view" in p]
+
     def __init__(self, view):
         super().__init__(view, PermissionModel())
 
-    def handle_permission_check(self, username, permission):
-        """Check if the user has the required permission and update the view."""
-        if self.model.verify_permission(username, permission):
-            self.view.display_success(PERMISSION_GRANTED)
-        else:
-            self.view.display_error(PERMISSION_DENIED)
-
-    def assign_permission_to_user(self, user_id, permission_id):
+    def assign_permission_to_user(self, username, permission):
         """Assign a permission to a user."""
+        if not session.SESSION.match_permissions("permission:grant"):
+            self.view.display_error(PERMISSION_DENIED)
+            return
+
         try:
-            self.model.assign_permission_to_user(user_id, permission_id)
+            self.model.assign_permission_to_user(username, permission)
             self.view.display_success(GRANT_PERMISSION_SUCCESSFULLY)
         except Exception as e:
             self.view.display_error(str(e))
@@ -30,22 +45,27 @@ class PermissionPresenter(Presenter):
         user_permissions = self.model.fetch_user_permissions()
         self.view.user_permission_table.setRowCount(0)  # Clear table
 
-        for row, (username, permission) in enumerate(user_permissions):
+        for row, user_permission in enumerate(user_permissions):
+            username, permissions = user_permission.username, user_permission.permissions
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(permission))
+            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(" ; ".join(permissions)))
 
         self.view.user_permission_table.resizeColumnsToContents()
 
     def add_default_permissions(self):
         """Add default permissions."""
-        default_permissions = [
-            "file:view", "file:create", "file:update", "file:execute", "file:delete",
-            "folder:view", "folder:create", "folder:update", "file:delete",
-            "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
-        ]
+        default_permissions = self.ALL_PERMISSION
         for permission in default_permissions:
             try:
                 self.model.add_permission(permission)
             except Exception as e:
                 print(f"Failed to add permission '{permission}': {e}")
+
+    def assign_all_permissions(self, username: str):
+        default_permissions = self.ALL_PERMISSION
+        for permission in default_permissions:
+            try:
+                self.model.assign_permission_to_user(username, permission)
+            except Exception as e:
+                print(f"Failed to assign permission '{permission}': {e}")

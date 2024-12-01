@@ -2,9 +2,11 @@ from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
+from common import session
+from common.session import UserSession
 from presenters.auth import AuthPresenter
+from presenters.permission import PermissionPresenter
 from ui.authentication import Ui_Dialog
-import resources
 from ui_components.custom_messgae_box import CustomMessageBox
 
 
@@ -13,12 +15,21 @@ class LoginDialog(QtWidgets.QDialog, Ui_Dialog):
         super().__init__()
         uic.loadUi('ui/login.ui', self)
         self.presenter = AuthPresenter(self)
+        self.permission_presenter = PermissionPresenter(self)
 
         # Add default user
         self.presenter.add_default_user('admin', 'admin123')
 
+        # Table widget
+        # Add default permission
+        self.permission_presenter.add_default_permissions()
+        self.permission_presenter.assign_all_permissions("admin")
+
         # Connect login button
-        self.login.clicked.connect(self.presenter.handle_login)
+        @self.login.clicked.connect
+        def handle_login():
+            username, permissions = self.presenter.handle_login()
+            session.SESSION = UserSession(username, permissions)
 
         # Initialize toggle button for password visibility
         self.password_visible = False  # Track visibility state

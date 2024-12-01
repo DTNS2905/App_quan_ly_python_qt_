@@ -1,11 +1,9 @@
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QColor, QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox, QGraphicsDropShadowEffect
+from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtWidgets import QMessageBox
 
 from presenters.file_tree import FileTreePresenter
 from presenters.permission import PermissionPresenter
-import resources
 from configs import FILES_ROOT_PATH
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -13,13 +11,10 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Màn hình chính")
         uic.loadUi('ui/admin_dashboard.ui', self)
         self.tree_presenter = FileTreePresenter(self)
         self.permission_presenter = PermissionPresenter(self)
-
-        # Table widget
-        # Add default permission
-        self.permission_presenter.add_default_permissions()
         self.permission_presenter.populate_table()
 
         # Connect buttons to slots
