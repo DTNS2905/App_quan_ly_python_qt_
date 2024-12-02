@@ -31,9 +31,9 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>226</red>
-        <green>226</green>
-        <blue>226</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -58,18 +58,18 @@
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -114,9 +114,9 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>226</red>
-        <green>226</green>
-        <blue>226</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -141,18 +141,18 @@
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -188,27 +188,27 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>226</red>
-        <green>226</green>
-        <blue>226</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>255</red>
-        <green>255</green>
-        <blue>255</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -234,10 +234,28 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Đăng ký</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">#Dialog {
+background: url(:/images/ui/images/z6088171383742_21bef345a06d8056854c93ca4e0c33c8.jpg) top fixed no-repeat;
+}
+
+.QLabel {
+color:black;
+}
+
+.QFrame {
+background-color: white;
+}
+.QFrame &gt; .QLineEdit {
+background-color:white;
+color:black;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -836,12 +854,12 @@ background-color: white;
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">#login:hover{
+      <string notr="true">#register_button:hover{
 background-color:black;
 color: white;
 }
 
-#login {;
+#register_button {;
 background:white;
 border:2px solid rgb(109, 109, 109);
 color:black;

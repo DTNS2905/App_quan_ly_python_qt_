@@ -580,6 +580,8 @@
     <file>icons/icons_white/activity.svg</file>
   </qresource>
   <qresource prefix="images">
+    <file>ui/images/icon_remove_background.png</file>
+    <file>ui/images/resized_image_1.jpg</file>
     <file>ui/images/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</file>
     <file>ui/images/z6088171383742_21bef345a06d8056854c93ca4e0c33c8.jpg</file>
     <file>ui/images/vecteezy_user-icon-on-transparent-background_19879186-80x80.png</file>

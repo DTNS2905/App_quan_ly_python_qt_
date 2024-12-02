@@ -237,8 +237,8 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/images/C:/Users/SANG DOAN/Downloads/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</normaloff>:/images/C:/Users/SANG DOAN/Downloads/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</iconset>
+   <iconset resource="../resources.qrc">
+    <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1213</width>
-    <height>626</height>
+    <height>602</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,12 +16,18 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Phần mềm quản lý hồ sơ bài giẳng</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/images/C:/Users/SANG DOAN/Downloads/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</normaloff>:/images/C:/Users/SANG DOAN/Downloads/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</iconset>
+   <iconset resource="../resources.qrc">
+    <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">#centralwidget{
@@ -91,10 +97,7 @@ background-color: rgb(238, 236, 230)
 border-radius:20px;
 }
 
-.QTreeView {
-background-color:#FAF9F6;
-color:black;
-}
+
 
 #add_file_button::hover{
 background-color: rgb(0, 116, 0);
@@ -156,8 +159,12 @@ object-fit:cover;
 color:black;
 }
 
+#label_4 {
+color:black;
+}
+
 #centralwidget {
-background-img:url(:/images/C:/Users/SANG DOAN/Downloads/z6088171383742_21bef345a06d8056854c93ca4e0c33c8.jpg)
+background:url(:/images/ui/images/resized_image_1.jpg)
 }
 </string>
    </property>
@@ -166,16 +173,16 @@ background-img:url(:/images/C:/Users/SANG DOAN/Downloads/z6088171383742_21bef345
      <number>0</number>
     </property>
     <property name="leftMargin">
-     <number>3</number>
+     <number>60</number>
     </property>
     <property name="topMargin">
-     <number>3</number>
+     <number>60</number>
     </property>
     <property name="rightMargin">
-     <number>3</number>
+     <number>60</number>
     </property>
     <property name="bottomMargin">
-     <number>3</number>
+     <number>60</number>
     </property>
     <item>
      <widget class="QFrame" name="left_menu">
@@ -227,7 +234,7 @@ background-img:url(:/images/C:/Users/SANG DOAN/Downloads/z6088171383742_21bef345
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
+           <verstretch>3</verstretch>
           </sizepolicy>
          </property>
          <property name="frameShape">
@@ -240,45 +247,97 @@ background-img:url(:/images/C:/Users/SANG DOAN/Downloads/z6088171383742_21bef345
           <number>0</number>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="spacing">
+           <number>3</number>
+          </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>10</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
           </property>
           <item>
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="baseSize">
+           <widget class="QWidget" name="horizontalWidget" native="true">
+            <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>0</height>
+              <width>50</width>
+              <height>50</height>
              </size>
             </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="baseSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Times New Roman</family>
+                 <pointsize>24</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">#label {
+color:balck;
+}</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="../resources.qrc">:/images/ui/images/icon_remove_background.png</pixmap>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
             <property name="font">
              <font>
               <family>Times New Roman</family>
-              <pointsize>24</pointsize>
+              <pointsize>14</pointsize>
              </font>
             </property>
-            <property name="styleSheet">
-             <string notr="true">#label {
-color:balck;
-}</string>
-            </property>
             <property name="text">
-             <string>App quản lý</string>
+             <string>Phần mềm quản lý hồ sơ giảng dạy</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -797,8 +856,8 @@ fill:red;</string>
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>901</width>
-                <height>560</height>
+                <width>816</width>
+                <height>426</height>
                </rect>
               </property>
               <property name="sizeIncrement">
@@ -1314,6 +1373,65 @@ border: 0px solid black;
                     <property name="focusPolicy">
                      <enum>Qt::FocusPolicy::NoFocus</enum>
                     </property>
+                    <property name="styleSheet">
+                     <string notr="true">QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(vline.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(branch-more.png) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(branch-end.png) 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(branch-closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(branch-open.png);
+}
+
+QTreeView {
+    show-decoration-selected: 1;
+}
+
+QTreeView::item {
+     border: 1px solid #d9d9d9;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+}
+
+QTreeView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
+    border: 1px solid #bfcde4;
+}
+
+QTreeView::item:selected {
+    border: 1px solid #567dbc;
+}
+
+QTreeView::item:selected:active{
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
+	color:white
+}
+
+QTreeView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
+	color:white
+}
+
+.QTreeView {
+background-color:#FAF9F6;
+color:black;
+}</string>
+                    </property>
                     <property name="frameShape">
                      <enum>QFrame::Shape::Box</enum>
                     </property>
@@ -1668,7 +1786,6 @@ background-color:rgb(230, 228, 222);
   <tabstop>pushButton_3</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources.qrc"/>
   <include location="../resources.qrc"/>
  </resources>
  <connections/>
