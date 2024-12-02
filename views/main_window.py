@@ -1,6 +1,7 @@
 from PyQt6 import QtWidgets, uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QHeaderView
 
 from presenters.file_tree import FileTreePresenter
 from presenters.permission import PermissionPresenter
@@ -38,6 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Set up treeView at FILES_ROOT_PATH
         self.tree_presenter.setup_view()
+
         root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
         self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
         # Execute files at FILES_ROOT_PATH

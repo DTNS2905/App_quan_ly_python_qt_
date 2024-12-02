@@ -245,6 +245,9 @@
     <pointsize>12</pointsize>
    </font>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>Login</string>
   </property>
@@ -252,7 +255,10 @@
    <double>5.000000000000000</double>
   </property>
   <property name="autoFillBackground">
-   <bool>false</bool>
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -330,6 +336,12 @@
           <pointsize>12</pointsize>
          </font>
         </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="maxLength">
+         <number>32766</number>
+        </property>
         <property name="frame">
          <bool>false</bool>
         </property>
@@ -365,6 +377,9 @@
    </item>
    <item>
     <widget class="QFrame" name="horizontalFrame">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
      </property>
@@ -632,6 +647,11 @@ color:black;
     </widget>
    </item>
   </layout>
+  <zorder>verticalFrame</zorder>
+  <zorder>password</zorder>
+  <zorder>horizontalFrame</zorder>
+  <zorder>login</zorder>
+  <zorder>username</zorder>
  </widget>
  <tabstops>
   <tabstop>login</tabstop>

@@ -3,9 +3,9 @@ import shutil
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QPointF
+from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect, QHeaderView
 
 from common import session
 from common.presenter import Presenter
@@ -34,6 +34,17 @@ class FileTreePresenter(Presenter):
         self.view.treeView.setAnimated(False)
         self.view.treeView.setIndentation(20)
         self.view.treeView.setSortingEnabled(True)
+        # self.set_custom_headers()
+
+        header = self.view.treeView.header()
+        # Stretch the first column
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        # Resize to contents for the second column
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        # Resize to contents for the third column
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        # Resize to contents for the fourth column
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
 
         # Enable multi-selection in the QTreeView
         self.view.treeView.setSelectionMode(self.view.treeView.SelectionMode.ExtendedSelection)
@@ -201,7 +212,7 @@ class FileTreePresenter(Presenter):
             reply = QMessageBox.question(
                 self.view,
                 "Xác nhận xóa",
-                f"bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
+                f"Bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
@@ -217,3 +228,9 @@ class FileTreePresenter(Presenter):
                     self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
         else:
             self.view.display_error(FOLDER_SELECTED_FAIL)
+
+    # def set_custom_headers(self):
+    #     """Set custom headers for the file system model."""
+    #     for i, header_text in enumerate(self.model.custom_headers):
+    #         # Call setHeaderData correctly on the model
+    #         self.model.setHeaderData(i, Qt.Orientation.Horizontal, header_text)  # Correct way to call

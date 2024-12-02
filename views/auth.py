@@ -1,5 +1,6 @@
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPainter, QPixmap
 from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
 from common import session
@@ -61,3 +62,4 @@ class LoginDialog(QtWidgets.QDialog):
         """Display a custom error message."""
         error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
+
