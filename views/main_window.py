@@ -4,6 +4,7 @@ from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QHeaderView
 
 from presenters.file_tree import FileTreePresenter
+from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from configs import FILES_ROOT_PATH
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -14,7 +15,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setWindowTitle("Màn hình chính")
         uic.loadUi('ui/admin_dashboard.ui', self)
-        self.tree_presenter = FileTreePresenter(self)
+        # self.tree_presenter = FileTreePresenter(self)
+        self.item_presenter = ItemPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
         self.permission_presenter.populate_table()
 
@@ -28,22 +30,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.home_button.clicked.connect(self.change_button_style_on_click)
         self.manage_user_button.clicked.connect(self.change_button_style_on_click)
 
-        self.add_file_button.clicked.connect(self.tree_presenter.handle_add_files)
-        self.remove_file_button.clicked.connect(self.tree_presenter.handle_remove_files)
+        self.add_file_button.clicked.connect(self.item_presenter.handle_add_files)
+        self.remove_file_button.clicked.connect(self.item_presenter.handle_remove_files)
 
-        self.add_folder_button.clicked.connect(self.tree_presenter.handle_add_folder)
-        self.remove_folder_button.clicked.connect(self.tree_presenter.handle_remove_folder)
+        self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
+        self.remove_folder_button.clicked.connect(self.item_presenter.handle_remove_folder)
 
         # self.add_permission_button.clicked.connect()
         # self.remove_permission_button.clicked.connect()
 
         # Set up treeView at FILES_ROOT_PATH
-        self.tree_presenter.setup_view()
-
-        root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
-        self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
+        self.item_presenter.setup_view()
+        # root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
+        # self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
         # Execute files at FILES_ROOT_PATH
-        self.treeView.doubleClicked.connect(self.tree_presenter.open_file)
+        self.treeView.doubleClicked.connect(self.item_presenter.open_file)
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
@@ -64,12 +65,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_tree_view(self, root_index):
         """Update the tree view to a specific root index."""
-        self.treeView.setRootIndex(root_index)
+        # self.treeView.setRootIndex(root_index)
 
     def refresh_tree_view(self):
         """Refresh the tree view to reflect any changes in the file system."""
-        root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))
-        self.treeView.setRootIndex(root_index)  # Reset the root index to refresh the view
+        self.set_model(self.item_presenter.refresh_model())
 
     def update_label_text(self):
         sender = self.sender()  # Get the button that triggered this slot

@@ -4,6 +4,9 @@ class UserSession:
         self._username = username
         self._permissions = permissions
 
+    def get_username(self):
+        return self._username
+
     def match_permissions(self, checked_permission):
         print(f"DEBUG: check permission {checked_permission}")
         return checked_permission in self._permissions
@@ -16,4 +19,4 @@ class UserSession:
         del self._permissions
 
 
-SESSION = None
+SESSION: UserSession = None
