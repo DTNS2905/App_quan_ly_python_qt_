@@ -163,7 +163,8 @@ class ItemPresenter(Presenter):
             # Refresh the view to show the new folder
             self.view.refresh_tree_view()
         except Exception as e:
-            self.view.display_error(f"{FOLDER_CREATE_ERROR}:{e}")
+            self.view.display_error(f"{FOLDER_CREATE_ERROR}")
+            print(f"Folder create error :'{e}'")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
@@ -184,7 +185,7 @@ class ItemPresenter(Presenter):
         reply = QMessageBox.question(
             self.view,
             "Xác nhận xóa",
-            f"bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
+            f"bạn chắc chắn muốn xóa thư mục ?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
@@ -192,9 +193,10 @@ class ItemPresenter(Presenter):
             try:
                 # Remove the folder
                 self.model.delete_folder(folder_path)
-                self.view.display_success(f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .")
+                self.view.display_success(f"{FOLDER_REMOVE_SUCCESS}.")
 
                 # Refresh the view to remove the deleted folder
                 self.view.refresh_tree_view()
             except Exception as e:
-                self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
+                self.view.display_error(f"{FOLDER_REMOVE_ERROR}")
+                print(f"Folder remove error :'{e}'")

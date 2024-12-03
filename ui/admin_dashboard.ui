@@ -815,7 +815,7 @@ fill:red;</string>
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QGridLayout" name="gridLayout_2">
@@ -1186,9 +1186,9 @@ border: 0px solid black;
                        <colorrole role="Button">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1213,18 +1213,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1251,9 +1251,9 @@ border: 0px solid black;
                        <colorrole role="Button">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1278,18 +1278,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1316,9 +1316,9 @@ border: 0px solid black;
                        <colorrole role="Button">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1343,18 +1343,18 @@ border: 0px solid black;
                        <colorrole role="Base">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
                        <colorrole role="Window">
                         <brush brushstyle="SolidPattern">
                          <color alpha="255">
-                          <red>250</red>
-                          <green>249</green>
-                          <blue>246</blue>
+                          <red>203</red>
+                          <green>201</green>
+                          <blue>196</blue>
                          </color>
                         </brush>
                        </colorrole>
@@ -1374,31 +1374,7 @@ border: 0px solid black;
                      <enum>Qt::FocusPolicy::NoFocus</enum>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true">QTreeView::branch:has-siblings:!adjoins-item {
-    border-image: url(vline.png) 0;
-}
-
-QTreeView::branch:has-siblings:adjoins-item {
-    border-image: url(branch-more.png) 0;
-}
-
-QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-    border-image: url(branch-end.png) 0;
-}
-
-QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
-        border-image: none;
-        image: url(branch-closed.png);
-}
-
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings  {
-        border-image: none;
-        image: url(branch-open.png);
-}
-
-QTreeView {
+                     <string notr="true">QTreeView {
     show-decoration-selected: 1;
 }
 
@@ -1428,7 +1404,7 @@ QTreeView::item:selected:!active {
 }
 
 .QTreeView {
-background-color:#FAF9F6;
+background-color:rgb(203, 201, 196);
 color:black;
 }</string>
                     </property>
@@ -1702,15 +1678,18 @@ border-radius:5px;
                  <string notr="true">#user_permission_table::item:selected{
 color:white;
 background-color:black;
+text-align:center;
 }
 
 #user_permission_table::item{
 color:black;
+text-align:center;
 }
 
 #user_permission_table::item:hover{
 color:black;
 background-color:rgb(230, 228, 222);
+text-align:center;
 }</string>
                 </property>
                 <property name="frameShape">
@@ -1729,7 +1708,7 @@ background-color:rgb(230, 228, 222);
                  <bool>true</bool>
                 </property>
                 <property name="textElideMode">
-                 <enum>Qt::TextElideMode::ElideMiddle</enum>
+                 <enum>Qt::TextElideMode::ElideRight</enum>
                 </property>
                 <property name="gridStyle">
                  <enum>Qt::PenStyle::SolidLine</enum>
@@ -1759,10 +1738,36 @@ background-color:rgb(230, 228, 222);
                  <property name="text">
                   <string>Tên ngưởi dùng</string>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
+                 </property>
                 </column>
                 <column>
                  <property name="text">
                   <string>Các quyền</string>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
                  </property>
                 </column>
                </widget>

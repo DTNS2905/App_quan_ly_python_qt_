@@ -13,6 +13,7 @@ from messages.messages import PERMISSION_DENIED, ADD_FILE_SUCCESS, ADD_FILE_ERRO
     FILE_REMOVE_FAIL, FILE_REMOVE_SUCCESS, OPEN_FILE_FAIL, FOLDER_SELECTED_FAIL, FOLDER_CREATE_ERROR, FOLDER_EXISTED, \
     FOLDER_SELECTED_NOT_FOUND, FOLDER_CREATE_SUCCESS, FOLDER_REMOVE_SUCCESS, FOLDER_REMOVE_ERROR, FILE_NOT_FOUND
 from models.file_tree import FileTreeModel
+from ui_components.custom_input_dialog import CustomInputDialog
 
 
 class FileTreePresenter(Presenter):
@@ -106,7 +107,7 @@ class FileTreePresenter(Presenter):
             reply = QMessageBox.question(
                 self.view,
                 "Xác nhận xóa",
-                f"Bạn chắc chắn muốn xóa {len(file_paths)} ?",
+                f"Bạn chắc chắn muốn xóa tài liệu ?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
@@ -171,28 +172,35 @@ class FileTreePresenter(Presenter):
             return
 
         try:
-            # Prompt for the folder name instead of path
-            folder_name, ok = QInputDialog.getText(self.view, "Thư mục mới", " Điền tên thư mục:")
-            if not ok or not folder_name.strip():
-                self.view.display_error(FOLDER_CREATE_ERROR)
-                return
+            # Use the custom input dialog
+            dialog = CustomInputDialog(self.view)
+            dialog.setLabelText("Điền tên thư mục:")
+            dialog.setWindowTitle("Thư mục mới")
 
-            # Ensure it's being created under the root path
-            target_path = self.model.root_path / folder_name.strip()
+            # Display the dialog and capture the result
+            if dialog.exec() == QInputDialog.DialogCode.Accepted:
+                folder_name = dialog.textValue().strip()  # Capture the entered folder name
 
-            # Check if the folder already exists
-            if target_path.exists():
-                self.view.display_error(f"{FOLDER_EXISTED} '{target_path}'")
-                return
+                if not folder_name:
+                    self.view.display_error(FOLDER_CREATE_ERROR)
+                    return
 
-            # Create the folder
-            os.makedirs(target_path)
-            self.view.display_success(f"{FOLDER_CREATE_SUCCESS}:'{target_path}'")
+                # Ensure it's being created under the root path
+                target_path = self.model.root_path / folder_name
 
-            # Refresh the view to show the new folder
-            self.view.refresh_tree_view()
+                # Check if the folder already exists
+                if target_path.exists():
+                    self.view.display_error(f"{FOLDER_EXISTED} '{target_path}'")
+                    return
+
+                # Create the folder
+                os.makedirs(target_path)
+                self.view.display_success(f"{FOLDER_CREATE_SUCCESS}: '{target_path}'")
+
+                # Refresh the view to show the new folder
+                self.view.refresh_tree_view()
         except Exception as e:
-            self.view.display_error(f"{FOLDER_CREATE_ERROR}:{e}")
+            self.view.display_error(f"{FOLDER_CREATE_ERROR}: '{e}'")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
@@ -212,7 +220,7 @@ class FileTreePresenter(Presenter):
             reply = QMessageBox.question(
                 self.view,
                 "Xác nhận xóa",
-                f"Bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
+                f"Bạn chắc chắn muốn xóa thư mục ?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )

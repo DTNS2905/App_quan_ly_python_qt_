@@ -5,8 +5,8 @@ import sys
 import uuid
 from dataclasses import dataclass
 
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeView
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont, QIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeView, QFileIconProvider
 
 from common.model import NativeSqlite3Model
 from configs import DATABASE_NAME, FILES_ROOT_PATH
@@ -51,6 +51,9 @@ class CustomItem(QStandardItem):
         self.setForeground(color)
         self.setFont(font)
         self.setText(content)
+
+    def set_custom_icon(self, icon):
+        self.setIcon(icon)
 
 
 class ItemModel(NativeSqlite3Model):
@@ -100,9 +103,21 @@ class ItemModel(NativeSqlite3Model):
         font_size = 14
         root_node = CustomItem(root_item_data.original_name, font_size, True)
 
+        # Initialize QFileIconProvider
+        icon_provider = QFileIconProvider()
+
+        # Get the root folder icon
+        root_icon = icon_provider.icon(QFileIconProvider.IconType.Folder)
+        root_node = CustomItem(root_item_data.original_name, font_size, True)
+        root_node.set_custom_icon(root_icon)
+
         def traverse(parent_node: CustomItem, parent_data: ItemDTO, f_size):
             for child in getattr(parent_data, 'children', []):
+                icon = icon_provider.icon(
+                    QFileIconProvider.IconType.Folder if child.type == "folder" else QFileIconProvider.IconType.File
+                )
                 item = CustomItem(child.original_name, f_size - 1, child.type == "folder")
+                item.set_custom_icon(icon)
                 parent_node.appendRow(item)
                 traverse(item, child, f_size - 1)
 
