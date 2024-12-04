@@ -220,7 +220,7 @@ class ItemPresenter(Presenter):
         reply = QMessageBox.question(
             self.view,
             "Xác nhận xóa",
-            f"bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
+            f"bạn chắc chắn muốn xóa thư mục ?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )

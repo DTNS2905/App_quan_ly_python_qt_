@@ -1,10 +1,12 @@
 from PyQt6 import QtWidgets, uic
+from PyQt6.QtCore import Qt, QObject, QEvent
 from PyQt6.QtGui import QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QHeaderView
 
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
+from views.profile_dialog import ProfileDialog
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -33,6 +35,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
         self.remove_folder_button.clicked.connect(self.item_presenter.handle_remove_folder)
 
+        self.label_2.installEventFilter(self)
+
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
         self.treeView.doubleClicked.connect(self.item_presenter.handle_download_item)
@@ -46,12 +50,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_success(self, message):
         """Display a custom success message."""
-        success_box = CustomMessageBox("Success", message, QMessageBox.Icon.Information, "Đóng", self)
+        success_box = CustomMessageBox("Thành công", message, QMessageBox.Icon.Information, "Đóng", self)
         success_box.exec()
 
     def display_error(self, message):
         """Display a custom error message."""
-        error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Đóng", self)
+        error_box = CustomMessageBox("Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self)
         error_box.exec()
 
     def update_tree_view(self, root_index):
@@ -89,3 +93,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def select_all_items(self):
         """Select all items in the QTreeView."""
         self.treeView.selectAll()
+
+    # def open_main_dialog(self):
+    #     self.main_dialog = MyMainDialog()
+    #     self.main_dialog.show()  # Opens the main window as if it's a dialog
+
+    def open_dialog(self):
+        dialog = ProfileDialog(self)  # Pass the main window as the parent
+        dialog.show()  # Open as a modal dialog
+
+    def eventFilter(self, source, event):
+        if source == self.label_2 and event.type() == QEvent.Type.MouseButtonPress:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.open_dialog()  # Call the dialog method
+                return True  # Event is handled
+        return super().eventFilter(source, event)

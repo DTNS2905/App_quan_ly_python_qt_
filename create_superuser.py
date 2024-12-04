@@ -10,7 +10,7 @@ def main():
     auth_model = AuthModel()
 
     # Create superuser
-    username = input("Enter superuser username: ")
+    username = input("Enter superuser username:\n ")
     print("Enter superuser password: ")
     password = getpass()
 

@@ -2,6 +2,7 @@ from PyQt6 import QtWidgets
 
 from common import session
 from common.presenter import Presenter
+from messages.contants import PERMISSION_TRANSLATIONS
 from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED
 from models.log import LogModel
 
@@ -44,18 +45,25 @@ class PermissionPresenter(Presenter):
             self.view.display_error(str(e))
             LogModel.write_log(session.SESSION.get_username(), str(e))
 
+    def translate_permissions(self, permissions: list[str]) -> list[str]:
+        """Translate a list of permissions to Vietnamese."""
+        return [PERMISSION_TRANSLATIONS.get(permission, permission) for permission in permissions]
+
     def populate_table(self):
         """Populate QTableWidget with user permissions data."""
         user_permissions = self.model.fetch_user_permissions()
         self.view.user_permission_table.setRowCount(0)  # Clear table
 
         for row, user_permission in enumerate(user_permissions):
-            username, permissions = user_permission.username, user_permission.permissions
+            username = user_permission.username
+            translated_permissions = self.translate_permissions(user_permission.permissions)
+            permissions_text = " ; ".join(translated_permissions)
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(" ; ".join(permissions)))
+            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions )))
 
         self.view.user_permission_table.resizeColumnsToContents()
+        self.view.user_permission_table.resizeRowsToContents()
 
     def add_default_permissions(self):
         """Add default permissions."""
