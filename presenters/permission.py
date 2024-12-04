@@ -3,6 +3,7 @@ from PyQt6 import QtWidgets
 from common import session
 from common.presenter import Presenter
 from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED
+from models.log import LogModel
 
 from models.permission import PermissionModel
 
@@ -32,13 +33,16 @@ class PermissionPresenter(Presenter):
         """Assign a permission to a user."""
         if not session.SESSION.match_permissions("permission:grant"):
             self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             return
 
         try:
             self.model.assign_permission_to_user(username, permission)
             self.view.display_success(GRANT_PERMISSION_SUCCESSFULLY)
+            LogModel.write_log(session.SESSION.get_username(), GRANT_PERMISSION_SUCCESSFULLY)
         except Exception as e:
             self.view.display_error(str(e))
+            LogModel.write_log(session.SESSION.get_username(), str(e))
 
     def populate_table(self):
         """Populate QTableWidget with user permissions data."""

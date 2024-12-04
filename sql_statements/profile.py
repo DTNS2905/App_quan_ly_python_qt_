@@ -17,5 +17,5 @@ CREATE_TABLE_SQL = '''
 
 INIT_DATA = """
 insert or ignore into profiles (id, user_id, fullname, position, phone_number)
-    values (0, 0, 'Admin', 'admin', '0987654321');
+    values (0, 1, 'Admin', 'admin', '0987654321');
 """

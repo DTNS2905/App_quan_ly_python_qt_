@@ -13,6 +13,7 @@ class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         uic.loadUi('ui/login.ui', self)
+        self.setWindowTitle("Màn hình đăng nhập")
         self.presenter = AuthPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
 

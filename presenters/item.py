@@ -10,6 +10,7 @@ from messages.messages import PERMISSION_DENIED, ADD_FILE_SUCCESS, ADD_FILE_ERRO
     FILE_REMOVE_FAIL, FILE_REMOVE_SUCCESS, OPEN_FILE_FAIL, FOLDER_SELECTED_FAIL, FOLDER_CREATE_ERROR, FOLDER_EXISTED, \
     FOLDER_SELECTED_NOT_FOUND, FOLDER_CREATE_SUCCESS, FOLDER_REMOVE_SUCCESS, FOLDER_REMOVE_ERROR, FILE_NOT_FOUND
 from models.item import ItemModel
+from models.log import LogModel
 
 
 class ItemPresenter(Presenter):
@@ -74,6 +75,7 @@ class ItemPresenter(Presenter):
         """Handle removing multiple selected files from the file system using QTreeView."""
         if not session.SESSION.match_permissions("file:delete"):
             self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             return
 
         try:
@@ -103,7 +105,10 @@ class ItemPresenter(Presenter):
                 for file_path in file_paths:
                     try:
                         self.model.delete_file(file_path)  # Remove each file
+                        LogModel.write_log(session.SESSION.get_username(), f" {FILE_REMOVE_SUCCESS} cho {len(file_paths)} ")
                     except Exception as e:
+                        LogModel.write_log(session.SESSION.get_username(),
+                                           f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
                         self.view.display_error(f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
 
                 self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {len(file_paths)} ")
@@ -111,15 +116,18 @@ class ItemPresenter(Presenter):
                 # Refresh the view after deletion
                 self.view.refresh_tree_view()
             else:
+                LogModel.write_log(session.SESSION.get_username(), FILE_REMOVE_FAIL)
                 self.view.display_error(FILE_REMOVE_FAIL)
 
         except Exception as e:
+            LogModel.write_log(session.SESSION.get_username(), f"{FILE_REMOVE_FAIL}:{e}")
             self.view.display_error(f"{FILE_REMOVE_FAIL}:{e}")
 
     def open_file(self, index):
         # Get the file path from the selected index
         if not session.SESSION.match_permissions("file:execute"):
             self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             return
 
         model = self.view.treeView.model()
@@ -128,11 +136,13 @@ class ItemPresenter(Presenter):
         try:
             self.model.open_file(original_name)
         except Exception as e:
+            LogModel.write_log(session.SESSION.get_username(), f"{OPEN_FILE_FAIL}: {e}")
             self.view.display_error(f"{OPEN_FILE_FAIL}: {e}")
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
         if not session.SESSION.match_permissions("folder:create"):
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             self.view.display_error(PERMISSION_DENIED)
             return
 
@@ -140,6 +150,7 @@ class ItemPresenter(Presenter):
             # Prompt for the folder name instead of path
             folder_name, ok = QInputDialog.getText(self.view, "Thư mục mới", " Điền tên thư mục:")
             if not ok or not folder_name.strip():
+                LogModel.write_log(session.SESSION.get_username(), FOLDER_CREATE_ERROR)
                 self.view.display_error(FOLDER_CREATE_ERROR)
                 return
 
@@ -158,21 +169,25 @@ class ItemPresenter(Presenter):
             username = session.SESSION.get_username()
             self.model.create_folder(username, folder_name.strip(), parent_original_name)
 
+            LogModel.write_log(username, f"{FOLDER_CREATE_SUCCESS}:'{folder_name}'")
             self.view.display_success(f"{FOLDER_CREATE_SUCCESS}:'{folder_name}'")
 
             # Refresh the view to show the new folder
             self.view.refresh_tree_view()
         except Exception as e:
             self.view.display_error(f"{FOLDER_CREATE_ERROR}:{e}")
+            LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_CREATE_ERROR}:{e}")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
         if not session.SESSION.match_permissions("folder:delete"):
             self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             return
 
         selected_indexes = self.view.treeView.selectedIndexes()
         if not selected_indexes:
+            LogModel.write_log(session.SESSION.get_username(), FOLDER_SELECTED_NOT_FOUND)
             self.view.display_error(FOLDER_SELECTED_NOT_FOUND)
             return
 
@@ -192,9 +207,11 @@ class ItemPresenter(Presenter):
             try:
                 # Remove the folder
                 self.model.delete_folder(folder_path)
+                LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .")
                 self.view.display_success(f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .")
 
                 # Refresh the view to remove the deleted folder
                 self.view.refresh_tree_view()
             except Exception as e:
+                LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {e}")
                 self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
