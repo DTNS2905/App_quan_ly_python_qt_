@@ -291,7 +291,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="verticalFrame">
+       <widget class="QFrame" name="verticalFrame_3">
         <property name="frameShape">
          <enum>QFrame::Shape::Box</enum>
         </property>
@@ -342,6 +342,36 @@
       </item>
       <item>
        <widget class="QListView" name="listView">
+        <property name="styleSheet">
+         <string notr="true">
+QListView::item:alternate {
+    background: #EEEEEE;
+}
+
+QListView::item:selected {
+    border: 1px solid #6a6ea9;
+}
+
+QListView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #ABAFE5, stop: 1 #8588B2);
+}
+
+QListView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #6a6ea9, stop: 1 #888dd9);
+}
+
+QListView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #FAFBFE, stop: 1 #DCDEF1);
+}
+
+QListView {
+    show-decoration-selected: 1; /* make the selection span the entire width of the view */
+	background:rgb(255, 255, 255)
+}</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::Shape::Box</enum>
         </property>
@@ -353,6 +383,9 @@
         </property>
         <property name="midLineWidth">
          <number>1</number>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
         </property>
        </widget>
       </item>
@@ -387,6 +420,11 @@ background-color:rgb(170, 0, 0);
 border:none;
 padding:3px;
 border-radius:5px;
+}
+
+.QPushButton {
+background:transparent;
+border:none
 }
 </string>
      </property>
@@ -477,5 +515,22 @@ border-radius:5px;
  <resources>
   <include location="../resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancel_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>297</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>18</x>
+     <y>-5</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

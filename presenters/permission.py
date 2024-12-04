@@ -10,7 +10,6 @@ from models.permission import PermissionModel
 
 
 class PermissionPresenter(Presenter):
-
     FILE_PERMISSIONS = [
         "file:view", "file:create", "file:update", "file:execute", "file:delete",
     ]
@@ -60,7 +59,8 @@ class PermissionPresenter(Presenter):
             permissions_text = " ; ".join(translated_permissions)
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions )))
+            self.view.user_permission_table.setItem(row, 1,
+                                                    QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions)))
 
         self.view.user_permission_table.resizeColumnsToContents()
         self.view.user_permission_table.resizeRowsToContents()
@@ -81,3 +81,29 @@ class PermissionPresenter(Presenter):
                 self.model.assign_permission_to_user(username, permission)
             except Exception as e:
                 print(f"Failed to assign permission '{permission}': {e}")
+
+    def assign_permissions_to_user(self, username: str, permissions: list[str]):
+        """Assign multiple permissions to a user."""
+        if not session.SESSION.match_permissions("permission:grant"):
+            self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
+            return
+
+        failed_permissions = []
+        for permission in permissions:
+            try:
+                self.model.assign_permission_to_user(username, permission)
+            except Exception as e:
+                failed_permissions.append(permission)
+                LogModel.write_log(session.SESSION.get_username(), f"Failed to assign {permission}: {str(e)}")
+
+        if failed_permissions:
+            self.view.display_error(f"Failed to assign the following permissions: {', '.join(failed_permissions)}")
+        else:
+            self.view.display_success(f"Permissions granted successfully to user '{username}'")
+            LogModel.write_log(session.SESSION.get_username(), PERMISSION_GRANTED)
+
+    def fetch_user_permissions(self):
+        user_permissions = self.model.fetch_user_permissions()
+
+        return user_permissions
