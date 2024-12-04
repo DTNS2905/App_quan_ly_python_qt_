@@ -43,10 +43,9 @@ class ProfileModel(NativeSqlite3Model):
         cur = self.connection.cursor()
         cur.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = cur.fetchone()[0]
-        cur.execute("SELECT id, user_id, fullname, position, phone_number, created_at, updated_at FROM profiles WHERE user_id = ?",
-                    (user_id,))
+        stm = f"SELECT id, user_id, fullname, position, phone_number, created_at, updated_at FROM profiles WHERE user_id={user_id}"
+        cur.execute(stm)
         data = cur.fetchone()
-        print(data)
         return ProfileDto(*data)
 
     def create(self, username, fullname, position, phone_number):

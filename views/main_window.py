@@ -3,17 +3,15 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QHeaderView
 
-from presenters.file_tree import FileTreePresenter
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
-from configs import FILES_ROOT_PATH
 from ui_components.custom_messgae_box import CustomMessageBox
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Màn hình chính")
+        self.setWindowTitle("Phần mềm hỗ trợ quản lý bài giảng")
         uic.loadUi('ui/admin_dashboard.ui', self)
         # self.tree_presenter = FileTreePresenter(self)
         self.item_presenter = ItemPresenter(self)
@@ -36,14 +34,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
         self.remove_folder_button.clicked.connect(self.item_presenter.handle_remove_folder)
 
-        # self.add_permission_button.clicked.connect()
-        # self.remove_permission_button.clicked.connect()
-
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
-        # root_index = self.tree_presenter.model.index(str(FILES_ROOT_PATH))  # Convert the path to QModelIndex
-        # self.treeView.setRootIndex(root_index)  # Set the root index for the tree view
-        # Execute files at FILES_ROOT_PATH
         self.treeView.doubleClicked.connect(self.item_presenter.open_file)
 
         # Add Ctrl+A shortcut for Select All in treeView
