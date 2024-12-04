@@ -23,6 +23,7 @@ class AuthPresenter(Presenter):
             return username, permissions
         else:
             self.view.display_error(LOGIN_ERROR)
+            # return None, None
 
     def add_default_user(self, username, password):
         self.model.add_user(username, password)
