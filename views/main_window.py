@@ -39,7 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
-        self.treeView.doubleClicked.connect(self.item_presenter.open_file)
+        self.treeView.doubleClicked.connect(self.item_presenter.handle_download_item)
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
