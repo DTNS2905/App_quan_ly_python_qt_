@@ -3,7 +3,8 @@ import sqlite3
 from PyQt6.QtWidgets import QMessageBox
 
 from common.presenter import Presenter
-from messages.messages import PROFILE_CREATE_SUCCESS, PROFILE_UPDATE_SUCCESS, DB_ERROR, CREATE_OR_UPDATE_PROFILE_ERROR
+from messages.messages import (PROFILE_CREATE_SUCCESS, PROFILE_UPDATE_SUCCESS, DB_ERROR, CREATE_OR_UPDATE_PROFILE_ERROR,
+                               CREATE_PROFILE_ERROR)
 from models.profile import ProfileModel
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -62,19 +63,10 @@ class ProfilePresenter(Presenter):
 
         except sqlite3.Error as db_error:
             # Handle database-specific errors
-            self.view.display_error(f"{DB_ERROR}")
+            self.view.display_error(f"{db_error}")
         except Exception as e:
             # Handle unexpected errors
             self.view.display_error(f"{CREATE_OR_UPDATE_PROFILE_ERROR}")
             print(f"An unexpected error occurred: {str(e)}")
 
-    def display_success(self, message):
-        """Display a custom success message."""
-        success_box = CustomMessageBox("Thành công", message, QMessageBox.Icon.Information, "Đóng", self)
-        success_box.exec()
-
-    def display_error(self, message):
-        """Display a custom error message."""
-        error_box = CustomMessageBox("Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self)
-        error_box.exec()
 

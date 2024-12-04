@@ -331,7 +331,7 @@ color:balck;
              </font>
             </property>
             <property name="text">
-             <string>Phần mềm quản lý hồ sơ giảng dạy</string>
+             <string>Quản lý hồ sơ bài </string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -815,7 +815,7 @@ fill:red;</string>
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QGridLayout" name="gridLayout_2">
