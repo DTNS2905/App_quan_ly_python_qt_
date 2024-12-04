@@ -21,7 +21,10 @@ FOLDER_CREATE_SUCCESS = "Thư mục tạo thành công"
 FOLDER_REMOVE_ERROR = "Thư mục không thể xóa"
 FOLDER_REMOVE_SUCCESS = "Thư mục xóa thành công"
 
-
-
+CREATE_PROFILE_ERROR = "Tạo hồ sơ cá nhân thát bại"
+PROFILE_CREATE_SUCCESS = "Tạo hồ sơ cá nhân thành công"
+PROFILE_UPDATE_SUCCESS = "Cập nhật hồ sơ thành công"
+DB_ERROR = "Lỗi trên cơ sở dữ liệu"
+CREATE_OR_UPDATE_PROFILE_ERROR = "Tạo hoặc cập nhật có vấn đề"
 
 

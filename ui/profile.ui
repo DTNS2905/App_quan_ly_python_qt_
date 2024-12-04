@@ -412,5 +412,22 @@ border-radius:5px;
  <resources>
   <include location="../resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancel_profile_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>425</x>
+     <y>429</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>672</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
