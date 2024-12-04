@@ -11,4 +11,4 @@ class ProfileDialog(QtWidgets.QMainWindow):
 
         self.presenter.load_profile("admin")
 
-        self.change_profile_button.clicked.connect(self.presenter.create_or_update_profile)
+        self.change_profile_button.clicked.connect(self.presenter.create_or_update_profile())

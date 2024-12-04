@@ -8,11 +8,13 @@ from common.session import UserSession
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
+from views.register_dialog import RegisterDialog
 
 
 class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
+        self.RegisterDialog = RegisterDialog(self)
         uic.loadUi('ui/login.ui', self)
         self.setWindowTitle("Màn hình đăng nhập")
         self.presenter = AuthPresenter(self)
@@ -39,6 +41,8 @@ class LoginDialog(QtWidgets.QDialog):
         self.toggle_button.setCheckable(True)
         self.toggle_button.clicked.connect(self.toggle_password_visibility)
 
+        self.register_button.clicked.connect(self.open_register_dialog)
+
     def closeEvent(self, event):
         self.presenter.close()
         event.accept()
@@ -64,3 +68,5 @@ class LoginDialog(QtWidgets.QDialog):
         error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
 
+    def open_register_dialog(self):
+        self.RegisterDialog.exec()  # Opens the dialog modally
