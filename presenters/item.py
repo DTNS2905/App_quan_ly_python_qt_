@@ -1,5 +1,7 @@
 import os
 import sys
+import traceback
+
 from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect
@@ -138,6 +140,25 @@ class ItemPresenter(Presenter):
         except Exception as e:
             LogModel.write_log(session.SESSION.get_username(), f"{OPEN_FILE_FAIL}: {e}")
             self.view.display_error(f"{OPEN_FILE_FAIL}: {e}")
+
+    def handle_download_item(self):
+        # Replace this with your actual data bytes
+        try:
+            selected_index = self.view.treeView.currentIndex()
+            model = self.view.treeView.model()
+            original_name = model.data(selected_index)
+            data_bytes = self.model.get_file_bytes(original_name)
+            if data_bytes is None:
+                self.view.display_error(f"'{original_name}' không phải là tệp đơn")
+                return
+
+            file_path, _ = QFileDialog.getSaveFileName(self.view, "Lưu tệp", original_name, "All Files (*)")
+            if file_path:
+                with open(file_path, 'wb') as f:
+                    f.write(data_bytes)
+                self.view.display_success(f"Lưu '{original_name}' về {file_path} thành công")
+        except Exception:
+            print(traceback.format_exc())
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""

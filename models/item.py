@@ -158,6 +158,16 @@ class ItemModel(NativeSqlite3Model):
         else:
             os.system(f'open "{file_path}"')  # Linux
 
+    def get_file_bytes(self, original_name):
+        cur = self.connection.cursor()
+        cur.execute("SELECT id, code, type FROM items WHERE original_name = ?", (original_name,))
+        item_id, code, file_type = cur.fetchone()
+        if file_type != "file":
+            return None
+        file_path = os.path.join(self._root_path, code)
+        with open(file_path, "rb") as f:
+            return f.read()
+
     def create_folder(self, username: str, original_name: str, parent_original_name: str = None):
         cur = self.connection.cursor()
         cur.execute("SELECT id FROM users WHERE username = ?", (username,))
@@ -202,7 +212,6 @@ class ItemModel(NativeSqlite3Model):
             self.connection.rollback()
             cur.close()
             raise Exception(f"Error: delete item with id '{item_id}' failed")
-
 
     def delete_folder(self, original_name):
         print(f"Delete folder '{original_name}'")
