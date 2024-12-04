@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
 from common import session
 from common.session import UserSession
+from models.log import LogModel
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -16,6 +17,7 @@ class LoginDialog(QtWidgets.QDialog):
         self.setWindowTitle("Màn hình đăng nhập")
         self.presenter = AuthPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
+        self.log_model = LogModel()
 
         # Add default user
         self.presenter.add_default_user('admin', 'admin123')
