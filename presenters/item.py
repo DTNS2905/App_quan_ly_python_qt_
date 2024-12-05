@@ -1,5 +1,3 @@
-import os
-import sys
 import traceback
 
 from PyQt6.QtCore import QPointF
@@ -35,6 +33,8 @@ class ItemPresenter(Presenter):
         self.view.treeView.setIndentation(20)
         self.view.treeView.setSortingEnabled(True)
         self.view.treeView.expandAll()
+        self.view.treeView.setColumnWidth(0, 300)  # Column 1 width
+        self.view.treeView.setColumnWidth(2, 200)  # Column 1 width
 
         # Enable multi-selection in the QTreeView
         self.view.treeView.setSelectionMode(self.view.treeView.SelectionMode.ExtendedSelection)
