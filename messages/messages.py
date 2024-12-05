@@ -1,9 +1,13 @@
 GRANT_PERMISSION_SUCCESSFULLY = "Gắn quyền thành công"
+GRANT_PERMISSION_ERROR = "Gắn quyền thất bại"
 PERMISSION_DENIED = "Quyền bị từ chối! Bạn không có quyền truy cập cần thiết."
 PERMISSION_GRANTED = "Quyền đã được cấp"
 
 LOGIN_SUCCESS = "Đang nhập thành công"
 LOGIN_ERROR = "Tên người dùng hoặc mật khẩu không hợp lệ"
+REGISTER_SUCCESS = "Đăng ký thành công!"
+REGISTER_ERROR = "Đăng ký thất bại."
+USERNAME_TAKEN = "Tên đăng nhập đã tồn tại."
 
 FILE_REMOVE_SUCCESS = "xóa thành công"
 FILE_REMOVE_FAIL = "xóa tài liệu không thành công"

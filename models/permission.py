@@ -5,7 +5,7 @@ from common.model import NativeSqlite3Model
 from configs import DATABASE_NAME
 from sql_statements.permission import ADD_PERMISSION_SQL, \
     PERMISSION_USER_VIEW_SQL, CREATE_PERMISSION_TABLE_SQL, CREATE_PERMISSION_USER_TABLE_SQL, \
-    GET_PERMISSION_BY_USERNAME_SQL, ASSIGN_PERMISSION_BY_USERNAME_SQL
+    GET_PERMISSION_BY_USERNAME_SQL, ASSIGN_PERMISSION_BY_USERNAME_SQL, REMOVE_PERMISSION_FROM_USER_SQL
 
 
 @dataclass
@@ -21,6 +21,7 @@ class PermissionModel(NativeSqlite3Model):
     _assign_permission_sql = ASSIGN_PERMISSION_BY_USERNAME_SQL
     _get_permission_by_username = GET_PERMISSION_BY_USERNAME_SQL
     _fetch_user_permission_sql = PERMISSION_USER_VIEW_SQL
+    _remove_permission_from_user_sql = REMOVE_PERMISSION_FROM_USER_SQL
 
     def __init__(self, database_name=DATABASE_NAME, table_create_sql=CREATE_PERMISSION_TABLE_SQL):
         super().__init__(database_name, table_create_sql)
@@ -88,6 +89,52 @@ class PermissionModel(NativeSqlite3Model):
             self.connection.rollback()
             cur.close()
             raise Exception(f"Error adding permission '{permission}'")
+
+    def unassign_permission_from_user(self, username, permission):
+        """Unassign a permission from a user using their IDs."""
+        user_id = self.get_user_id_by_username(username)
+        permission_id = self.get_permission_id_by_name(permission)
+        cur = self.connection.cursor()
+        try:
+            cur.execute(self._remove_permission_from_user_sql, (user_id, permission_id))
+            if cur.rowcount > 0:
+                self.connection.commit()
+                print(f"Unassigned permission '{permission}' from '{username}' successfully")
+            else:
+                self.connection.rollback()
+                raise Exception(f"Error unassigning permission '{permission}' from '{username}'")
+        finally:
+            cur.close()
+
+    def get_user_id_by_username(self, username):
+        """Get user_id from username."""
+        cur = self.connection.cursor()
+        cur.execute(self._get_user_id_sql, (username,))
+        result = cur.fetchone()
+        cur.close()
+        if result:
+            return result[0]
+        else:
+            raise Exception(f"User '{username}' not found.")
+
+    def get_permission_id_by_name(self, permission):
+        """Get permission_id from permission name."""
+        cur = self.connection.cursor()
+        cur.execute(self._get_permission_id_sql, (permission,))
+        result = cur.fetchone()
+        cur.close()
+        if result:
+            return result[0]
+        else:
+            raise Exception(f"Permission '{permission}' not found.")
+
+    def get_permission_by_username(self, username: str):
+        """Verify if a user has specific permissions."""
+        cur = self.connection.cursor()
+        cur.execute(self._get_permission_by_username, (username,))
+        rows = cur.fetchall()
+        cur.close()
+        return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,13 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt, QObject, QEvent
 from PyQt6.QtGui import QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox, QHeaderView
+from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog
 
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
+from views.auth import LoginDialog
+from views.permission_dialog import PermissionDialog
 from views.profile_dialog import ProfileDialog
 
 
@@ -36,6 +38,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.remove_folder_button.clicked.connect(self.item_presenter.handle_remove_folder)
 
         self.label_2.installEventFilter(self)
+
+        self.add_permission_button.clicked.connect(lambda: self.open_dialog(PermissionDialog(
+            self,
+            "assign_permission"
+        )))
+
+        self.remove_permission_button.clicked.connect(lambda: self.open_dialog(PermissionDialog(
+            self,
+            "unassign_permission"
+        )))
+
+        self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
@@ -94,17 +108,25 @@ class MainWindow(QtWidgets.QMainWindow):
         """Select all items in the QTreeView."""
         self.treeView.selectAll()
 
-    # def open_main_dialog(self):
-    #     self.main_dialog = MyMainDialog()
-    #     self.main_dialog.show()  # Opens the main window as if it's a dialog
-
-    def open_dialog(self):
+    def open_profile_dialog(self):
         dialog = ProfileDialog(self)  # Pass the main window as the parent
         dialog.show()  # Open as a modal dialog
 
     def eventFilter(self, source, event):
         if source == self.label_2 and event.type() == QEvent.Type.MouseButtonPress:
             if event.button() == Qt.MouseButton.LeftButton:
-                self.open_dialog()  # Call the dialog method
+                self.open_profile_dialog()  # Call the dialog method
                 return True  # Event is handled
         return super().eventFilter(source, event)
+
+    def open_dialog(self, dialog_instance):
+        if isinstance(dialog_instance, QDialog):
+            dialog_instance.exec()  # For modal dialogs
+        else:
+            print("Provided instance is not a QDialog.")
+
+    def log_out(self, dialog_instance):
+        # Close the main window
+        self.close()
+        # Open the dialog
+        self.open_dialog(dialog_instance)
