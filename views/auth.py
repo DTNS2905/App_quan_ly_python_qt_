@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
 from common import session
 from common.session import UserSession
+from configs import LOGIN_UI_PATH
 from models.log import LogModel
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
@@ -16,7 +17,7 @@ class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.RegisterDialog = RegisterDialog(self)
-        uic.loadUi('ui/login.ui', self)
+        uic.loadUi(LOGIN_UI_PATH, self)
         self.setWindowTitle("Màn hình đăng nhập")
         self.presenter = AuthPresenter(self)
         self.permission_presenter = PermissionPresenter(self)

@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt, QObject, QEvent
 from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QHeaderView
 
+from configs import DASHBOARD_UI_PATH
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -13,7 +14,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Phần mềm hỗ trợ quản lý bài giảng")
-        uic.loadUi('ui/admin_dashboard.ui', self)
+        uic.loadUi(DASHBOARD_UI_PATH, self)
         # self.tree_presenter = FileTreePresenter(self)
         self.item_presenter = ItemPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
