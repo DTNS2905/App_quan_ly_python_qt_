@@ -1,12 +1,9 @@
 import sqlite3
 
-from PyQt6.QtWidgets import QMessageBox
-
 from common.presenter import Presenter
 from messages.messages import (PROFILE_CREATE_SUCCESS, PROFILE_UPDATE_SUCCESS, DB_ERROR, CREATE_OR_UPDATE_PROFILE_ERROR,
                                CREATE_PROFILE_ERROR)
 from models.profile import ProfileModel
-from ui_components.custom_messgae_box import CustomMessageBox
 
 
 class ProfilePresenter(Presenter):
@@ -26,21 +23,31 @@ class ProfilePresenter(Presenter):
                 "Updated At": profile.updated_at,
             }
         except Exception as e:
-            self.view.display_error(CREATE_PROFILE_ERROR)
             print({"success": False, "error": str(e)})
+            return {"error": str(e)}
 
     def load_profile(self, username):
         # Use the presenter to get profile data
         profile_data = self.get_profile_details(username)
 
-        if "error" in profile_data:
+        if profile_data is None:
+            # If no profile data is found
+            self.view.name_input.setText("")
+            self.view.operative_unit_input.setText("")
+            self.view.telephone_input.setText("")
+
+        elif "error" in profile_data:
             self.display_error("Error", profile_data["error"])
             return
+        else:
+            full_name = profile_data.get("Full Name", "")
+            position = profile_data.get("Position", "")
+            phone_number = str(profile_data.get("Phone Number", ""))
 
-        # Populate QLineEdit widgets with profile data
-        self.view.name_input.setText(profile_data["Full Name"])
-        self.view.operative_unit_input.setText(profile_data["Position"])
-        self.view.telephone_input.setText(str(profile_data["Phone Number"]))
+            # Populate the form fields
+            self.view.name_input.setText(full_name)
+            self.view.operative_unit_input.setText(position)
+            self.view.telephone_input.setText(phone_number)
 
     def create_or_update_profile(self, username, fullname, position, phone_number):
         """
@@ -68,5 +75,3 @@ class ProfilePresenter(Presenter):
             # Handle unexpected errors
             self.view.display_error(f"{CREATE_OR_UPDATE_PROFILE_ERROR}")
             print(f"An unexpected error occurred: {str(e)}")
-
-

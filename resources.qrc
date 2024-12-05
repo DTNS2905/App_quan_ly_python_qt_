@@ -580,6 +580,10 @@
     <file>icons/icons_white/activity.svg</file>
   </qresource>
   <qresource prefix="images">
+    <file>ui/images/z6098200034683_81935c17db22495d87649c2c18433ce1_enhanced.jpg</file>
+    <file>ui/images/z6098206412945_c18442c295b849f00bada2cde9bc1511_enhanced.jpg</file>
+    <file>ui/images/resize_img_2.jpg</file>
+    <file>ui/images/resize_img_3.jpg</file>
     <file>ui/images/icon_remove_background.png</file>
     <file>ui/images/resized_image_1.jpg</file>
     <file>ui/images/z6088169785864_8678aa25fc0a40b809a49b162f99984d.jpg</file>

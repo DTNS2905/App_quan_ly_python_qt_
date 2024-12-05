@@ -58,3 +58,7 @@ PERMISSION_USER_VIEW_SQL = '''
     JOIN permissions p ON up.permission_id = p.id;
 '''
 
+GET_USER_ID_SQL = "SELECT id FROM users WHERE username = ?;"
+
+GET_PERMISSION_ID_SQL = "SELECT id FROM permissions WHERE name = ?;"
+

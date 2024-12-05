@@ -255,6 +255,17 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel {
+color:black;
+}
+
+.QLineEdit {
+color:black;
+background-color:rgb(255, 255, 255);
+}
+</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Shape::Box</enum>
      </property>
@@ -349,26 +360,27 @@ QListView::item:alternate {
 }
 
 QListView::item:selected {
-    border: 1px solid #6a6ea9;
+    border: 1px solid #567dbc;
 }
 
 QListView::item:selected:!active {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #ABAFE5, stop: 1 #8588B2);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
+    color:white
 }
 
 QListView::item:selected:active {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #6a6ea9, stop: 1 #888dd9);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
+    color:white
 }
 
 QListView::item:hover {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #FAFBFE, stop: 1 #DCDEF1);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
+    border: 1px solid #bfcde4;
 }
 
 QListView {
     show-decoration-selected: 1; /* make the selection span the entire width of the view */
+	color:black;
 	background:rgb(255, 255, 255)
 }</string>
         </property>

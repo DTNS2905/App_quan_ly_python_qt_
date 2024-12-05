@@ -263,7 +263,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">#Dialog {
-background: url(:/images/ui/images/z6088171383742_21bef345a06d8056854c93ca4e0c33c8.jpg) top fixed no-repeat;
+
+border-image: url(:/images/ui/images/z6098206412945_c18442c295b849f00bada2cde9bc1511_enhanced.jpg)  0 0 0 0 stretch stretch;
 }
 
 .QLabel {

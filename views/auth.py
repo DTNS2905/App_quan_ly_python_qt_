@@ -14,8 +14,8 @@ from views.register_dialog import RegisterDialog
 
 
 class LoginDialog(QtWidgets.QDialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.RegisterDialog = RegisterDialog(self)
         uic.loadUi(LOGIN_UI_PATH, self)
         self.setWindowTitle("Màn hình đăng nhập")
@@ -26,7 +26,6 @@ class LoginDialog(QtWidgets.QDialog):
         # Add default user
         self.presenter.add_default_user('admin', 'admin123')
 
-        # Table widget
         # Add default permission
         self.permission_presenter.add_default_permissions()
         self.permission_presenter.assign_all_permissions("admin")
@@ -38,7 +37,7 @@ class LoginDialog(QtWidgets.QDialog):
             session.SESSION = UserSession(username, permissions)
 
         # Initialize toggle button for password visibility
-        self.password_visible = False  # Track visibility state
+        self.password_visible = False
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.toggle_button.setIcon(QIcon(":/icons/icons/eye-off.svg"))
         self.toggle_button.setCheckable(True)
@@ -46,30 +45,26 @@ class LoginDialog(QtWidgets.QDialog):
 
         self.register_button.clicked.connect(self.open_register_dialog)
 
+    def open_register_dialog(self):
+        """Open the RegisterDialog."""
+        self.RegisterDialog.show()  # Non-modal dialog
     def closeEvent(self, event):
         self.presenter.close()
         event.accept()
 
     def toggle_password_visibility(self):
         if self.password_visible:
-            # Hide password
             self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
             self.toggle_button.setIcon(QIcon(":/icons/icons/eye-off.svg"))
         else:
-            # Show password
             self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
             self.toggle_button.setIcon(QIcon(":/icons/icons/eye.svg"))
         self.password_visible = not self.password_visible
 
     def display_success(self, message):
-        """Display a custom success message."""
         success_box = CustomMessageBox("Success", message, QMessageBox.Icon.Information, "Đóng", self)
         success_box.exec()
 
     def display_error(self, message):
-        """Display a custom error message."""
         error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
-
-    def open_register_dialog(self):
-        self.RegisterDialog.exec()  # Opens the dialog modally
