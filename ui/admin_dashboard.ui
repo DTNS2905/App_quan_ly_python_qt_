@@ -378,7 +378,7 @@ color:balck;
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="spacing">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="leftMargin">
            <number>10</number>
@@ -479,6 +479,37 @@ color: black;
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="log_button_2">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="mouseTracking">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton_3">
             <property name="enabled">
              <bool>true</bool>
@@ -503,31 +534,6 @@ color: black;
             </property>
             <property name="autoDefault">
              <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>Times New Roman</family>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="mouseTracking">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string/>
             </property>
            </widget>
           </item>
@@ -1970,8 +1976,7 @@ border-radius:5px;
  </widget>
  <tabstops>
   <tabstop>scrollArea</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton_3</tabstop>
+  <tabstop>log_button_2</tabstop>
  </tabstops>
  <resources>
   <include location="../resources.qrc"/>

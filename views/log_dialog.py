@@ -6,4 +6,4 @@ class LogDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         uic.loadUi('ui/log.ui', self)
-        self.presenter = ProfilePresenter(self)
+        
