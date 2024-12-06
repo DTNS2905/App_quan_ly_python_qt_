@@ -1,5 +1,5 @@
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import Qt, QObject, QEvent
+from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog
 
@@ -122,12 +122,53 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def open_dialog(self, dialog_instance):
         if isinstance(dialog_instance, QDialog):
+            dialog_instance.finished.connect(self.refresh_permission_view)
             dialog_instance.exec()  # For modal dialogs
         else:
             print("Provided instance is not a QDialog.")
 
     def log_out(self, dialog_instance):
-        # Close the main window
-        self.close()
-        # Open the dialog
-        self.open_dialog(dialog_instance)
+        # Create a confirmation dialog
+        message_box = QMessageBox(self)
+        message_box.setWindowTitle("Xác Nhận")  # Translated dialog title
+        message_box.setText("Bạn có chắc chắn muốn đăng xuất không?")
+        message_box.setIcon(QMessageBox.Icon.Question)
+
+        # Custom buttons with Vietnamese text
+        yes_button = message_box.addButton("Đồng Ý", QMessageBox.ButtonRole.YesRole)
+        no_button = message_box.addButton("Hủy", QMessageBox.ButtonRole.NoRole)
+        message_box.setStyleSheet("""
+            QMessageBox {
+                background-color: white;
+                color: black;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+            QLabel {
+                color: black;
+                font-size: 14px;
+            }
+            QPushButton {
+                background-color: #E0E0E0;
+                color: black;
+                padding: 8px 16px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #C0C0C0;
+            }
+        """)
+
+        # Show the dialog and wait for user input
+        message_box.exec()
+
+        # Check which button was clicked
+        if message_box.clickedButton() == yes_button:
+            self.close()
+            dialog_instance.exec()  # For modal dialogs
+        elif message_box.clickedButton() == no_button:
+            print("user does not log out")
+            return
+
+    def refresh_permission_view(self):
+        self.permission_presenter.populate_table()

@@ -38,8 +38,9 @@ GET_PERMISSION_BY_USERNAME_SQL = '''
 REMOVE_PERMISSION_FROM_USER_SQL = '''
     DELETE FROM user_permissions
     WHERE user_id = (SELECT id FROM users WHERE username = ?)
-    AND permission_id = (SELECT id FROM permissions WHERE permission = ?)
+    AND permission_id = (SELECT id FROM permissions WHERE permission = ?);
 '''
+
 UPDATE_PERMISSION_SQL = '''
     INSERT OR IGNORE INTO user_permissions (user_id, permission_id)
         VALUES (
@@ -60,5 +61,9 @@ PERMISSION_USER_VIEW_SQL = '''
 
 GET_USER_ID_SQL = "SELECT id FROM users WHERE username = ?;"
 
-GET_PERMISSION_ID_SQL = "SELECT id FROM permissions WHERE name = ?;"
+GET_PERMISSION_ID_SQL = "SELECT id FROM permissions WHERE permission = ?;"
 
+ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL = '''
+INSERT INTO user_item_permissions (item_id, user_id, permission_id) VALUES (?, ?, ?);
+);
+'''

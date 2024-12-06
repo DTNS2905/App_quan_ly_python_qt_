@@ -40,7 +40,7 @@ class PermissionDialog(QtWidgets.QDialog):
                 self.process_selection(),
                 user_assign
             ))
-        elif action_type == "assign_permission":
+        elif action_type == "unassign_permission":
             self.perform_button.clicked.connect(lambda: self.presenter.unassign_permissions_from_user(
                 self.lineEdit.text(),
                 self.process_selection(),

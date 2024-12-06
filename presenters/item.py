@@ -236,3 +236,14 @@ class ItemPresenter(Presenter):
             except Exception as e:
                 LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {e}")
                 self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
+
+    # def get_item_id_by_name(self, item_name):
+    #     if not session.SESSION.match_permissions("folder:delete"):
+    #         self.view.display_error(PERMISSION_DENIED)
+    #         LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
+    #         return
+    #     try:
+    #         self.model.get_item_id_by_name(item_name)
+    #     except Exception as e:
+    #         print(f"{FOLDER_GET_ERROR}: {e}")
+

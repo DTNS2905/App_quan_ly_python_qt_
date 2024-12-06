@@ -5,7 +5,8 @@ from common.model import NativeSqlite3Model
 from configs import DATABASE_NAME
 from sql_statements.permission import ADD_PERMISSION_SQL, \
     PERMISSION_USER_VIEW_SQL, CREATE_PERMISSION_TABLE_SQL, CREATE_PERMISSION_USER_TABLE_SQL, \
-    GET_PERMISSION_BY_USERNAME_SQL, ASSIGN_PERMISSION_BY_USERNAME_SQL, REMOVE_PERMISSION_FROM_USER_SQL
+    GET_PERMISSION_BY_USERNAME_SQL, ASSIGN_PERMISSION_BY_USERNAME_SQL, REMOVE_PERMISSION_FROM_USER_SQL, \
+    ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL, GET_USER_ID_SQL, GET_PERMISSION_ID_SQL
 
 
 @dataclass
@@ -22,6 +23,8 @@ class PermissionModel(NativeSqlite3Model):
     _get_permission_by_username = GET_PERMISSION_BY_USERNAME_SQL
     _fetch_user_permission_sql = PERMISSION_USER_VIEW_SQL
     _remove_permission_from_user_sql = REMOVE_PERMISSION_FROM_USER_SQL
+    _get_user_id_sql = GET_USER_ID_SQL
+    _get_permission_id_sql = GET_PERMISSION_ID_SQL
 
     def __init__(self, database_name=DATABASE_NAME, table_create_sql=CREATE_PERMISSION_TABLE_SQL):
         super().__init__(database_name, table_create_sql)
@@ -92,11 +95,10 @@ class PermissionModel(NativeSqlite3Model):
 
     def unassign_permission_from_user(self, username, permission):
         """Unassign a permission from a user using their IDs."""
-        user_id = self.get_user_id_by_username(username)
-        permission_id = self.get_permission_id_by_name(permission)
         cur = self.connection.cursor()
         try:
-            cur.execute(self._remove_permission_from_user_sql, (user_id, permission_id))
+            cur.execute(self._remove_permission_from_user_sql, (username, permission))
+            print(cur.rowcount)
             if cur.rowcount > 0:
                 self.connection.commit()
                 print(f"Unassigned permission '{permission}' from '{username}' successfully")
@@ -135,6 +137,62 @@ class PermissionModel(NativeSqlite3Model):
         rows = cur.fetchall()
         cur.close()
         return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
+
+    def assign_permissions_to_users_for_file(self, item_name, users, permissions):
+        """
+        Assign multiple users and permissions to a single file.
+
+        :param db_path: Path to the SQLite database.
+        :param item_name: The name of the file (original_name in the items table).
+        :param users: List of usernames to assign permissions to.
+        :param permissions: List of permission names to assign.
+        """
+
+        cur = self.connection.cursor()
+
+        try:
+            # Fetch item_id using the item's original name
+            cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
+            item = cur.fetchone()
+            if not item:
+                print(f"Item '{item_name}' not found.")
+                return
+            item_id = item[0]
+
+            # Iterate over users and permissions
+            for username in users:
+                # Fetch user_id using the username
+                cur.execute("SELECT id FROM users WHERE username = ?", (username,))
+                user = cur.fetchone()
+                if not user:
+                    print(f"User '{username}' not found. Skipping...")
+                    continue
+                user_id = user[0]
+
+                for permission_name in permissions:
+                    # Fetch permission_id using the permission name
+                    cur.execute("SELECT id FROM permissions WHERE name = ?", (permission_name,))
+                    permission = cur.fetchone()
+                    if not permission:
+                        print(f"Permission '{permission_name}' not found. Skipping...")
+                        continue
+                    permission_id = permission[0]
+
+                    # Insert into user_item_permissions
+                    try:
+                        cur.execute(ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL, (item_id, user_id, permission_id))
+                    except sqlite3.IntegrityError as e:
+                        print(f"Skipping duplicate assignment: {e}")
+
+            # Commit the transaction
+            cur.commit()
+            print(f"Permissions successfully assigned to users for item '{item_name}'.")
+
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+        finally:
+            # Close the connection
+            cur.close()
 
 
 if __name__ == "__main__":

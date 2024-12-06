@@ -274,6 +274,28 @@ class ItemModel(NativeSqlite3Model):
         cur.close()
         return data
 
+    def get_item_id_by_name(self,item_name):
+        # Connect to the SQLite database
+        cur = self.connection.cursor()
+
+        try:
+            # Execute the query to find the item ID
+            cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
+            result = cur.fetchone()
+
+            # Check if a result was found
+            if result:
+                return result[0]  # Return the item ID
+            else:
+                print("Item not found.")
+                return None
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return None
+        finally:
+            # Close the connection
+            cur.close()
+
 
 if __name__ == "__main__":
     model = ItemModel(database_name=r'D:\freelances\Tuan\app_quan_ly_python_qt\app_quan_ly_pyqt6.db')

@@ -50,7 +50,6 @@ class LogModel(NativeSqlite3Model):
             cur.close()
             connection.close()
 
-
     def search_log(self, message_pattern):
         cur = self.connection.cursor()
         cur.execute("SELECT id, user_id, message, created_at, updated_at FROM logs WHERE message LIKE %?%",

@@ -33,8 +33,13 @@ class LoginDialog(QtWidgets.QDialog):
         # Connect login button
         @self.login.clicked.connect
         def handle_login():
-            username, permissions = self.presenter.handle_login()
-            session.SESSION = UserSession(username, permissions)
+            result = self.presenter.handle_login()
+            if result:  # Check if result is not None
+                username, permissions = result
+                session.SESSION = UserSession(username, permissions)
+            else:
+                # Log or handle login failure gracefully
+                print("Login failed or user has no permissions.")
 
         # Initialize toggle button for password visibility
         self.password_visible = False

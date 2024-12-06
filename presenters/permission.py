@@ -139,6 +139,7 @@ class PermissionPresenter(Presenter):
                     f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
                 )
 
+
             error_message = f"{user_assgin} không thể gắn {', '.join(failed_permissions)}"
             self.view.display_error(error_message)
         else:

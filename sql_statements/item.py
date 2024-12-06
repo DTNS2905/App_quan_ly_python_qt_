@@ -36,3 +36,7 @@ CREATE_PERMISSION_USER_ITEM_TABLE_SQL = '''
         FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
     )
 '''
+
+
+
+
