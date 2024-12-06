@@ -8,6 +8,7 @@ from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 from views.auth import LoginDialog
+from views.log_dialog import LogDialog
 from views.permission_dialog import PermissionDialog
 from views.profile_dialog import ProfileDialog
 
@@ -40,17 +41,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.label_2.installEventFilter(self)
 
-        self.add_permission_button.clicked.connect(lambda: self.open_dialog(PermissionDialog(
+        self.add_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
             self,
             "assign_permission"
         )))
 
-        self.remove_permission_button.clicked.connect(lambda: self.open_dialog(PermissionDialog(
+        self.remove_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
             self,
             "unassign_permission"
         )))
 
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
+
+        self.log_button.clicked.connect(lambda: self.open_dialog(LogDialog(self)))
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
@@ -120,9 +123,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 return True  # Event is handled
         return super().eventFilter(source, event)
 
-    def open_dialog(self, dialog_instance):
+    def open_permission_dialog(self, dialog_instance):
         if isinstance(dialog_instance, QDialog):
             dialog_instance.finished.connect(self.refresh_permission_view)
+            dialog_instance.exec()  # For modal dialogs
+        else:
+            print("Provided instance is not a QDialog.")
+
+    def open_dialog(self, dialog_instance):
+        if isinstance(dialog_instance, QDialog):
             dialog_instance.exec()  # For modal dialogs
         else:
             print("Provided instance is not a QDialog.")

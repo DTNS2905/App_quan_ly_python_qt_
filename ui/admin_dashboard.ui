@@ -142,6 +142,18 @@ padding:3px;
 border-radius:5px;
 }
 
+#log_button::hover{
+background-color: rgb(116, 195, 255)
+}
+
+#log_button{
+background-color: rgb(108, 179, 237);
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+
 #frame_4 .QPushButton {
 color:white;
 }
@@ -1103,14 +1115,14 @@ border: 0px solid black;
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="2">
-                      <widget class="QPushButton" name="add_folder_button">
+                     <item row="0" column="3">
+                      <widget class="QPushButton" name="remove_folder_button">
                        <property name="text">
-                        <string>Thêm thư mục</string>
+                        <string>xóa thư mục</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
+                         <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1149,14 +1161,25 @@ border: 0px solid black;
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="3">
-                      <widget class="QPushButton" name="remove_folder_button">
+                     <item row="0" column="2">
+                      <widget class="QPushButton" name="add_folder_button">
                        <property name="text">
-                        <string>xóa thư mục</string>
+                        <string>Thêm thư mục</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
+                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="4">
+                      <widget class="QPushButton" name="log_button">
+                       <property name="text">
+                        <string>mở bảng trạng thái</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/airplay.svg</normaloff>:/icons_white/icons/icons_white/airplay.svg</iconset>
                        </property>
                       </widget>
                      </item>
