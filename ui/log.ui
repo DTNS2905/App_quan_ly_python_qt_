@@ -14,7 +14,7 @@
    <string>Bảng trạng thái</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources.qrc">
+   <iconset>
     <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
@@ -101,6 +101,21 @@ QTableWidget {
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked</set>
      </property>
+     <column>
+      <property name="text">
+       <string>Họ Tên</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thông Tin</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thời Gian</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>

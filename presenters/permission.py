@@ -58,7 +58,6 @@ class PermissionPresenter(Presenter):
         for row, user_permission in enumerate(user_permissions):
             username = user_permission.username
             translated_permissions = self.translate_permissions(user_permission.permissions)
-            permissions_text = " ; ".join(translated_permissions)
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
             self.view.user_permission_table.setItem(row, 1,

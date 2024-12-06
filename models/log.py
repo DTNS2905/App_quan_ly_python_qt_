@@ -15,19 +15,28 @@ class LogDto:
     updated_at: str
 
 
+@dataclass
+class LogTableData:
+    username: int
+    message: str
+    created_at: str
+
+
 class LogModel(NativeSqlite3Model):
     _fetch_sql = """
         SELECT id, user_id, message, created_at, updated_at FROM logs
+    """
+    _fetch_table_sql = """
+        SELECT p.fullname, l.message, l.created_at FROM logs l INNER JOIN profiles p on l.user_id = p.user_id
     """
 
     def __init__(self, database_name=DATABASE_NAME, table_create_sql=CREATE_TABLE_SQL):
         super().__init__(database_name, table_create_sql)
 
-    def fetch_log(self):
+    def fetch_table_log(self):
         cur = self.connection.cursor()
-        cur.execute(self._fetch_sql)
-        data = cur.fetchone()
-        return LogDto(*data)
+        cur.execute(self._fetch_table_sql)
+        return [LogTableData(*i) for i in cur.fetchall()]
 
     @staticmethod
     def write_log(username, message):
