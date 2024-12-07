@@ -1,9 +1,13 @@
+import logging
 import sys
 import resources
 from PyQt6 import QtWidgets
+
+from configs import setup_logging
 from views.auth import LoginDialog
 from views.main_window import MainWindow
 from views.permission_dialog import PermissionDialog
+setup_logging()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -17,9 +21,9 @@ if __name__ == "__main__":
 
             main_window.show()
         else:
-            print("Login cancelled.")
+            logging.info("Login cancelled.")
     except Exception as e:
-        print(f"Error occurred: {e}")
+        logging.error(f"Error occurred: {e}")
         sys.exit(1)
 
     sys.exit(app.exec())

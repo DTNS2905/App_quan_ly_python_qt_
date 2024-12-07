@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from dataclasses import dataclass
 
@@ -64,7 +65,7 @@ class PermissionModel(NativeSqlite3Model):
         if cur.rowcount > 0:
             self.connection.commit()
             cur.close()
-            print(f"assigning permission '{permission}' to '{username}' successfully")
+            logging.info(f"assigning permission '{permission}' to '{username}' successfully")
         else:
             self.connection.rollback()
             cur.close()
@@ -121,7 +122,7 @@ class PermissionModel(NativeSqlite3Model):
         if cur.rowcount > 0:
             self.connection.commit()
             cur.close()
-            print(f"Add permission '{permission}' successfully")
+            logging.info(f"Add permission '{permission}' successfully")
         else:
             self.connection.rollback()
             cur.close()
@@ -132,10 +133,9 @@ class PermissionModel(NativeSqlite3Model):
         cur = self.connection.cursor()
         try:
             cur.execute(self._remove_permission_from_user_sql, (username, permission))
-            print(cur.rowcount)
             if cur.rowcount > 0:
                 self.connection.commit()
-                print(f"Unassigned permission '{permission}' from '{username}' successfully")
+                logging.info(f"Unassigned permission '{permission}' from '{username}' successfully")
             else:
                 self.connection.rollback()
                 raise Exception(f"Error unassigning permission '{permission}' from '{username}'")
@@ -159,10 +159,10 @@ class PermissionModel(NativeSqlite3Model):
             cur.execute("DELETE FROM users WHERE username=?", (username,))
             if cur.rowcount > 0:
                 self.connection.commit()
-                print(f"Delete '{username}' successfully")
+                logging.info(f"Delete '{username}' successfully")
             else:
                 self.connection.rollback()
-                raise Exception(print(f"Delete '{username}' failed"))
+                raise Exception(f"Delete '{username}' failed")
         finally:
             cur.close()
 
@@ -202,7 +202,7 @@ class PermissionModel(NativeSqlite3Model):
             cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
             item = cur.fetchone()
             if not item:
-                print(f"Item '{item_name}' not found.")
+                logging.warning(f"Item '{item_name}' not found.")
                 return
             item_id = item[0]
 
@@ -212,7 +212,7 @@ class PermissionModel(NativeSqlite3Model):
                 cur.execute("SELECT id FROM users WHERE username = ?", (username,))
                 user = cur.fetchone()
                 if not user:
-                    print(f"User '{username}' not found. Skipping...")
+                    logging.warning(f"User '{username}' not found. Skipping...")
                     continue
                 user_id = user[0]
 
@@ -221,7 +221,7 @@ class PermissionModel(NativeSqlite3Model):
                     cur.execute("SELECT id FROM permissions WHERE permission = ?", (permission_name,))
                     permission = cur.fetchone()
                     if not permission:
-                        print(f"Permission '{permission_name}' not found. Skipping...")
+                        logging.warning(f"Permission '{permission_name}' not found. Skipping...")
                         continue
                     permission_id = permission[0]
 
@@ -229,14 +229,14 @@ class PermissionModel(NativeSqlite3Model):
                     try:
                         cur.execute(ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL, (item_id, user_id, permission_id))
                     except sqlite3.IntegrityError as e:
-                        print(f"Skipping duplicate assignment: {e}")
+                        logging.error(f"Skipping duplicate assignment: {e}")
 
             # Commit the transaction
             cur.commit()
-            print(f"Permissions successfully assigned to users for item '{item_name}'.")
+            logging.info(f"Permissions successfully assigned to users for item '{item_name}'.")
 
         except sqlite3.Error as e:
-            print(f"Database error: {e}")
+            logging.error(f"Database error: {e}")
         finally:
             # Close the connection
             cur.close()
@@ -253,7 +253,7 @@ class PermissionModel(NativeSqlite3Model):
             # Extract usernames from the result
             return [row[0] for row in rows]
         except sqlite3.Error as e:
-            print(f"Database error: {e}")
+            logging.error(f"Database error: {e}")
             return []
         finally:
             cur.close()

@@ -1,7 +1,10 @@
+import logging
+
+
 class UserSession:
     def __init__(self, username, permissions: list[str],
                  item_permissions: dict[str, list[str]] = {}):
-        print(f"DEBUG: User '{username}'\n- Permissions '{permissions}'\n- Items '{item_permissions}'")
+        logging.debug(f"DEBUG: User '{username}'\n- Permissions '{permissions}'\n- Items '{item_permissions}'")
         self._username = username
         self._permissions = permissions
         self._item_permissions = item_permissions
@@ -18,11 +21,11 @@ class UserSession:
         return self._item_permissions[item]
 
     def match_permissions(self, checked_permission):
-        print(f"DEBUG: check permission {checked_permission}")
+        logging.debug(f"DEBUG: check permission {checked_permission}")
         return checked_permission in self._permissions
 
     def match_item_permissions(self, item: str, checked_permission: str):
-        print(f"DEBUG: check {item} permission {checked_permission}")
+        logging.debug(f"DEBUG: check {item} permission {checked_permission}")
         return (item in self._item_permissions.keys()
                 and checked_permission in self._item_permissions[item])
 

@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from dataclasses import dataclass
 
@@ -57,7 +58,7 @@ class ProfileModel(NativeSqlite3Model):
         if cur.rowcount > 0:
             self.connection.commit()
             cur.close()
-            print(f"Create profile for user '{username}' successfully")
+            logging.info(f"Create profile for user '{username}' successfully")
             return cur.lastrowid
         else:
             self.connection.rollback()
@@ -76,7 +77,7 @@ class ProfileModel(NativeSqlite3Model):
         if cur.rowcount > 0:
             self.connection.commit()
             cur.close()
-            print(f"Update profile for user '{username}' successfully")
+            logging.info(f"Update profile for user '{username}' successfully")
             return cur.lastrowid
         else:
             self.connection.rollback()

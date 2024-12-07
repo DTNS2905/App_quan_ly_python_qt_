@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 from PyQt6 import QtWidgets
@@ -7,7 +8,8 @@ from common import session
 from common.presenter import Presenter
 from messages.contants import PERMISSION_TRANSLATIONS
 from messages.messages import *
-from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT, DEFAULT_PERMISSION
+from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT, DEFAULT_PERMISSION, \
+    USER_DELETE
 from models.log import LogModel
 
 from models.permission import PermissionModel
@@ -31,7 +33,7 @@ class PermissionPresenter(Presenter):
             LogModel.write_log(session.SESSION.get_username(), GRANT_PERMISSION_SUCCESSFULLY)
         except Exception as e:
             self.view.display_error(GRANT_PERMISSION_ERROR)
-            print(str(e))
+            logging.error(e)
             LogModel.write_log(session.SESSION.get_username(), str(e))
 
     def translate_permissions(self, permissions: list[str]) -> list[str]:
@@ -60,6 +62,11 @@ class PermissionPresenter(Presenter):
                 delete_button = QPushButton("Xóa")
 
                 def delete_user(r):
+                    if not session.SESSION.match_permissions(USER_DELETE):
+                        self.view.display_error(PERMISSION_DENIED)
+                        LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
+                        return
+
                     try:
                         index = self.view.user_permission_table.model().index(r, 0)
                         delete_username = self.view.user_permission_table.model().data(index)
@@ -74,15 +81,15 @@ class PermissionPresenter(Presenter):
                             self.model.delete_user_by_username(delete_username)
                             self.view.display_success(f"Xóa người dùng {delete_username}' thành công!.")
                             self.populate_table()
-                    except:
-                        print(traceback.print_exc())
+                    except Exception as e:
+                        logging.error(e)
 
                 delete_button.clicked.connect(lambda checked, r=row: delete_user(r))
 
                 self.view.user_permission_table.setIndexWidget(
                     self.view.user_permission_table.model().index(row, 5), delete_button)
-            except:
-                print(traceback.print_exc())
+            except Exception as e:
+                logging.error(e)
 
         self.view.user_permission_table.resizeColumnsToContents()
         self.view.user_permission_table.resizeRowsToContents()
@@ -94,7 +101,7 @@ class PermissionPresenter(Presenter):
             try:
                 self.model.add_permission(permission)
             except Exception as e:
-                print(f"Failed to add permission '{permission}': {e}")
+                logging.error(f"Failed to add permission '{permission}': {e}")
 
     def assign_all_permissions(self, username: str):
         default_permissions = ALL_PERMISSION
@@ -102,7 +109,7 @@ class PermissionPresenter(Presenter):
             try:
                 self.model.assign_permission_to_user(username, permission)
             except Exception as e:
-                print(f"Failed to assign permission '{permission}': {e}")
+                logging.error(f"Failed to assign permission '{permission}': {e}")
 
     def assign_permissions_to_user(self, username: str, permissions: list[str], user_assgin: str):
         """
@@ -254,7 +261,7 @@ class PermissionPresenter(Presenter):
             self.view.string_list_model.setStringList(suggestions)
         except Exception as e:
             # Handle potential errors during database fetching
-            print(f"Error fetching suggestions: {e}")
+            logging.error(f"Error fetching suggestions: {e}")
             self.view.string_list_model.setStringList([])
 
     def add_default_permissions_for_register(self):
@@ -264,4 +271,4 @@ class PermissionPresenter(Presenter):
             try:
                 self.model.add_permission(permission)
             except Exception as e:
-                print(f"Failed to add permission '{permission}': {e}")
+                logging.error(f"Failed to add permission '{permission}': {e}")

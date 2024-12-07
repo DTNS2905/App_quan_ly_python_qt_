@@ -1,3 +1,5 @@
+import logging
+
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt6.QtGui import QShortcut, QKeySequence
@@ -130,13 +132,13 @@ class MainWindow(QtWidgets.QMainWindow):
             dialog_instance.finished.connect(self.refresh_permission_view)
             dialog_instance.exec()  # For modal dialogs
         else:
-            print("Provided instance is not a QDialog.")
+            logging.warning("Provided instance is not a QDialog.")
 
     def open_dialog(self, dialog_instance):
         if isinstance(dialog_instance, QDialog):
             dialog_instance.exec()  # For modal dialogs
         else:
-            print("Provided instance is not a QDialog.")
+            logging.warning("Provided instance is not a QDialog.")
 
     def log_out(self, dialog_instance):
         # Create a confirmation dialog
@@ -178,7 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close()
             dialog_instance.exec()  # For modal dialogs
         elif message_box.clickedButton() == no_button:
-            print("user does not log out")
+            logging.info("user does not log out")
             return
 
     def refresh_permission_view(self):

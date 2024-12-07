@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 from PyQt6 import uic, QtWidgets
@@ -13,5 +14,5 @@ class LogDialog(QtWidgets.QDialog):
         try:
             self.presenter.populate_table()
         except Exception:
-            print(traceback.print_exc())
+            logging.error(traceback.print_exc())
         

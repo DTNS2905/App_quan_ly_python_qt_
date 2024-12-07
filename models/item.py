@@ -1,3 +1,4 @@
+import logging
 import os.path
 import shutil
 import sqlite3
@@ -161,7 +162,7 @@ class ItemModel(NativeSqlite3Model):
             self.connection.commit()
             cur.close()
             shutil.copy(file_path, os.path.join(self._root_path, code))
-            print(f"Create file name '{original_name}' successfully")
+            logging.info(f"Create file name '{original_name}' successfully")
             return cur.lastrowid
         else:
             self.connection.rollback()
@@ -210,7 +211,7 @@ class ItemModel(NativeSqlite3Model):
         if cur.rowcount > 0:
             self.connection.commit()
             cur.close()
-            print(f"Create folder name '{original_name}' successfully")
+            logging.info(f"Create folder name '{original_name}' successfully")
             return cur.lastrowid
         else:
             self.connection.rollback()
@@ -218,11 +219,9 @@ class ItemModel(NativeSqlite3Model):
             raise Exception(f"Error: folder file name '{original_name}' failed")
 
     def delete_file(self, original_name):
-        print(f"Delete file '{original_name}'")
         cur = self.connection.cursor()
         cur.execute("SELECT id, code, type FROM items WHERE original_name = ?", (original_name,))
         item_id, code, file_type = cur.fetchone()
-        print(f"{item_id} - {code} - {file_type}")
         if file_type != "file":
             cur.close()
             raise Exception(f"Error: this is not a file")
@@ -232,7 +231,7 @@ class ItemModel(NativeSqlite3Model):
             self.connection.commit()
             cur.close()
             os.remove(file_path)
-            print(f"Delete file with id '{item_id}' successfully")
+            logging.info(f"Delete file with id '{item_id}' successfully")
             return item_id
         else:
             self.connection.rollback()
@@ -240,11 +239,9 @@ class ItemModel(NativeSqlite3Model):
             raise Exception(f"Error: delete item with id '{item_id}' failed")
 
     def delete_folder(self, original_name):
-        print(f"Delete folder '{original_name}'")
         cur = self.connection.cursor()
         cur.execute("SELECT id, code, type FROM items WHERE original_name = ?", (original_name,))
         item_id, code, file_type = cur.fetchone()
-        print(f"{item_id} - {code} - {file_type}")
         if file_type != "folder":
             cur.close()
             raise Exception(f"Error: this is not a folder")
@@ -257,7 +254,7 @@ class ItemModel(NativeSqlite3Model):
         if cur.rowcount == 1:
             self.connection.commit()
             cur.close()
-            print(f"Delete folder with id '{item_id}' successfully")
+            logging.info(f"Delete folder with id '{item_id}' successfully")
             return item_id
         else:
             self.connection.rollback()
@@ -287,10 +284,10 @@ class ItemModel(NativeSqlite3Model):
             if result:
                 return result[0]  # Return the item ID
             else:
-                print("Item not found.")
+                logging.info("Item not found.")
                 return None
         except sqlite3.Error as e:
-            print(f"Database error: {e}")
+            logging.error(f"Database error: {e}")
             return None
         finally:
             # Close the connection

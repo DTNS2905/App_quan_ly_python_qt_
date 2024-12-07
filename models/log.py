@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from dataclasses import dataclass
 
@@ -49,12 +50,12 @@ class LogModel(NativeSqlite3Model):
                         (user_id, message))
             if cur.rowcount > 0:
                 connection.commit()
-                print(f"Log for user '{username}' successfully")
+                logging.info(f"Log for user '{username}' successfully")
             else:
                 connection.rollback()
-                print(f"Error: Log for user '{username}' failed")
+                logging.error(f"Error: Log for user '{username}' failed")
         except Exception as e:
-            print(f"Error: Log for user '{username}' failed: {str(e)}")
+            logging.error(f"Error: Log for user '{username}' failed: {str(e)}")
         finally:
             cur.close()
             connection.close()

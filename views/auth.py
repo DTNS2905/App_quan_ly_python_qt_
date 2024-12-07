@@ -1,3 +1,5 @@
+import logging
+
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QLineEdit, QMessageBox
@@ -43,7 +45,7 @@ class LoginDialog(QtWidgets.QDialog):
                 session.SESSION = UserSession(username, permissions, item_permissions)
             else:
                 # Log or handle login failure gracefully
-                print("Login failed or user has no permissions.")
+                logging.error("Login failed or user has no permissions.")
 
         # Initialize toggle button for password visibility
         self.password_visible = False

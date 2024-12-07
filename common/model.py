@@ -1,4 +1,5 @@
 import abc
+import logging
 import sqlite3
 
 from PyQt6 import QtSql
@@ -45,9 +46,9 @@ class NativeSqlite3Model(Model):
         try:
             cur.execute(self._table_create_sql)
             self.connection.commit()
-            print("Table created successfully")
+            logging.info(f"Table created successfully:\n{self._table_create_sql}")
         except sqlite3.Error as error:
-            print(f"Error creating table: {error}")
+            logging.error(f"Error creating table: {error}")
         finally:
             cur.close()
 

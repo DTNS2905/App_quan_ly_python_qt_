@@ -1,3 +1,5 @@
+import logging
+
 from PyQt6 import QtSql
 
 from common.auth import hash_password
@@ -27,10 +29,10 @@ class AuthModel(SqliteModel):
     def create_superuser(self, username, password):
         # Check if the user already exists
         if self.verify_user(username):
-            print(f"Superuser '{username}' already exists.")
+            logging.info(f"Superuser '{username}' already exists.")
         else:
             self.add_user(username, password, is_superuser=True)
-            print(f"Superuser '{username}' created successfully!")
+            logging.info(f"Superuser '{username}' created successfully!")
 
     def verify_user(self, username):
         query = QtSql.QSqlQuery()

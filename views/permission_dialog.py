@@ -18,7 +18,6 @@ class PermissionDialog(QtWidgets.QDialog):
         self.presenter = PermissionPresenter(self)
 
         permissions = self.presenter.fetch_user_permissions()
-        print(permissions)
 
         # Maintain a mapping of translated permissions to original permissions
         self.translation_map = {

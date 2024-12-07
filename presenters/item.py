@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 from PyQt6.QtCore import QPointF
@@ -158,7 +159,7 @@ class ItemPresenter(Presenter):
                 self.view.display_success(f"Lưu '{original_name}' về {file_path} thành công")
         except Exception as e:
             self.view.display_error(f"Lưu thất bại: {str(e)}")
-            print(traceback.format_exc())
+            logging.error(e)
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
