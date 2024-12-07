@@ -1,20 +1,20 @@
 HEADERS_FILE_TREE = ["Tên tài liệu/Thư mục", "Kích cỡ", "Loại tài liệu", "Ngày điều chỉnh"]
 
 PERMISSION_TRANSLATIONS = {
-    "file:view": "xem tài liệu",
-    "file:create": "tạo tài liệu",
-    "file:update": "cập nhật tài liệu",
-    "file:delete": "xóa tài liệu",
-    "file:execute": "thực thi tài liệu ",
-    "folder:view": "xem thư mục",
-    "folder:create": "tạo thư mục",
-    "folder:update": "cập nhật thư mục",
-    "folder:delete": "xóa thư mục",
-    "permission:view": "gắn quyền xem",
-    "permission:create": "gắn quyền tạo",
-    "permission:update": "gắn quyền cập nhật",
-    "permission:grant": "cấp quyền",
-    "permission:delete": "gắn quyền xóa ",
+    "file:view": "Xem tài liệu",
+    "file:create": "Tạo tài liệu",
+    "file:update": "Cập nhật tài liệu",
+    "file:delete": "Xóa tài liệu",
+    "file:execute": "Thực thi tài liệu ",
+    "folder:view": "Xem thư mục",
+    "folder:create": "Tạo thư mục",
+    "folder:update": "Cập nhật thư mục",
+    "folder:delete": "Xóa thư mục",
+    "permission:view": "Gắn quyền xem",
+    "permission:create": "Gắn quyền tạo",
+    "permission:update": "Gắn quyền cập nhật",
+    "permission:grant": "Cấp quyền",
+    "permission:delete": "Gắn quyền xóa ",
 
     # Add more translations as needed
 }

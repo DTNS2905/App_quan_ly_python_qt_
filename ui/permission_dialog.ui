@@ -333,6 +333,9 @@ background-color:rgb(255, 255, 255);
            <property name="frame">
             <bool>false</bool>
            </property>
+           <property name="echoMode">
+            <enum>QLineEdit::EchoMode::Normal</enum>
+           </property>
           </widget>
          </item>
         </layout>

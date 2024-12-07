@@ -23,6 +23,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.permission_presenter = PermissionPresenter(self)
         self.permission_presenter.populate_table()
 
+        self.showMaximized()
+
         # Connect buttons to slots
         self.home_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1))
         self.manage_user_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage2))

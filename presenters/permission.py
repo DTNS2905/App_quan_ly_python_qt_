@@ -83,7 +83,7 @@ class PermissionPresenter(Presenter):
             except Exception as e:
                 print(f"Failed to assign permission '{permission}': {e}")
 
-    def assign_permissions_to_user(self, username: str, permissions: list[str], user_assgin:str):
+    def assign_permissions_to_user(self, username: str, permissions: list[str], user_assgin: str):
         """
         Assign multiple permissions to a user.
 
@@ -137,7 +137,6 @@ class PermissionPresenter(Presenter):
                     session.SESSION.get_username(),
                     f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
                 )
-
 
             error_message = f"{user_assgin} không thể gắn {', '.join(failed_permissions)}"
             self.view.display_error(error_message)
@@ -218,3 +217,22 @@ class PermissionPresenter(Presenter):
         user_permissions = self.model.fetch_user_permissions()
 
         return user_permissions
+
+    def update_suggestions(self, text):
+        """Fetch matching usernames from the database and update the completer's suggestions."""
+        if not text.strip():
+            # Clear suggestions if the input is empty
+            self.view.string_list_model.setStringList([])
+            return
+
+        try:
+            # Fetch suggestions from the database
+            suggestions = self.model.fetch_usernames_based_on_suggestions(text)
+
+            # Update the completer's model with the fetched suggestions
+            self.view.string_list_model.setStringList(suggestions)
+        except Exception as e:
+            # Handle potential errors during database fetching
+            print(f"Error fetching suggestions: {e}")
+            self.view.string_list_model.setStringList([])  # Clear suggestions in case of an error
+
