@@ -16,6 +16,7 @@ FILE_DOWNLOAD = "file:download"
 FILE_RENAME = "file:rename"
 FILE_CREATE = "file:create"
 FILE_VIEW = "file:view"
+LOG_VIEW = "log:view"
 
 
 FILE_PERMISSIONS = [
