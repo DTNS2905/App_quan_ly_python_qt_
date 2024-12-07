@@ -14,7 +14,6 @@ class LogPresenter(Presenter):
         self.view.tableWidget.setRowCount(0)
 
         for row, log in enumerate(logs):
-            print(log)
             self.view.tableWidget.insertRow(row)
             self.view.tableWidget.setItem(row, 0, QTableWidgetItem(log.username))
             self.view.tableWidget.setItem(row, 1, QTableWidgetItem(log.message))

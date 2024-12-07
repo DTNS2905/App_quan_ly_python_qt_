@@ -82,6 +82,7 @@ class ItemPresenter(Presenter):
 
         try:
             selected_indexes = self.view.treeView.selectedIndexes()
+            selected_indexes = [value for index, value in enumerate(selected_indexes) if index % 4 == 0]
 
             if not selected_indexes:
                 self.view.display_error(SELECTED_FILE_ERROR)
@@ -98,7 +99,7 @@ class ItemPresenter(Presenter):
             reply = QMessageBox.question(
                 self.view,
                 "Xác nhận xóa",
-                f"Bạn chắc chắn muốn xóa {len(file_paths)} ?",
+                f"Bạn chắc chắn muốn xóa {', '.join(file_paths)} ?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )
@@ -107,13 +108,13 @@ class ItemPresenter(Presenter):
                 for file_path in file_paths:
                     try:
                         self.model.delete_file(file_path)  # Remove each file
-                        LogModel.write_log(session.SESSION.get_username(), f" {FILE_REMOVE_SUCCESS} cho {len(file_paths)} ")
+                        LogModel.write_log(session.SESSION.get_username(), f" {FILE_REMOVE_SUCCESS} cho {file_path} ")
                     except Exception as e:
                         LogModel.write_log(session.SESSION.get_username(),
-                                           f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
+                                           f"{FILE_REMOVE_FAIL} cho {file_path}: {e}")
                         self.view.display_error(f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
 
-                self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {len(file_paths)} ")
+                self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)} ")
 
                 # Refresh the view after deletion
                 self.view.refresh_tree_view()

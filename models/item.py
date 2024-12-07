@@ -103,7 +103,6 @@ class ItemModel(NativeSqlite3Model):
         items = self.fetch_data()
         root_item_data = build_tree(items)
         font_size = 14
-        root_node = CustomItem(root_item_data.original_name, font_size, True)
 
         # Initialize QFileIconProvider
         icon_provider = QFileIconProvider()
@@ -136,7 +135,8 @@ class ItemModel(NativeSqlite3Model):
         self.get_root_node().appendRow(root_node)
 
     def refresh_model(self):
-        self.model = QStandardItemModel()
+        self.model = QStandardItemModel(0, len(FILE_TREE_VIEW_COLUMNS))
+        self.model.setHorizontalHeaderLabels(FILE_TREE_VIEW_COLUMNS)
         self.populate_data()
         return self.model
 

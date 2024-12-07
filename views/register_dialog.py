@@ -2,6 +2,7 @@ from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox, QLineEdit
 
+from configs import REGISTER_UI_PATH
 from presenters.auth import AuthPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -9,7 +10,7 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class RegisterDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/register_ui.ui', self)
+        uic.loadUi(REGISTER_UI_PATH, self)
 
         self.presenter = AuthPresenter(self)
 
