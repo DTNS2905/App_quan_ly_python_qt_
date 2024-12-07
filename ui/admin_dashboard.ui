@@ -105,6 +105,7 @@ background-color: rgb(0, 116, 0);
 
 #add_file_button{
 background-color:rgb(0, 85, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -115,6 +116,7 @@ background-color:rgb(200, 0, 0)
 }
 #remove_file_button {
 background-color:rgb(170, 0, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -127,6 +129,7 @@ background-color: rgb(0, 116, 0);
 
 #add_folder_button{
 background-color:rgb(0, 85, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -137,6 +140,7 @@ background-color:rgb(200, 0, 0)
 }
 #remove_folder_button {
 background-color:rgb(170, 0, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -839,7 +843,7 @@ fill:red;</string>
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="stackedWidgetPage1">
           <layout class="QGridLayout" name="gridLayout_2">
@@ -1124,7 +1128,7 @@ border: 0px solid black;
                      <item row="0" column="3">
                       <widget class="QPushButton" name="remove_folder_button">
                        <property name="text">
-                        <string>xóa thư mục</string>
+                        <string>Xóa thư mục</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">
@@ -1181,7 +1185,7 @@ border: 0px solid black;
                      <item row="0" column="4">
                       <widget class="QPushButton" name="log_button">
                        <property name="text">
-                        <string>mở bảng trạng thái</string>
+                        <string>Mở bảng lịch sử</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../resources.qrc">

@@ -193,6 +193,22 @@ class PermissionModel(NativeSqlite3Model):
         finally:
             # Close the connection
             cur.close()
+    def fetch_usernames_based_on_suggestions(self, text):
+        """Fetch usernames from the database that match the input."""
+        cur = self.connection.cursor()
+
+        try:
+            # Use SQL LIKE to match usernames containing the input text
+            cur.execute("SELECT username FROM users WHERE username LIKE ?", (f"%{text}%",))
+            rows = cur.fetchall()
+
+            # Extract usernames from the result
+            return [row[0] for row in rows]
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return []
+        finally:
+            cur.close()
 
 
 if __name__ == "__main__":

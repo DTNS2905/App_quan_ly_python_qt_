@@ -1,8 +1,9 @@
 from PyQt6 import uic, QtWidgets
-from PyQt6.QtCore import QStringListModel
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtCore import QStringListModel, Qt
+from PyQt6.QtWidgets import QMessageBox, QCompleter
 
 from common import session
+from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -46,6 +47,21 @@ class PermissionDialog(QtWidgets.QDialog):
                 self.process_selection(),
                 user_assign
             ))
+
+        # Initialize QCompleter
+        self.completer = QCompleter(self)
+        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)  # Corrected: Use enum
+        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
+        self.completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)  # Use popup for suggestions
+
+        # Set the model for the completer
+        self.string_list_model = QStringListModel()  # Start with an empty model
+        self.completer.setModel(self.string_list_model)
+
+        # Attach the completer to the lineEdit
+        self.lineEdit.setCompleter(self.completer)
+
+        self.lineEdit.textChanged.connect(self.presenter.update_suggestions)
 
     def process_selection(self):
         """Retrieve original permissions from selected translated ones."""
