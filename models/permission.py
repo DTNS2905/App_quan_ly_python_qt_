@@ -16,6 +16,16 @@ class PermissionDTO:
     is_admin: bool = False
 
 
+@dataclass
+class PermissionTableDTO:
+    username: str
+    fullname: str
+    position: str
+    phone_number: str
+    permissions: list[str]
+    is_admin: bool = False
+
+
 class PermissionModel(NativeSqlite3Model):
     _junction_table_sql = CREATE_PERMISSION_USER_TABLE_SQL
     _add_permission_sql = ADD_PERMISSION_SQL
@@ -61,22 +71,26 @@ class PermissionModel(NativeSqlite3Model):
         cur.close()
         return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
 
-    def fetch_user_permissions(self) -> list[PermissionDTO]:
+    def fetch_user_permissions(self) -> list[PermissionTableDTO]:
         """Fetch all usernames and their permissions."""
         cur = self.connection.cursor()
         cur.execute(self._fetch_user_permission_sql)
         rows = cur.fetchall()
-        data: list[PermissionDTO] = []
-        raw_data: dict[str, list[str]] = {}
+        data: list[PermissionTableDTO] = []
+        raw_data: dict[str, dict[str, list[str]]] = {}
         for row in rows:
-            username = row[0]
-            permission = row[1]
+            username, fullname, phone_number, position, permission = row
             if username not in raw_data.keys():
-                raw_data[username] = [permission]
+                raw_data[username] = {
+                    "infos": [fullname, phone_number, position],
+                    "permissions": [permission] if permission is not None else [""]
+                }
             else:
-                raw_data[username].append(permission)
-        for username, permissions in raw_data.items():
-            data.append(PermissionDTO(username, permissions, "admin" in username))
+                raw_data[username]["permissions"].append(permission if permission is not None else "")
+        for username, value in raw_data.items():
+            infos = value["infos"]
+            permissions = value["permissions"]
+            data.append(PermissionTableDTO(username, *infos, permissions=permissions, is_admin="admin" in username))
         cur.close()
         return data
 
@@ -118,6 +132,19 @@ class PermissionModel(NativeSqlite3Model):
             return result[0]
         else:
             raise Exception(f"User '{username}' not found.")
+
+    def delete_user_by_username(self, username):
+        cur = self.connection.cursor()
+        try:
+            cur.execute("DELETE FROM users WHERE username=?", (username,))
+            if cur.rowcount > 0:
+                self.connection.commit()
+                print(f"Delete '{username}' successfully")
+            else:
+                self.connection.rollback()
+                raise Exception(print(f"Delete '{username}' failed"))
+        finally:
+            cur.close()
 
     def get_permission_id_by_name(self, permission):
         """Get permission_id from permission name."""
@@ -171,7 +198,7 @@ class PermissionModel(NativeSqlite3Model):
 
                 for permission_name in permissions:
                     # Fetch permission_id using the permission name
-                    cur.execute("SELECT id FROM permissions WHERE name = ?", (permission_name,))
+                    cur.execute("SELECT id FROM permissions WHERE permission = ?", (permission_name,))
                     permission = cur.fetchone()
                     if not permission:
                         print(f"Permission '{permission_name}' not found. Skipping...")

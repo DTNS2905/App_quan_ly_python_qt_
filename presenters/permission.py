@@ -1,4 +1,7 @@
+import traceback
+
 from PyQt6 import QtWidgets
+from PyQt6.QtWidgets import QPushButton, QMessageBox
 
 from common import session
 from common.presenter import Presenter
@@ -57,11 +60,41 @@ class PermissionPresenter(Presenter):
 
         for row, user_permission in enumerate(user_permissions):
             username = user_permission.username
+            fullname = user_permission.fullname
+            position = user_permission.position
+            phone_number = user_permission.phone_number
             translated_permissions = self.translate_permissions(user_permission.permissions)
             self.view.user_permission_table.insertRow(row)
             self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-            self.view.user_permission_table.setItem(row, 1,
+            self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(fullname))
+            self.view.user_permission_table.setItem(row, 2, QtWidgets.QTableWidgetItem(position))
+            self.view.user_permission_table.setItem(row, 3, QtWidgets.QTableWidgetItem(phone_number))
+            self.view.user_permission_table.setItem(row, 4,
                                                     QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions)))
+            delete_button = QPushButton("Xóa")
+
+            def delete_user(_row):
+                try:
+                    index = self.view.user_permission_table.model().index(row, 0)
+                    delete_username = self.view.user_permission_table.model().data(index)
+                    reply = QMessageBox.question(
+                        self.view,
+                        "Xác nhận xóa",
+                        f"bạn chắc chắn muốn xóa người dùng {delete_username} ?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                        QMessageBox.StandardButton.No
+                    )
+                    if reply == QMessageBox.StandardButton.Yes:
+                        self.model.delete_user_by_username(delete_username)
+                        self.view.display_success(f"Xóa người dùng {delete_username}' thành công!.")
+                        self.populate_table()
+                except:
+                    print(traceback.print_exc())
+
+            delete_button.clicked.connect(lambda checked, _row=row: delete_user(_row))
+
+            self.view.user_permission_table.setIndexWidget(
+                self.view.user_permission_table.model().index(row, 5), delete_button)
 
         self.view.user_permission_table.resizeColumnsToContents()
         self.view.user_permission_table.resizeRowsToContents()
@@ -235,4 +268,3 @@ class PermissionPresenter(Presenter):
             # Handle potential errors during database fetching
             print(f"Error fetching suggestions: {e}")
             self.view.string_list_model.setStringList([])  # Clear suggestions in case of an error
-

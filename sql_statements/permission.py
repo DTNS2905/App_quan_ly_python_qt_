@@ -50,13 +50,17 @@ UPDATE_PERMISSION_SQL = '''
 '''
 
 PERMISSION_USER_VIEW_SQL = '''
-    SELECT 
+    SELECT
         u.username,
+        pr.fullname,
+        pr.phone_number,
+        pr.position,
         p.permission
-    FROM 
-        user_permissions up
-    JOIN users u ON up.user_id = u.id
-    JOIN permissions p ON up.permission_id = p.id;
+    FROM
+        users u
+    LEFT JOIN user_permissions up ON up.user_id = u.id
+    LEFT JOIN profiles pr ON pr.user_id = u.id
+    LEFT JOIN permissions p ON up.permission_id = p.id
 '''
 
 GET_USER_ID_SQL = "SELECT id FROM users WHERE username = ?;"

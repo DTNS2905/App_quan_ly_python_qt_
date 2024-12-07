@@ -26,7 +26,7 @@
    <string>Phần mềm quản lý hồ sơ bài giẳng</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources.qrc">
+   <iconset>
     <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
@@ -322,7 +322,7 @@ color:balck;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../resources.qrc">:/images/ui/images/icon_remove_background.png</pixmap>
+                <pixmap>:/images/ui/images/icon_remove_background.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -423,7 +423,7 @@ color:balck;
              <string>Trang chủ </string>
             </property>
             <property name="icon">
-             <iconset resource="../resources.qrc">
+             <iconset>
               <normaloff>:/icons/icons/home.svg</normaloff>:/icons/icons/home.svg</iconset>
             </property>
             <property name="iconSize">
@@ -468,7 +468,7 @@ color: black;
              <string>Quản lý người dùng</string>
             </property>
             <property name="icon">
-             <iconset resource="../resources.qrc">
+             <iconset>
               <normaloff>:/icons/icons/user.svg</normaloff>:/icons/icons/user.svg</iconset>
             </property>
             <property name="iconSize">
@@ -776,7 +776,7 @@ color: black;
                 <enum>Qt::TextFormat::AutoText</enum>
                </property>
                <property name="pixmap">
-                <pixmap resource="../resources.qrc">:/images/ui/images/vecteezy_user-icon-on-transparent-background_19879186-80x80.png</pixmap>
+                <pixmap>:/images/ui/images/vecteezy_user-icon-on-transparent-background_19879186-80x80.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -799,7 +799,7 @@ fill:red;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources.qrc">
+             <iconset>
               <normaloff>:/icons/icons/log-out.svg</normaloff>:/icons/icons/log-out.svg</iconset>
             </property>
             <property name="iconSize">
@@ -884,8 +884,8 @@ fill:red;</string>
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>631</width>
-                <height>367</height>
+                <width>443</width>
+                <height>137</height>
                </rect>
               </property>
               <property name="sizeIncrement">
@@ -1111,7 +1111,7 @@ border: 0px solid black;
                         <string>Thêm tài liệu</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../resources.qrc">
+                        <iconset>
                          <normaloff>:/icons_white/icons/icons_white/file-plus.svg</normaloff>:/icons_white/icons/icons_white/file-plus.svg</iconset>
                        </property>
                        <property name="autoDefault">
@@ -1131,7 +1131,7 @@ border: 0px solid black;
                         <string>Xóa thư mục</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../resources.qrc">
+                        <iconset>
                          <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
                        </property>
                       </widget>
@@ -1160,7 +1160,7 @@ border: 0px solid black;
                         <string>Xóa tài liệu</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../resources.qrc">
+                        <iconset>
                          <normaloff>:/icons_white/icons/icons_white/file-minus.svg</normaloff>:/icons_white/icons/icons_white/file-minus.svg</iconset>
                        </property>
                        <property name="autoDefault">
@@ -1177,7 +1177,7 @@ border: 0px solid black;
                         <string>Thêm thư mục</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../resources.qrc">
+                        <iconset>
                          <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
                        </property>
                       </widget>
@@ -1188,7 +1188,7 @@ border: 0px solid black;
                         <string>Mở bảng lịch sử</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../resources.qrc">
+                        <iconset>
                          <normaloff>:/icons_white/icons/icons_white/airplay.svg</normaloff>:/icons_white/icons/icons_white/airplay.svg</iconset>
                        </property>
                       </widget>
@@ -1595,7 +1595,7 @@ border-radius:5px;
                     <string>Thêm quyền cho người dùng </string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../resources.qrc">
+                    <iconset>
                      <normaloff>:/icons_white/icons/icons_white/user-check.svg</normaloff>:/icons_white/icons/icons_white/user-check.svg</iconset>
                    </property>
                   </widget>
@@ -1612,7 +1612,7 @@ border-radius:5px;
                     <string>Bỏ quyền cho người dùng </string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../resources.qrc">
+                    <iconset>
                      <normaloff>:/icons_white/icons/icons_white/user-x.svg</normaloff>:/icons_white/icons/icons_white/user-x.svg</iconset>
                    </property>
                   </widget>
@@ -1947,7 +1947,79 @@ border-radius:5px;
                 </column>
                 <column>
                  <property name="text">
-                  <string>Các quyền</string>
+                  <string>Họ Tên</string>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Số Điện Thoại</string>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Đơn Vị Công Tác</string>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Quyền</string>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="background">
+                  <color>
+                   <red>53</red>
+                   <green>53</green>
+                   <blue>53</blue>
+                  </color>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Tác Vụ</string>
                  </property>
                  <property name="font">
                   <font>
