@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['app.py'],
-    pathex=['D:\\freelances\\Tuan\\app_quan_ly_python_qt\\venv\\Lib\\site-packages'],
+    pathex=['D:\\QT_app\\qt_project\\venv\\Lib\\site-packages'],
     binaries=[],
     datas=[('common', 'common'), ('messages', 'messages'), ('models', 'models'), ('presenters', 'presenters'), ('sql_statements', 'sql_statements'), ('ui', 'ui'), ('ui_components', 'ui_components'), ('views', 'views'), ('configs.py', 'configs.py'), ('icon.ico', 'icon.ico'), ('resources.py', 'resources.py'), ('resources.qrc', 'resources.qrc')],
     hiddenimports=[],
