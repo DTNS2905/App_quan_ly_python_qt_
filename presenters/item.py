@@ -2,7 +2,7 @@ import traceback
 
 from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDropShadowEffect, QDialog
 
 from common import session
 from common.presenter import Presenter
@@ -12,6 +12,7 @@ from messages.messages import PERMISSION_DENIED, ADD_FILE_SUCCESS, ADD_FILE_ERRO
 from messages.permissions import FILE_CREATE, FILE_DELETE, FILE_DOWNLOAD, FOLDER_CREATE, FOLDER_DELETE
 from models.item import ItemModel
 from models.log import LogModel
+from ui_components.cusom_input_dialog import CustomInputDialog
 
 
 class ItemPresenter(Presenter):
@@ -161,35 +162,40 @@ class ItemPresenter(Presenter):
             print(traceback.format_exc())
 
     def handle_add_folder(self):
-        """Add a new folder to the selected directory under the root path."""
+        """Thêm một thư mục mới vào thư mục đã chọn dưới đường dẫn gốc."""
         if not session.SESSION.match_permissions(FOLDER_CREATE):
             LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
-            self.view.display_error(PERMISSION_DENIED)
+            self.view.display_error("Bạn không có quyền tạo thư mục.")  # Thông báo lỗi
             return
 
         try:
-            # Prompt for the folder name instead of path
-            folder_name, ok = QInputDialog.getText(self.view, "Thư mục mới", " Điền tên thư mục:")
-            if not ok or not folder_name.strip():
-                LogModel.write_log(session.SESSION.get_username(), FOLDER_CREATE_ERROR)
-                self.view.display_error(FOLDER_CREATE_ERROR)
-                return
+            # Use the custom dialog
+            dialog = CustomInputDialog(self.view)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                folder_name = dialog.get_text()
+                if not folder_name:
+                    LogModel.write_log(session.SESSION.get_username(), FOLDER_CREATE_ERROR)
+                    self.view.display_error("Tên thư mục không được để trống.")  # Thông báo lỗi
+                    return
 
-            selected_index = self.view.treeView.currentIndex()
-            model = self.view.treeView.model()
-            parent_original_name = model.data(selected_index)
+                selected_index = self.view.treeView.currentIndex()
+                model = self.view.treeView.model()
+                parent_original_name = model.data(selected_index)
 
-            username = session.SESSION.get_username()
-            self.model.create_folder(username, folder_name.strip(), parent_original_name)
+                username = session.SESSION.get_username()
+                self.model.create_folder(username, folder_name, parent_original_name)
 
-            LogModel.write_log(username, f"{FOLDER_CREATE_SUCCESS}:'{folder_name}'")
-            self.view.display_success(f"{FOLDER_CREATE_SUCCESS}:'{folder_name}'")
+                LogModel.write_log(username, f"Thành công: Tạo thư mục '{folder_name}'")
+                self.view.display_success(f"Thư mục '{folder_name}' đã được tạo thành công.")  # Thông báo thành công
 
-            # Refresh the view to show the new folder
-            self.view.refresh_tree_view()
+                # Refresh the view to show the new folder
+                self.view.refresh_tree_view()
+            else:
+                LogModel.write_log(session.SESSION.get_username(),
+                                   "Người dùng đã hủy việc tạo thư mục.")  # Nhật ký khi hủy
         except Exception as e:
-            self.view.display_error(f"{FOLDER_CREATE_ERROR}:{e}")
-            LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_CREATE_ERROR}:{e}")
+            self.view.display_error(f"Lỗi tạo thư mục: {e}")  # Thông báo lỗi hệ thống
+            LogModel.write_log(session.SESSION.get_username(), f"Lỗi tạo thư mục: {e}")
 
     def handle_remove_folder(self):
         """Remove the selected folder."""

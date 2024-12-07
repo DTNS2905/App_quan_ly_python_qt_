@@ -17,6 +17,7 @@ PERMISSION_TRANSLATIONS = {
     f"{PERMISSION_VIEW}": "Xem cấp quyền",
     f"{PERMISSION_GRANT}": "Cấp quyền",
     f"{PERMISSION_UNGRANT}": "Thu hồi quyền",
+    f"{LOG_VIEW}" : "xem bảng lịch sử"
 
     # Add more translations as needed
 }
