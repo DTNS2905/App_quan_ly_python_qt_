@@ -51,6 +51,7 @@ class ItemPresenter(Presenter):
         """Handle adding multiple files to the root directory."""
         if not session.SESSION.match_permissions(FILE_CREATE):
             self.view.display_error(PERMISSION_DENIED)
+            LogModel.write_log(session.SESSION.get_username(), f"{FILE_CREATE}: {PERMISSION_DENIED}")
             return
 
         try:
@@ -68,7 +69,9 @@ class ItemPresenter(Presenter):
                 self.model.create_file(username, file_path, parent_original_name)
 
             # Notify the view about the success
-            self.view.display_success(f"{len(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.get_root_path()}.")
+            self.view.display_success(f"{', '.join(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.get_root_path()}.")
+            LogModel.write_log(session.SESSION.get_username(),
+                               f"{', '.join(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.get_root_path()}.")
 
             # Refresh the view
             self.view.refresh_tree_view()

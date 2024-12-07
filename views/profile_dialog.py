@@ -2,6 +2,7 @@ from PyQt6 import uic, QtWidgets
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox, QLineEdit
 from common import session
+from configs import PROFILE_PATH
 from presenters.profile import ProfilePresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 
@@ -9,7 +10,7 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class ProfileDialog(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/profile.ui', self)
+        uic.loadUi(PROFILE_PATH, self)
         self.presenter = ProfilePresenter(self)
 
         username = session.SESSION.get_username()

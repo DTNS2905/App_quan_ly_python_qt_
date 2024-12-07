@@ -1,16 +1,32 @@
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 
+if getattr(sys, 'frozen', False):
+    # If the application is run as a bundle, the PyInstaller bootloader
+    # extends the sys module by a flag frozen=True and sets the app
+    # path into variable _MEIPASS'.
+    APP_PATH = sys._MEIPASS
+else:
+    APP_PATH = os.path.dirname(os.path.abspath(__file__))
+
+
+FILES_ROOT_PATH = os.path.join(APP_PATH, 'files_storage')
+
 DATABASE_NAME = "app_quan_ly_pyqt6.db"
-FILES_ROOT_PATH = Path(__file__).parent / 'files_storage'
+LOG_PATH = Path(__file__).parent / 'logs'
 LOGIN_UI_PATH = Path(__file__).parent / 'ui/login.ui'
 DASHBOARD_UI_PATH = Path(__file__).parent / 'ui/admin_dashboard.ui'
 REGISTER_UI_PATH = Path(__file__).parent / 'ui/register_ui.ui'
+LOG_UI_PATH = Path(__file__).parent / 'ui/log.ui'
+PERMISSION_PATH = Path(__file__).parent / 'ui/permission_dialog.ui'
+PROFILE_PATH = Path(__file__).parent / 'ui/profile.ui'
 FILE_TREE_VIEW_COLUMNS = ["Tên", "Loại", "Ngày Tạo", "Người Tạo"]
-LOG_PATH = Path(__file__).parent / 'logs'
+
 os.makedirs(LOG_PATH, exist_ok=True)
+os.makedirs(FILES_ROOT_PATH, exist_ok=True)
 
 
 def setup_logging():

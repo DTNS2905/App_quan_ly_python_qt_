@@ -3,6 +3,7 @@ from PyQt6.QtCore import QStringListModel, Qt
 from PyQt6.QtWidgets import QMessageBox, QCompleter
 
 from common import session
+from configs import PERMISSION_PATH
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -11,7 +12,7 @@ from ui_components.custom_messgae_box import CustomMessageBox
 class PermissionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, action_type=None):
         super().__init__(parent)
-        uic.loadUi('ui/permission_dialog.ui', self)
+        uic.loadUi(PERMISSION_PATH, self)
 
         self.action_type = action_type  # Store the action type ('assign' or 'unassign')
 
