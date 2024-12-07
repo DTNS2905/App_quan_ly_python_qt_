@@ -1,12 +1,13 @@
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon, QPainter, QPixmap
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QLineEdit, QMessageBox
 
 from common import session
 from common.session import UserSession
 from configs import LOGIN_UI_PATH
+from models.item import ItemModel
 from models.log import LogModel
+from models.profile import ProfileModel
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -22,6 +23,8 @@ class LoginDialog(QtWidgets.QDialog):
         self.presenter = AuthPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
         self.log_model = LogModel()
+        self.item_model = ItemModel()
+        self.profile_model = ProfileModel()
 
         # Add default user
         self.presenter.add_default_user('admin', 'admin123')
@@ -35,8 +38,8 @@ class LoginDialog(QtWidgets.QDialog):
         def handle_login():
             result = self.presenter.handle_login()
             if result:  # Check if result is not None
-                username, permissions = result
-                session.SESSION = UserSession(username, permissions)
+                username, permissions, item_permissions = result
+                session.SESSION = UserSession(username, permissions, item_permissions)
             else:
                 # Log or handle login failure gracefully
                 print("Login failed or user has no permissions.")

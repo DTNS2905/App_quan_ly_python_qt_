@@ -20,7 +20,8 @@ class AuthPresenter(Presenter):
             self.view.display_success(LOGIN_SUCCESS)
             self.view.accept()  # Close dialog and signal success
             permissions = self.permission_model.get_permission_by_username(username).permissions
-            return username, permissions
+            item_permissions = self.permission_model.get_item_permission_by_username(username).permissions
+            return username, permissions, item_permissions
         else:
             self.view.display_error(LOGIN_ERROR)
             return

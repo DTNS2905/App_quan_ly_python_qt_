@@ -6,36 +6,21 @@ from PyQt6.QtWidgets import QPushButton, QMessageBox
 from common import session
 from common.presenter import Presenter
 from messages.contants import PERMISSION_TRANSLATIONS
-from messages.messages import GRANT_PERMISSION_SUCCESSFULLY, PERMISSION_DENIED, PERMISSION_GRANTED, \
-    GRANT_PERMISSION_ERROR
+from messages.messages import *
+from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT
 from models.log import LogModel
 
 from models.permission import PermissionModel
 
 
 class PermissionPresenter(Presenter):
-    FILE_PERMISSIONS = [
-        "file:view", "file:create", "file:update", "file:execute", "file:delete",
-    ]
-
-    FOLDER_PERMISSION = [
-        "folder:view", "folder:create", "folder:update", "folder:delete",
-    ]
-
-    PERMISSION_PERMISSION = [
-        "permission:view", "permission:create", "permission:update", "permission:grant", "permission:delete",
-    ]
-
-    ALL_PERMISSION = [*FILE_PERMISSIONS, *FOLDER_PERMISSION, *PERMISSION_PERMISSION]
-
-    VIEW_SCOPES = [p for p in ALL_PERMISSION if ":view" in p]
 
     def __init__(self, view):
         super().__init__(view, PermissionModel())
 
     def assign_permission_to_user(self, username, permission):
         """Assign a permission to a user."""
-        if not session.SESSION.match_permissions("permission:grant"):
+        if not session.SESSION.match_permissions(PERMISSION_GRANT):
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             return
@@ -101,7 +86,7 @@ class PermissionPresenter(Presenter):
 
     def add_default_permissions(self):
         """Add default permissions."""
-        default_permissions = self.ALL_PERMISSION
+        default_permissions = ALL_PERMISSION
         for permission in default_permissions:
             try:
                 self.model.add_permission(permission)
@@ -109,7 +94,7 @@ class PermissionPresenter(Presenter):
                 print(f"Failed to add permission '{permission}': {e}")
 
     def assign_all_permissions(self, username: str):
-        default_permissions = self.ALL_PERMISSION
+        default_permissions = ALL_PERMISSION
         for permission in default_permissions:
             try:
                 self.model.assign_permission_to_user(username, permission)
@@ -126,7 +111,7 @@ class PermissionPresenter(Presenter):
             user_assign (str): The user performing the assignment.
         """
 
-        if not session.SESSION.match_permissions("permission:grant"):
+        if not session.SESSION.match_permissions(PERMISSION_GRANT):
             # Display error and log permission denial
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(
@@ -192,7 +177,7 @@ class PermissionPresenter(Presenter):
             user_unassign (str): The user performing the unassignment.
         """
 
-        if not session.SESSION.match_permissions("permission:delete"):
+        if not session.SESSION.match_permissions(PERMISSION_UNGRANT):
             # Display error and log permission denial
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(

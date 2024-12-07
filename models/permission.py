@@ -6,7 +6,7 @@ from configs import DATABASE_NAME
 from sql_statements.permission import ADD_PERMISSION_SQL, \
     PERMISSION_USER_VIEW_SQL, CREATE_PERMISSION_TABLE_SQL, CREATE_PERMISSION_USER_TABLE_SQL, \
     GET_PERMISSION_BY_USERNAME_SQL, ASSIGN_PERMISSION_BY_USERNAME_SQL, REMOVE_PERMISSION_FROM_USER_SQL, \
-    ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL, GET_USER_ID_SQL, GET_PERMISSION_ID_SQL
+    ASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL, GET_USER_ID_SQL, GET_PERMISSION_ID_SQL, GET_ITEM_PERMISSION_BY_USERNAME_SQL
 
 
 @dataclass
@@ -14,6 +14,12 @@ class PermissionDTO:
     username: str
     permissions: list[str]
     is_admin: bool = False
+
+
+@dataclass
+class PermissionItemDTO:
+    username: str
+    permissions: dict[str, list[str]]
 
 
 @dataclass
@@ -31,6 +37,7 @@ class PermissionModel(NativeSqlite3Model):
     _add_permission_sql = ADD_PERMISSION_SQL
     _assign_permission_sql = ASSIGN_PERMISSION_BY_USERNAME_SQL
     _get_permission_by_username = GET_PERMISSION_BY_USERNAME_SQL
+    _get_item_permission_by_username = GET_ITEM_PERMISSION_BY_USERNAME_SQL
     _fetch_user_permission_sql = PERMISSION_USER_VIEW_SQL
     _remove_permission_from_user_sql = REMOVE_PERMISSION_FROM_USER_SQL
     _get_user_id_sql = GET_USER_ID_SQL
@@ -70,6 +77,19 @@ class PermissionModel(NativeSqlite3Model):
         rows = cur.fetchall()
         cur.close()
         return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
+
+    def get_item_permission_by_username(self, username: str):
+        cur = self.connection.cursor()
+        cur.execute(self._get_item_permission_by_username, (username,))
+        rows = cur.fetchall()
+        permissions: dict[str, list[str]] = {}
+        for item, permission in rows:
+            if item not in permissions.keys():
+                permissions[item] = [permission]
+            else:
+                permissions[item].append(permission)
+        cur.close()
+        return PermissionItemDTO(username, permissions)
 
     def fetch_user_permissions(self) -> list[PermissionTableDTO]:
         """Fetch all usernames and their permissions."""
@@ -241,6 +261,7 @@ class PermissionModel(NativeSqlite3Model):
 if __name__ == "__main__":
     model = PermissionModel(database_name=r'D:\freelances\Tuan\app_quan_ly_python_qt\app_quan_ly_pyqt6.db')
     # model.add_permission("test")
-    model.assign_permission_to_user("admin", "file:view")
+    # model.assign_permission_to_user("admin", "file:view")
     # print(model.fetch_user_permissions())
     # print(model.get_permission_by_username("admin"))
+    print(model.get_item_permission_by_username("admin"))

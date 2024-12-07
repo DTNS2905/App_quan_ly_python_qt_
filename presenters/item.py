@@ -7,8 +7,9 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox, QInputDialog, QGraphicsDro
 from common import session
 from common.presenter import Presenter
 from messages.messages import PERMISSION_DENIED, ADD_FILE_SUCCESS, ADD_FILE_ERROR, SELECTED_FILE_ERROR, \
-    FILE_REMOVE_FAIL, FILE_REMOVE_SUCCESS, OPEN_FILE_FAIL, FOLDER_SELECTED_FAIL, FOLDER_CREATE_ERROR, FOLDER_EXISTED, \
+    FILE_REMOVE_FAIL, FILE_REMOVE_SUCCESS, OPEN_FILE_FAIL, FOLDER_CREATE_ERROR, \
     FOLDER_SELECTED_NOT_FOUND, FOLDER_CREATE_SUCCESS, FOLDER_REMOVE_SUCCESS, FOLDER_REMOVE_ERROR, FILE_NOT_FOUND
+from messages.permissions import FILE_CREATE, FILE_DELETE, FILE_DOWNLOAD, FOLDER_CREATE, FOLDER_DELETE
 from models.item import ItemModel
 from models.log import LogModel
 
@@ -46,7 +47,7 @@ class ItemPresenter(Presenter):
 
     def handle_add_files(self):
         """Handle adding multiple files to the root directory."""
-        if not session.SESSION.match_permissions("file:create"):
+        if not session.SESSION.match_permissions(FILE_CREATE):
             self.view.display_error(PERMISSION_DENIED)
             return
 
@@ -75,11 +76,8 @@ class ItemPresenter(Presenter):
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
-        if not session.SESSION.match_permissions("file:delete"):
-            self.view.display_error(PERMISSION_DENIED)
-            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
-            return
 
+        can_all_remove = session.SESSION.match_permissions(FILE_DELETE)
         try:
             selected_indexes = self.view.treeView.selectedIndexes()
             selected_indexes = [value for index, value in enumerate(selected_indexes) if index % 4 == 0]
@@ -91,63 +89,63 @@ class ItemPresenter(Presenter):
             # Collect unique file paths from selected indexes (to avoid duplicates)
             file_paths = set()
             model = self.view.treeView.model()
+            not_deleted_files = set()
             for index in selected_indexes:
                 original_name = model.data(index)
-                file_paths.add(original_name)
+                if can_all_remove or session.SESSION.match_item_permissions(original_name, FILE_DELETE):
+                    file_paths.add(original_name)
+                else:
+                    not_deleted_files.add(original_name)
 
-            # Confirmation dialog for batch file deletion
-            reply = QMessageBox.question(
-                self.view,
-                "Xác nhận xóa",
-                f"Bạn chắc chắn muốn xóa {', '.join(file_paths)} ?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No
-            )
+            if len(not_deleted_files) > 0:
+                self.view.display_error(f"Xóa {', '.join(not_deleted_files)}: {PERMISSION_DENIED}")
 
-            if reply == QMessageBox.StandardButton.Yes:
-                for file_path in file_paths:
-                    try:
-                        self.model.delete_file(file_path)  # Remove each file
-                        LogModel.write_log(session.SESSION.get_username(), f" {FILE_REMOVE_SUCCESS} cho {file_path} ")
-                    except Exception as e:
-                        LogModel.write_log(session.SESSION.get_username(),
-                                           f"{FILE_REMOVE_FAIL} cho {file_path}: {e}")
-                        self.view.display_error(f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
+            if len(file_paths) > 0:
+                # Confirmation dialog for batch file deletion
+                reply = QMessageBox.question(
+                    self.view,
+                    "Xác nhận xóa",
+                    f"Bạn chắc chắn muốn xóa {', '.join(file_paths)} ?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No
+                )
 
-                self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)} ")
+                if reply == QMessageBox.StandardButton.Yes:
+                    for file_path in file_paths:
+                        try:
+                            self.model.delete_file(file_path)  # Remove each file
+                            LogModel.write_log(session.SESSION.get_username(), f" {FILE_REMOVE_SUCCESS} cho {file_path} ")
+                        except Exception as e:
+                            LogModel.write_log(session.SESSION.get_username(),
+                                               f"{FILE_REMOVE_FAIL} cho {file_path}: {e}")
+                            self.view.display_error(f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}")
 
-                # Refresh the view after deletion
-                self.view.refresh_tree_view()
-            else:
-                LogModel.write_log(session.SESSION.get_username(), FILE_REMOVE_FAIL)
-                self.view.display_error(FILE_REMOVE_FAIL)
+                    self.view.display_success(f" {FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)} ")
+
+                    # Refresh the view after deletion
+                    self.view.refresh_tree_view()
+                else:
+                    LogModel.write_log(session.SESSION.get_username(), FILE_REMOVE_FAIL)
+                    self.view.display_error(FILE_REMOVE_FAIL)
 
         except Exception as e:
             LogModel.write_log(session.SESSION.get_username(), f"{FILE_REMOVE_FAIL}:{e}")
             self.view.display_error(f"{FILE_REMOVE_FAIL}:{e}")
 
-    def open_file(self, index):
-        # Get the file path from the selected index
-        if not session.SESSION.match_permissions("file:execute"):
-            self.view.display_error(PERMISSION_DENIED)
-            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
-            return
-
-        model = self.view.treeView.model()
-        original_name = model.data(index)
-
-        try:
-            self.model.open_file(original_name)
-        except Exception as e:
-            LogModel.write_log(session.SESSION.get_username(), f"{OPEN_FILE_FAIL}: {e}")
-            self.view.display_error(f"{OPEN_FILE_FAIL}: {e}")
-
     def handle_download_item(self):
         # Replace this with your actual data bytes
+        can_all_download = session.SESSION.match_permissions(FILE_DOWNLOAD)
+
         try:
             selected_index = self.view.treeView.currentIndex()
             model = self.view.treeView.model()
             original_name = model.data(selected_index)
+
+            if not (can_all_download or session.SESSION.match_item_permissions(original_name, FILE_DOWNLOAD)):
+                self.view.display_error(f"Lưu {original_name}: {PERMISSION_DENIED}")
+                LogModel.write_log(session.SESSION.get_username(), f"Lưu '{original_name}': {PERMISSION_DENIED}")
+                return
+
             data_bytes = self.model.get_file_bytes(original_name)
             if data_bytes is None:
                 self.view.display_error(f"'{original_name}' không phải là tệp đơn")
@@ -158,12 +156,13 @@ class ItemPresenter(Presenter):
                 with open(file_path, 'wb') as f:
                     f.write(data_bytes)
                 self.view.display_success(f"Lưu '{original_name}' về {file_path} thành công")
-        except Exception:
+        except Exception as e:
+            self.view.display_error(f"Lưu thất bại: {str(e)}")
             print(traceback.format_exc())
 
     def handle_add_folder(self):
         """Add a new folder to the selected directory under the root path."""
-        if not session.SESSION.match_permissions("folder:create"):
+        if not session.SESSION.match_permissions(FOLDER_CREATE):
             LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             self.view.display_error(PERMISSION_DENIED)
             return
@@ -175,14 +174,6 @@ class ItemPresenter(Presenter):
                 LogModel.write_log(session.SESSION.get_username(), FOLDER_CREATE_ERROR)
                 self.view.display_error(FOLDER_CREATE_ERROR)
                 return
-
-            # # Ensure it's being created under the root path
-            # target_path = self.model.root_path / folder_name.strip()
-
-            # # Check if the folder already exists
-            # if target_path.exists():
-            #     self.view.display_error(f"{FOLDER_EXISTED} '{target_path}'")
-            #     return
 
             selected_index = self.view.treeView.currentIndex()
             model = self.view.treeView.model()
@@ -202,11 +193,7 @@ class ItemPresenter(Presenter):
 
     def handle_remove_folder(self):
         """Remove the selected folder."""
-        if not session.SESSION.match_permissions("folder:delete"):
-            self.view.display_error(PERMISSION_DENIED)
-            LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
-            return
-
+        can_all_remove = session.SESSION.match_permissions(FOLDER_DELETE)
         selected_indexes = self.view.treeView.selectedIndexes()
         if not selected_indexes:
             LogModel.write_log(session.SESSION.get_username(), FOLDER_SELECTED_NOT_FOUND)
@@ -218,6 +205,11 @@ class ItemPresenter(Presenter):
         original_name = model.data(index)
         folder_path = original_name
 
+        if not (can_all_remove or session.SESSION.match_item_permissions(folder_path, FOLDER_DELETE)):
+            self.view.display_error(f"Xóa {folder_path}: {PERMISSION_DENIED}")
+            LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {PERMISSION_DENIED}")
+            return
+
         reply = QMessageBox.question(
             self.view,
             "Xác nhận xóa",
@@ -225,6 +217,7 @@ class ItemPresenter(Presenter):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
+
         if reply == QMessageBox.StandardButton.Yes:
             try:
                 # Remove the folder
@@ -237,14 +230,3 @@ class ItemPresenter(Presenter):
             except Exception as e:
                 LogModel.write_log(session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {e}")
                 self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
-
-    # def get_item_id_by_name(self, item_name):
-    #     if not session.SESSION.match_permissions("folder:delete"):
-    #         self.view.display_error(PERMISSION_DENIED)
-    #         LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
-    #         return
-    #     try:
-    #         self.model.get_item_id_by_name(item_name)
-    #     except Exception as e:
-    #         print(f"{FOLDER_GET_ERROR}: {e}")
-

@@ -35,6 +35,15 @@ GET_PERMISSION_BY_USERNAME_SQL = '''
     WHERE u.username = ?
 '''
 
+GET_ITEM_PERMISSION_BY_USERNAME_SQL = '''
+    SELECT DISTINCT i.original_name, p.permission
+    FROM users u
+    INNER JOIN user_item_permissions uip ON u.id = uip.user_id
+    INNER JOIN items i ON i.id = uip.item_id = i.id
+    INNER JOIN permissions p ON uip.permission_id = p.id
+    WHERE u.username = ?
+'''
+
 REMOVE_PERMISSION_FROM_USER_SQL = '''
     DELETE FROM user_permissions
     WHERE user_id = (SELECT id FROM users WHERE username = ?)
