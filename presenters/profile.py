@@ -11,20 +11,28 @@ class ProfilePresenter(Presenter):
         super().__init__(view, ProfileModel())
 
     def get_profile_details(self, username):
+        """
+        Fetches profile details by username using the model.
+        Returns a dictionary with profile information, None if not found, or an error message.
+        """
         try:
             profile = self.model.get_profile_by_username(username)
+
+            # If no profile is found, return None
+            if profile is None:
+                return None
+
+            # Ensure the profile object has the necessary attributes before returning
             return {
                 "ID": profile.id,
                 "User ID": profile.user_id,
-                "Full Name": profile.fullname,
-                "Position": profile.position,
-                "Phone Number": profile.phone_number,
-                "Created At": profile.created_at,
-                "Updated At": profile.updated_at,
+                "Full Name": getattr(profile, 'fullname', ''),
+                "Position": getattr(profile, 'position', ''),
+                "Phone Number": getattr(profile, 'phone_number', ''),
             }
         except Exception as e:
-            print({"success": False, "error": str(e)})
-            return {"error": str(e)}
+            # Return an error dictionary for the caller to handle
+            return {"error": f"Could not retrieve profile for {username}: {str(e)}"}
 
     def load_profile(self, username):
         # Use the presenter to get profile data
@@ -37,7 +45,7 @@ class ProfilePresenter(Presenter):
             self.view.telephone_input.setText("")
 
         elif "error" in profile_data:
-            self.display_error("Error", profile_data["error"])
+            self.view.display_error("Error", profile_data["error"])
             return
         else:
             full_name = profile_data.get("Full Name", "")
@@ -75,3 +83,4 @@ class ProfilePresenter(Presenter):
             # Handle unexpected errors
             self.view.display_error(f"{CREATE_OR_UPDATE_PROFILE_ERROR}")
             print(f"An unexpected error occurred: {str(e)}")
+

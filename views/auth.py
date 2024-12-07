@@ -10,6 +10,7 @@ from models.log import LogModel
 from models.profile import ProfileModel
 from presenters.auth import AuthPresenter
 from presenters.permission import PermissionPresenter
+from presenters.profile import ProfilePresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 from views.register_dialog import RegisterDialog
 

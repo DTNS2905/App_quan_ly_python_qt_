@@ -18,6 +18,7 @@ class PermissionDialog(QtWidgets.QDialog):
         self.presenter = PermissionPresenter(self)
 
         permissions = self.presenter.fetch_user_permissions()
+        print(permissions)
 
         # Maintain a mapping of translated permissions to original permissions
         self.translation_map = {
@@ -26,6 +27,7 @@ class PermissionDialog(QtWidgets.QDialog):
             for original_permission, translated_permission in zip(
                 dto.permissions, self.presenter.translate_permissions(dto.permissions)
             )
+            if original_permission.strip() and translated_permission.strip()  # Filter out empty strings
         }
 
         # Use the translated permissions for display

@@ -240,6 +240,7 @@ class PermissionModel(NativeSqlite3Model):
         finally:
             # Close the connection
             cur.close()
+
     def fetch_usernames_based_on_suggestions(self, text):
         """Fetch usernames from the database that match the input."""
         cur = self.connection.cursor()

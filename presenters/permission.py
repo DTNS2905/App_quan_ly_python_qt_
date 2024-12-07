@@ -7,7 +7,7 @@ from common import session
 from common.presenter import Presenter
 from messages.contants import PERMISSION_TRANSLATIONS
 from messages.messages import *
-from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT
+from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT, DEFAULT_PERMISSION
 from models.log import LogModel
 
 from models.permission import PermissionModel
@@ -252,4 +252,13 @@ class PermissionPresenter(Presenter):
         except Exception as e:
             # Handle potential errors during database fetching
             print(f"Error fetching suggestions: {e}")
-            self.view.string_list_model.setStringList([])  # Clear suggestions in case of an error
+            self.view.string_list_model.setStringList([])
+
+    def add_default_permissions_for_register(self):
+        """Add default permissions."""
+        default_permissions = DEFAULT_PERMISSION
+        for permission in default_permissions:
+            try:
+                self.model.add_permission(permission)
+            except Exception as e:
+                print(f"Failed to add permission '{permission}': {e}")
