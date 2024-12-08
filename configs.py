@@ -35,6 +35,6 @@ def setup_logging():
     log_filename = os.path.join(LOG_PATH, f"app_log_{time.strftime('%Y-%m-%d')}.log")
     logging.basicConfig(
         filename=log_filename,
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
     )

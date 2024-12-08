@@ -173,7 +173,7 @@ class ItemModel(NativeSqlite3Model):
                     parent_node.setChild(index, 3, item_created_by)
                     traverse(item, child, f_size - 1)
                 except:
-                    print(traceback.print_exc())
+                    logging.error(traceback.print_exc())
 
         traverse(root_node, root_item_data, font_size)
         self.get_root_node().appendRow(root_node)
