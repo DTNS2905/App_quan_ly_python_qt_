@@ -19,6 +19,7 @@ from sql_statements.permission import (
     GET_ITEM_PERMISSION_BY_USERNAME_SQL,
     UNASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL,
     PERMISSION_ITEM_USER_VIEW_SQL,
+    EXIST_PERMISSION_SQL,
 )
 
 
@@ -83,6 +84,11 @@ class PermissionModel(NativeSqlite3Model):
     def assign_permission_to_user(self, username, permission):
         """Link a user to a permission in the junction table."""
         cur = self.connection.cursor()
+        cur.execute(EXIST_PERMISSION_SQL, (username, permission))
+        if cur.fetchone()[0] > 0:
+            cur.close()
+            raise Exception(f"Quyền đã tồn tại")
+
         cur.execute(self._assign_permission_sql, (permission, username))
         if cur.rowcount > 0:
             self.connection.commit()
@@ -94,7 +100,7 @@ class PermissionModel(NativeSqlite3Model):
             self.connection.rollback()
             cur.close()
             raise Exception(
-                f"Error assigning permission '{permission}' to '{username}' successfully"
+                f"Error assigning permission '{permission}' to '{username}' failed"
             )
 
     def get_permission_by_username(self, username: str):

@@ -21,6 +21,15 @@ ASSIGN_PERMISSION_SQL = (
     "INSERT OR IGNORE INTO user_permissions (user_id, permission_id) VALUES (?, ?)"
 )
 
+EXIST_PERMISSION_SQL = """
+    SELECT COUNT(*)
+    FROM user_permissions up
+    JOIN users u ON u.id = up.user_id
+    JOIN permissions p ON p.id = up.permission_id
+    WHERE u.username = ? AND p.permission = ?
+"""
+
+
 ASSIGN_PERMISSION_BY_USERNAME_SQL = """
     INSERT OR IGNORE INTO user_permissions (user_id, permission_id)
     SELECT u.id, p.id
@@ -41,7 +50,7 @@ GET_ITEM_PERMISSION_BY_USERNAME_SQL = """
     SELECT DISTINCT i.original_name, p.permission
     FROM users u
     INNER JOIN user_item_permissions uip ON u.id = uip.user_id
-    INNER JOIN items i ON i.id = uip.item_id = i.id
+    INNER JOIN items i ON i.id = uip.item_id
     INNER JOIN permissions p ON uip.permission_id = p.id
     WHERE u.username = ?
 """

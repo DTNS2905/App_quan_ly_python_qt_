@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>cửa sổ xem quyền tài liệu</string>
+   <string>Quyền Thực Thi Cho Tài Liệu</string>
   </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>
@@ -115,7 +115,7 @@ background-color:rgb(250, 249, 246);
         </property>
         <column>
          <property name="text">
-          <string>Tên Người Dùng</string>
+          <string>Người Được Uỷ Quyền</string>
          </property>
         </column>
         <column>
@@ -125,7 +125,7 @@ background-color:rgb(250, 249, 246);
         </column>
         <column>
          <property name="text">
-          <string>Quyền</string>
+          <string>Quyền Thực Thi</string>
          </property>
         </column>
        </widget>

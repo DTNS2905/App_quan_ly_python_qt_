@@ -3,7 +3,8 @@ import sqlite3
 from dataclasses import dataclass
 
 from common.model import NativeSqlite3Model
-from configs import DATABASE_NAME
+from common.time import convert_utc_time_to_timezone
+from configs import DATABASE_NAME, TIMEZONE
 from sql_statements.log import CREATE_TABLE_SQL
 
 
@@ -37,7 +38,14 @@ class LogModel(NativeSqlite3Model):
     def fetch_table_log(self):
         cur = self.connection.cursor()
         cur.execute(self._fetch_table_sql)
-        return [LogTableData(*i) for i in cur.fetchall()]
+        results = []
+        for row in cur.fetchall():
+            username, message, created_at = row
+            created_at = convert_utc_time_to_timezone(created_at, TIMEZONE).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            results.append(LogTableData(username, message, created_at))
+        return results
 
     @staticmethod
     def write_log(username, message):
@@ -46,8 +54,9 @@ class LogModel(NativeSqlite3Model):
         try:
             cur.execute("SELECT id FROM users WHERE username = ?", (username,))
             user_id = cur.fetchone()[0]
-            cur.execute("insert into logs (user_id, message) values (?, ?)",
-                        (user_id, message))
+            cur.execute(
+                "insert into logs (user_id, message) values (?, ?)", (user_id, message)
+            )
             if cur.rowcount > 0:
                 connection.commit()
                 logging.info(f"Log for user '{username}' successfully")
@@ -62,14 +71,18 @@ class LogModel(NativeSqlite3Model):
 
     def search_log(self, message_pattern):
         cur = self.connection.cursor()
-        cur.execute("SELECT id, user_id, message, created_at, updated_at FROM logs WHERE message LIKE %?%",
-                    (message_pattern,))
+        cur.execute(
+            "SELECT id, user_id, message, created_at, updated_at FROM logs WHERE message LIKE %?%",
+            (message_pattern,),
+        )
         return [LogDto(*item) for item in cur.fetchall()]
 
     def get_log_for_user(self, username):
         cur = self.connection.cursor()
         cur.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = cur.fetchone()[0]
-        cur.execute("SELECT id, user_id, message, created_at, updated_at FROM logs WHERE user_id = ?",
-                    (user_id,))
+        cur.execute(
+            "SELECT id, user_id, message, created_at, updated_at FROM logs WHERE user_id = ?",
+            (user_id,),
+        )
         return [LogDto(*item) for item in cur.fetchall()]
