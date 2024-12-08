@@ -23,6 +23,7 @@ REGISTER_UI_PATH = Path(__file__).parent / 'ui/register_ui.ui'
 LOG_UI_PATH = Path(__file__).parent / 'ui/log.ui'
 PERMISSION_PATH = Path(__file__).parent / 'ui/permission_dialog.ui'
 PROFILE_PATH = Path(__file__).parent / 'ui/profile.ui'
+ITEM_PERMISSION_PATH = Path(__file__).parent / 'ui/item_permission.ui'
 FILE_TREE_VIEW_COLUMNS = ["Tên", "Loại", "Ngày Tạo", "Người Tạo"]
 
 os.makedirs(LOG_PATH, exist_ok=True)

@@ -26,7 +26,7 @@
    <string>Phần mềm quản lý hồ sơ bài giẳng</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../resources.qrc">
     <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
@@ -147,11 +147,12 @@ border-radius:5px;
 }
 
 #log_button::hover{
-background-color: rgb(116, 195, 255)
+background-color: rgb(108, 180, 238);
+
 }
 
 #log_button{
-background-color: rgb(108, 179, 237);
+background-color: rgb(86, 145, 190) ;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -200,6 +201,18 @@ background-color:rgb(200, 0, 0)
 }
 #remove_permission_button_2 {
 background-color:rgb(170, 0, 0);
+color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+#item_permission_button::hover{
+background-color: rgb(108, 180, 238);
+}
+
+#item_permission_button{
+background-color: rgb(86, 145, 190) ;
 color:white;
 border:none;
 padding:3px;
@@ -345,7 +358,7 @@ color:balck;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/images/ui/images/icon_remove_background.png</pixmap>
+                <pixmap resource="../resources.qrc">:/images/ui/images/icon_remove_background.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -446,7 +459,7 @@ color:balck;
              <string>Trang chủ </string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../resources.qrc">
               <normaloff>:/icons/icons/home.svg</normaloff>:/icons/icons/home.svg</iconset>
             </property>
             <property name="iconSize">
@@ -491,7 +504,7 @@ color: black;
              <string>Quản lý người dùng</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../resources.qrc">
               <normaloff>:/icons/icons/user.svg</normaloff>:/icons/icons/user.svg</iconset>
             </property>
             <property name="iconSize">
@@ -799,7 +812,7 @@ color: black;
                 <enum>Qt::TextFormat::AutoText</enum>
                </property>
                <property name="pixmap">
-                <pixmap>:/images/ui/images/vecteezy_user-icon-on-transparent-background_19879186-80x80.png</pixmap>
+                <pixmap resource="../resources.qrc">:/images/ui/images/vecteezy_user-icon-on-transparent-background_19879186-80x80.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -822,7 +835,7 @@ fill:red;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../resources.qrc">
               <normaloff>:/icons/icons/log-out.svg</normaloff>:/icons/icons/log-out.svg</iconset>
             </property>
             <property name="iconSize">
@@ -1104,7 +1117,7 @@ border: 0px solid black;
                         <string>Thêm thư mục</string>
                        </property>
                        <property name="icon">
-                        <iconset>
+                        <iconset resource="../resources.qrc">
                          <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
                        </property>
                       </widget>
@@ -1133,7 +1146,7 @@ border: 0px solid black;
                         <string>Xóa tài liệu</string>
                        </property>
                        <property name="icon">
-                        <iconset>
+                        <iconset resource="../resources.qrc">
                          <normaloff>:/icons_white/icons/icons_white/file-minus.svg</normaloff>:/icons_white/icons/icons_white/file-minus.svg</iconset>
                        </property>
                        <property name="autoDefault">
@@ -1150,7 +1163,7 @@ border: 0px solid black;
                         <string>Mở bảng lịch sử</string>
                        </property>
                        <property name="icon">
-                        <iconset>
+                        <iconset resource="../resources.qrc">
                          <normaloff>:/icons_white/icons/icons_white/airplay.svg</normaloff>:/icons_white/icons/icons_white/airplay.svg</iconset>
                        </property>
                       </widget>
@@ -1191,7 +1204,7 @@ border: 0px solid black;
                         <string>Thêm tài liệu</string>
                        </property>
                        <property name="icon">
-                        <iconset>
+                        <iconset resource="../resources.qrc">
                          <normaloff>:/icons_white/icons/icons_white/file-plus.svg</normaloff>:/icons_white/icons/icons_white/file-plus.svg</iconset>
                        </property>
                        <property name="autoDefault">
@@ -1211,7 +1224,7 @@ border: 0px solid black;
                         <string>Xóa thư mục</string>
                        </property>
                        <property name="icon">
-                        <iconset>
+                        <iconset resource="../resources.qrc">
                          <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
                        </property>
                       </widget>
@@ -1312,7 +1325,7 @@ border: 0px solid black;
                            <string>Thêm quyền cho tài liệu</string>
                           </property>
                           <property name="icon">
-                           <iconset>
+                           <iconset resource="../resources.qrc">
                             <normaloff>:/icons_white/icons/icons_white/user-plus.svg</normaloff>:/icons_white/icons/icons_white/user-plus.svg</iconset>
                           </property>
                           <property name="autoDefault">
@@ -1332,8 +1345,19 @@ border: 0px solid black;
                            <string>Gỡ quyền cho tài liệu</string>
                           </property>
                           <property name="icon">
-                           <iconset>
+                           <iconset resource="../resources.qrc">
                             <normaloff>:/icons_white/icons/icons_white/user-minus.svg</normaloff>:/icons_white/icons/icons_white/user-minus.svg</iconset>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="2">
+                         <widget class="QPushButton" name="item_permission_button">
+                          <property name="text">
+                           <string>Xem quyền cho tài liệu</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../resources.qrc">
+                            <normaloff>:/icons_white/icons/icons_white/file.svg</normaloff>:/icons_white/icons/icons_white/file.svg</iconset>
                           </property>
                          </widget>
                         </item>
@@ -1746,7 +1770,7 @@ border-radius:5px;
                     <string>Thêm quyền cho người dùng </string>
                    </property>
                    <property name="icon">
-                    <iconset>
+                    <iconset resource="../resources.qrc">
                      <normaloff>:/icons_white/icons/icons_white/user-check.svg</normaloff>:/icons_white/icons/icons_white/user-check.svg</iconset>
                    </property>
                   </widget>
@@ -1763,7 +1787,7 @@ border-radius:5px;
                     <string>Bỏ quyền cho người dùng </string>
                    </property>
                    <property name="icon">
-                    <iconset>
+                    <iconset resource="../resources.qrc">
                      <normaloff>:/icons_white/icons/icons_white/user-x.svg</normaloff>:/icons_white/icons/icons_white/user-x.svg</iconset>
                    </property>
                   </widget>
@@ -2032,6 +2056,7 @@ border-radius:5px;
 
 .QPushButton::hover{
 background-color:rgb(65, 65, 65) ;
+color:white;
 }
 
 

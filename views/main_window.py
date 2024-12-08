@@ -11,6 +11,7 @@ from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 from version import create_about_action
 from views.auth import LoginDialog
+from views.item_permission import ItemPermissionDialog
 from views.log_dialog import LogDialog
 from views.permission_dialog import PermissionDialog
 from views.permission_item_dialog import PermissionItemDialog
@@ -80,6 +81,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
         self.log_button.clicked.connect(lambda: self.open_dialog(LogDialog(self)))
+
+        self.item_permission_button.clicked.connect(lambda: self.open_dialog(ItemPermissionDialog(self)))
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()

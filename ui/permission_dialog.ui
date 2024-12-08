@@ -237,7 +237,7 @@
    <string>Dialog</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../resources.qrc">
     <normaloff>:/images/ui/images/icon_remove_background.png</normaloff>:/images/ui/images/icon_remove_background.png</iconset>
   </property>
   <property name="styleSheet">
@@ -418,20 +418,24 @@ QListView {
      <property name="styleSheet">
       <string notr="true">#perform_button::hover{
 background-color: rgb(0, 116, 0);
+color:white;
 }
 
 #perform_button {
 background-color:rgb(0, 85, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
 }
 
 #cancel_button::hover{
-background-color:rgb(200, 0, 0)
+background-color:rgb(200, 0, 0);
+color:white;
 }
 #cancel_button {
 background-color:rgb(170, 0, 0);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
