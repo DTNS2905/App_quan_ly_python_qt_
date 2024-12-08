@@ -1,11 +1,15 @@
 import logging
+import traceback
 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal
 from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog
 
+from common import session
 from configs import DASHBOARD_UI_PATH
+from messages.messages import PERMISSION_DENIED
+from messages.permissions import LOG_VIEW, PERMISSION_VIEW
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -80,9 +84,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
-        self.log_button.clicked.connect(lambda: self.open_dialog(LogDialog(self)))
+        def view_log():
+            if not session.SESSION.match_permissions(LOG_VIEW):
+                self.display_error(PERMISSION_DENIED)
+            else:
+                self.open_dialog(LogDialog(self))
 
-        self.item_permission_button.clicked.connect(lambda: self.open_dialog(ItemPermissionDialog(self)))
+        self.log_button.clicked.connect(lambda: view_log())
+
+        def view_item_permission():
+            if not session.SESSION.match_permissions(PERMISSION_VIEW):
+                self.display_error(PERMISSION_DENIED)
+            else:
+                self.open_dialog(ItemPermissionDialog(self))
+
+        self.item_permission_button.clicked.connect(lambda: view_item_permission())
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
@@ -212,8 +228,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Check which button was clicked
         if message_box.clickedButton() == yes_button:
-            self.close()
-            dialog_instance.exec()  # For modal dialogs
+            try:
+                self.close()
+                session.SESSION = None
+                if dialog_instance.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+                    # Proceed to main window if login is successful
+                    main_window = MainWindow()
+                    main_window.show()
+                else:
+                    logging.info("Login cancelled.")
+            except:
+                logging.error(traceback.print_exc())
         elif message_box.clickedButton() == no_button:
             logging.info("user does not log out")
             return

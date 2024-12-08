@@ -6,6 +6,7 @@ from PyQt6 import QtWidgets
 from configs import setup_logging
 from views.auth import LoginDialog
 from views.main_window import MainWindow
+
 setup_logging()
 
 if __name__ == "__main__":
