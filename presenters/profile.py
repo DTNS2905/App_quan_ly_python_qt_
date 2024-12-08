@@ -82,5 +82,6 @@ class ProfilePresenter(Presenter):
         except Exception as e:
             # Handle unexpected errors
             self.view.display_error(f"{CREATE_OR_UPDATE_PROFILE_ERROR}")
+            print(e)
             logging.error(f"An unexpected error occurred: {str(e)}")
 
