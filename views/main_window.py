@@ -15,6 +15,8 @@ from messages.permissions import (
     PERMISSION_GRANT,
     PERMISSION_UNGRANT,
     FILE_DOWNLOAD,
+    FILE_CREATE,
+    FOLDER_CREATE,
 )
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
@@ -59,9 +61,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.manage_user_button.clicked.connect(self.change_button_style_on_click)
 
         self.add_file_button.clicked.connect(self.item_presenter.handle_add_files)
+        self.add_file_button.setVisible(session.SESSION.match_permissions(FILE_CREATE))
+
         self.remove_file_button.clicked.connect(self.item_presenter.handle_remove_files)
 
         self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
+        self.add_folder_button.setVisible(
+            session.SESSION.match_permissions(FOLDER_CREATE)
+        )
+
         self.remove_folder_button.clicked.connect(
             self.item_presenter.handle_remove_folder
         )
@@ -105,19 +113,21 @@ class MainWindow(QtWidgets.QMainWindow):
             session.SESSION.match_permissions(PERMISSION_UNGRANT)
         )
 
-        self.add_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
-            self,
-            "assign_permission"
-        )))
+        self.add_permission_button.clicked.connect(
+            lambda: self.open_permission_dialog(
+                PermissionDialog(self, "assign_permission")
+            )
+        )
 
         self.add_permission_button.setVisible(
             session.SESSION.match_permissions(PERMISSION_UNGRANT)
         )
 
-        self.remove_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
-            self,
-            "unassign_permission"
-        )))
+        self.remove_permission_button.clicked.connect(
+            lambda: self.open_permission_dialog(
+                PermissionDialog(self, "unassign_permission")
+            )
+        )
 
         self.remove_permission_button.setVisible(
             session.SESSION.match_permissions(PERMISSION_UNGRANT)
@@ -147,10 +157,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
-        if session.SESSION.match_permissions(FILE_DOWNLOAD):
-            self.treeView.doubleClicked.connect(
-                self.item_presenter.handle_download_item
-            )
+
+        self.treeView.doubleClicked.connect(self.item_presenter.handle_download_item)
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
