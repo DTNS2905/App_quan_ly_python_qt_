@@ -113,6 +113,21 @@ background-color:rgb(250, 249, 246);
         <property name="midLineWidth">
          <number>1</number>
         </property>
+        <column>
+         <property name="text">
+          <string>Tên Người Dùng</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tệp / Thư Mục</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Quyền</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>

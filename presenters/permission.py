@@ -125,6 +125,36 @@ class PermissionPresenter(Presenter):
         self.view.user_permission_table.resizeColumnsToContents()
         self.view.user_permission_table.resizeRowsToContents()
 
+    def populate_item_table(self):
+        user_permissions = self.model.fetch_user_item_permissions()
+        self.view.item_permission_table.setRowCount(0)  # Clear table
+        print(user_permissions)
+
+        for row, user_permission in enumerate(user_permissions):
+            try:
+                username = user_permission.username
+                item = user_permission.item
+                translated_permissions = self.translate_permissions(
+                    user_permission.permissions
+                )
+                self.view.item_permission_table.insertRow(row)
+                self.view.item_permission_table.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(username)
+                )
+                self.view.item_permission_table.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(item)
+                )
+                self.view.item_permission_table.setItem(
+                    row,
+                    2,
+                    QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions)),
+                )
+            except Exception as e:
+                logging.error(e)
+
+        self.view.item_permission_table.resizeColumnsToContents()
+        self.view.item_permission_table.resizeRowsToContents()
+
     def add_default_permissions(self):
         """Add default permissions."""
         default_permissions = ALL_PERMISSION

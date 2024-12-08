@@ -74,6 +74,18 @@ PERMISSION_USER_VIEW_SQL = """
     LEFT JOIN permissions p ON up.permission_id = p.id
 """
 
+PERMISSION_ITEM_USER_VIEW_SQL = """
+    SELECT
+        u.username,
+        i.original_name,
+        p.permission
+    FROM
+        user_item_permissions uip
+    INNER JOIN users u ON uip.user_id = u.id
+    INNER JOIN permissions p ON uip.permission_id = p.id
+    INNER JOIN items i ON i.id = uip.item_id
+"""
+
 GET_USER_ID_SQL = "SELECT id FROM users WHERE username = ?;"
 
 GET_PERMISSION_ID_SQL = "SELECT id FROM permissions WHERE permission = ?;"

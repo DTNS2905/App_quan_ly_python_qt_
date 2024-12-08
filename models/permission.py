@@ -18,6 +18,7 @@ from sql_statements.permission import (
     GET_PERMISSION_ID_SQL,
     GET_ITEM_PERMISSION_BY_USERNAME_SQL,
     UNASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL,
+    PERMISSION_ITEM_USER_VIEW_SQL,
 )
 
 
@@ -32,6 +33,13 @@ class PermissionDTO:
 class PermissionItemDTO:
     username: str
     permissions: dict[str, list[str]]
+
+
+@dataclass
+class PermissionItemTableDTO:
+    username: str
+    item: str
+    permissions: list[str]
 
 
 @dataclass
@@ -51,6 +59,7 @@ class PermissionModel(NativeSqlite3Model):
     _get_permission_by_username = GET_PERMISSION_BY_USERNAME_SQL
     _get_item_permission_by_username = GET_ITEM_PERMISSION_BY_USERNAME_SQL
     _fetch_user_permission_sql = PERMISSION_USER_VIEW_SQL
+    _fetch_user_item_permission_sql = PERMISSION_ITEM_USER_VIEW_SQL
     _remove_permission_from_user_sql = REMOVE_PERMISSION_FROM_USER_SQL
     _get_user_id_sql = GET_USER_ID_SQL
     _get_permission_id_sql = GET_PERMISSION_ID_SQL
@@ -108,6 +117,28 @@ class PermissionModel(NativeSqlite3Model):
                 permissions[item].append(permission)
         cur.close()
         return PermissionItemDTO(username, permissions)
+
+    def fetch_user_item_permissions(self) -> list[PermissionItemTableDTO]:
+        cur = self.connection.cursor()
+        cur.execute(self._fetch_user_item_permission_sql)
+        rows = cur.fetchall()
+        data: list[PermissionItemTableDTO] = []
+        raw_data = {}
+        for row in rows:
+            username, item, permission = row
+            if (username, item) not in raw_data.keys():
+                raw_data[(username, item)] = (
+                    [permission] if permission is not None else [""]
+                )
+            else:
+                raw_data[(username, item)].append(
+                    permission if permission is not None else ""
+                )
+        for key, permissions in raw_data.items():
+            username, item = key
+            data.append(PermissionItemTableDTO(username, item, permissions))
+        cur.close()
+        return data
 
     def fetch_user_permissions(self) -> list[PermissionTableDTO]:
         """Fetch all usernames and their permissions."""
