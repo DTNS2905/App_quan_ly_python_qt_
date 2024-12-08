@@ -8,8 +8,13 @@ from common import session
 from common.presenter import Presenter
 from messages.contants import PERMISSION_TRANSLATIONS
 from messages.messages import *
-from messages.permissions import ALL_PERMISSION, PERMISSION_GRANT, PERMISSION_UNGRANT, DEFAULT_PERMISSION, \
-    USER_DELETE
+from messages.permissions import (
+    ALL_PERMISSION,
+    PERMISSION_GRANT,
+    PERMISSION_UNGRANT,
+    DEFAULT_PERMISSION,
+    USER_DELETE,
+)
 from models.log import LogModel
 
 from models.permission import PermissionModel
@@ -30,7 +35,9 @@ class PermissionPresenter(Presenter):
         try:
             self.model.assign_permission_to_user(username, permission)
             self.view.display_success(GRANT_PERMISSION_SUCCESSFULLY)
-            LogModel.write_log(session.SESSION.get_username(), GRANT_PERMISSION_SUCCESSFULLY)
+            LogModel.write_log(
+                session.SESSION.get_username(), GRANT_PERMISSION_SUCCESSFULLY
+            )
         except Exception as e:
             self.view.display_error(GRANT_PERMISSION_ERROR)
             logging.error(e)
@@ -38,7 +45,10 @@ class PermissionPresenter(Presenter):
 
     def translate_permissions(self, permissions: list[str]) -> list[str]:
         """Translate a list of permissions to Vietnamese."""
-        return [PERMISSION_TRANSLATIONS.get(permission, permission) for permission in permissions]
+        return [
+            PERMISSION_TRANSLATIONS.get(permission, permission)
+            for permission in permissions
+        ]
 
     def populate_table(self):
         """Populate QTableWidget with user permissions data."""
@@ -51,35 +61,55 @@ class PermissionPresenter(Presenter):
                 fullname = user_permission.fullname
                 position = user_permission.position
                 phone_number = user_permission.phone_number
-                translated_permissions = self.translate_permissions(user_permission.permissions)
+                translated_permissions = self.translate_permissions(
+                    user_permission.permissions
+                )
                 self.view.user_permission_table.insertRow(row)
-                self.view.user_permission_table.setItem(row, 0, QtWidgets.QTableWidgetItem(username))
-                self.view.user_permission_table.setItem(row, 1, QtWidgets.QTableWidgetItem(fullname))
-                self.view.user_permission_table.setItem(row, 2, QtWidgets.QTableWidgetItem(position))
-                self.view.user_permission_table.setItem(row, 3, QtWidgets.QTableWidgetItem(phone_number))
-                self.view.user_permission_table.setItem(row, 4,
-                                                        QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions)))
+                self.view.user_permission_table.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(username)
+                )
+                self.view.user_permission_table.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(fullname)
+                )
+                self.view.user_permission_table.setItem(
+                    row, 2, QtWidgets.QTableWidgetItem(position)
+                )
+                self.view.user_permission_table.setItem(
+                    row, 3, QtWidgets.QTableWidgetItem(phone_number)
+                )
+                self.view.user_permission_table.setItem(
+                    row,
+                    4,
+                    QtWidgets.QTableWidgetItem(" \n ".join(translated_permissions)),
+                )
                 delete_button = QPushButton("Xóa")
 
                 def delete_user(r):
                     if not session.SESSION.match_permissions(USER_DELETE):
                         self.view.display_error(PERMISSION_DENIED)
-                        LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
+                        LogModel.write_log(
+                            session.SESSION.get_username(), PERMISSION_DENIED
+                        )
                         return
 
                     try:
                         index = self.view.user_permission_table.model().index(r, 0)
-                        delete_username = self.view.user_permission_table.model().data(index)
+                        delete_username = self.view.user_permission_table.model().data(
+                            index
+                        )
                         reply = QMessageBox.question(
                             self.view,
                             "Xác nhận xóa",
                             f"bạn chắc chắn muốn xóa người dùng {delete_username} ?",
-                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                            QMessageBox.StandardButton.No
+                            QMessageBox.StandardButton.Yes
+                            | QMessageBox.StandardButton.No,
+                            QMessageBox.StandardButton.No,
                         )
                         if reply == QMessageBox.StandardButton.Yes:
                             self.model.delete_user_by_username(delete_username)
-                            self.view.display_success(f"Xóa người dùng {delete_username}' thành công!.")
+                            self.view.display_success(
+                                f"Xóa người dùng {delete_username}' thành công!."
+                            )
                             self.populate_table()
                     except Exception as e:
                         logging.error(e)
@@ -87,7 +117,8 @@ class PermissionPresenter(Presenter):
                 delete_button.clicked.connect(lambda checked, r=row: delete_user(r))
 
                 self.view.user_permission_table.setIndexWidget(
-                    self.view.user_permission_table.model().index(row, 5), delete_button)
+                    self.view.user_permission_table.model().index(row, 5), delete_button
+                )
             except Exception as e:
                 logging.error(e)
 
@@ -111,7 +142,23 @@ class PermissionPresenter(Presenter):
             except Exception as e:
                 logging.error(f"Failed to assign permission '{permission}': {e}")
 
-    def assign_permissions_to_user(self, username: str, permissions: list[str], user_assgin: str):
+    def assign_permissions_to_users_for_file(
+        self, item_name: str, username: str, permissions: list[str]
+    ):
+        return self.model.assign_permissions_to_users_for_file(
+            item_name, username, permissions
+        )
+
+    def unassign_permissions_to_users_for_file(
+        self, item_name: str, username: str, permissions: list[str]
+    ):
+        return self.model.unassign_permissions_to_users_for_file(
+            item_name, username, permissions
+        )
+
+    def assign_permissions_to_user(
+        self, username: str, permissions: list[str], user_assgin: str
+    ):
         """
         Assign multiple permissions to a user.
 
@@ -126,7 +173,7 @@ class PermissionPresenter(Presenter):
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{PERMISSION_DENIED} - người thực hiện:{user_assgin}'."
+                f"{PERMISSION_DENIED} - người thực hiện:{user_assgin}'.",
             )
             return
 
@@ -135,10 +182,12 @@ class PermissionPresenter(Presenter):
 
         for permission in permissions:
             if len(permission) < 3:  # Ensure permission strings are valid
-                self.view.display_error(f"Quyền không có trong cơ sở dữ liệu: '{permission}'")
+                self.view.display_error(
+                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'"
+                )
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua."
+                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua.",
                 )
                 failed_permissions.append(permission)
                 continue
@@ -152,32 +201,40 @@ class PermissionPresenter(Presenter):
                 failed_permissions.append(permission)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_assgin} không thể gắn '{permission}' cho '{username}': {str(e)}"
+                    f"{user_assgin} không thể gắn '{permission}' cho '{username}': {str(e)}",
                 )
 
         # Handle the outcome
         if failed_permissions:
             # Show both successes and failures if applicable
             if success_permissions:
-                success_message = f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
+                success_message = (
+                    f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
+                )
                 self.view.display_success(success_message)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
+                    f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}",
                 )
 
-            error_message = f"{user_assgin} không thể gắn {', '.join(failed_permissions)}"
+            error_message = (
+                f"{user_assgin} không thể gắn {', '.join(failed_permissions)}"
+            )
             self.view.display_error(error_message)
         else:
             # All permissions were successfully assigned
-            success_message = f"{user_assgin} gắn tất cả quyền thành công  '{username}'."
+            success_message = (
+                f"{user_assgin} gắn tất cả quyền thành công  '{username}'."
+            )
             self.view.display_success(success_message)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{user_assgin} gắn quyền thành công cho  '{username}"
+                f"{user_assgin} gắn quyền thành công cho  '{username}",
             )
 
-    def unassign_permissions_from_user(self, username: str, permissions: list[str], user_unassign: str):
+    def unassign_permissions_from_user(
+        self, username: str, permissions: list[str], user_unassign: str
+    ):
         """
         Unassign multiple permissions from a user.
 
@@ -192,7 +249,7 @@ class PermissionPresenter(Presenter):
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{PERMISSION_DENIED} - người thực hiện: {user_unassign}."
+                f"{PERMISSION_DENIED} - người thực hiện: {user_unassign}.",
             )
             return
 
@@ -201,10 +258,12 @@ class PermissionPresenter(Presenter):
 
         for permission in permissions:
             if len(permission) < 3:  # Ensure permission strings are valid
-                self.view.display_error(f"Quyền không có trong cơ sở dữ liệu: '{permission}'")
+                self.view.display_error(
+                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'"
+                )
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua."
+                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua.",
                 )
                 failed_permissions.append(permission)
                 continue
@@ -218,7 +277,7 @@ class PermissionPresenter(Presenter):
                 failed_permissions.append(permission)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_unassign} không thể gỡ '{permission}' khỏi '{username}': {str(e)}"
+                    f"{user_unassign} không thể gỡ '{permission}' khỏi '{username}': {str(e)}",
                 )
 
         # Handle the outcome
@@ -228,17 +287,19 @@ class PermissionPresenter(Presenter):
                 self.view.display_success(success_message)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_unassign} gỡ {', '.join(success_permissions)} khỏi {username} thành công."
+                    f"{user_unassign} gỡ {', '.join(success_permissions)} khỏi {username} thành công.",
                 )
 
             error_message = f"{user_unassign} không thể gỡ {', '.join(failed_permissions)} khỏi {username}."
             self.view.display_error(error_message)
         else:
-            success_message = f"{user_unassign} đã gỡ quyền khỏi '{username}' thành công."
+            success_message = (
+                f"{user_unassign} đã gỡ quyền khỏi '{username}' thành công."
+            )
             self.view.display_success(success_message)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{user_unassign} đã gỡ tất cả quyền khỏi '{username}' thành công."
+                f"{user_unassign} đã gỡ tất cả quyền khỏi '{username}' thành công.",
             )
 
     def fetch_user_permissions(self):

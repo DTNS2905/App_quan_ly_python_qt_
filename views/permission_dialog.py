@@ -13,6 +13,7 @@ class PermissionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, action_type=None):
         super().__init__(parent)
         uic.loadUi(PERMISSION_PATH, self)
+        self.setWindowTitle("Màn Hình Chỉnh Quyền")
 
         self.action_type = action_type  # Store the action type ('assign' or 'unassign')
 

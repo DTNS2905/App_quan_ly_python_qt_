@@ -9,9 +9,11 @@ from configs import DASHBOARD_UI_PATH
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
+from version import create_about_action
 from views.auth import LoginDialog
 from views.log_dialog import LogDialog
 from views.permission_dialog import PermissionDialog
+from views.permission_item_dialog import PermissionItemDialog
 from views.profile_dialog import ProfileDialog
 
 
@@ -20,7 +22,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setWindowTitle("Phần mềm hỗ trợ quản lý bài giảng")
         uic.loadUi(DASHBOARD_UI_PATH, self)
-        # self.tree_presenter = FileTreePresenter(self)
+
+        menu_bar = self.menuBar()
+        help_menu = menu_bar.addMenu("Help")
+        create_about_action(self, help_menu)
+
         self.item_presenter = ItemPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
         self.permission_presenter.populate_table()
@@ -28,8 +34,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.showMaximized()
 
         # Connect buttons to slots
-        self.home_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1))
-        self.manage_user_button.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage2))
+        self.home_button.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1)
+        )
+        self.manage_user_button.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage2)
+        )
 
         self.home_button.clicked.connect(self.update_label_text)
         self.manage_user_button.clicked.connect(self.update_label_text)
@@ -41,19 +51,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.remove_file_button.clicked.connect(self.item_presenter.handle_remove_files)
 
         self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
-        self.remove_folder_button.clicked.connect(self.item_presenter.handle_remove_folder)
+        self.remove_folder_button.clicked.connect(
+            self.item_presenter.handle_remove_folder
+        )
 
         self.label_2.installEventFilter(self)
 
-        self.add_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
-            self,
-            "assign_permission"
-        )))
+        def do_permission(action):
+            items = [
+                self.treeView.model().data(value)
+                for index, value in enumerate(self.treeView.selectedIndexes())
+                if index % 4 == 0
+            ]
+            if len(items) == 0:
+                self.display_error("Xin chọn 1 tệp")
+            else:
+                dialog = PermissionItemDialog(self, items, action)
+                self.open_permission_dialog(dialog)
 
-        self.remove_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
-            self,
-            "unassign_permission"
-        )))
+        self.add_perrmission_button.clicked.connect(
+            lambda: do_permission("assign_permission")
+        )
+
+        self.remove_permission_button_2.clicked.connect(
+            lambda: do_permission("unassign_permission")
+        )
 
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
@@ -72,12 +94,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_success(self, message):
         """Display a custom success message."""
-        success_box = CustomMessageBox("Thành công", message, QMessageBox.Icon.Information, "Đóng", self)
+        success_box = CustomMessageBox(
+            "Thành công", message, QMessageBox.Icon.Information, "Đóng", self
+        )
         success_box.exec()
 
     def display_error(self, message):
         """Display a custom error message."""
-        error_box = CustomMessageBox("Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self)
+        error_box = CustomMessageBox(
+            "Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self
+        )
         error_box.exec()
 
     def update_tree_view(self, root_index):
@@ -101,16 +127,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for button in [self.home_button, self.manage_user_button]:
             if button == sender:
-                button.setStyleSheet("""
+                button.setStyleSheet(
+                    """
                     background-color:#6CB4EE;
                     border-top-left-radius: 15px;
-                """)
+                """
+                )
 
             # Set the new button as active and change its style
             else:
-                button.setStyleSheet("""
+                button.setStyleSheet(
+                    """
                      background-color:#FAF9F6;
-            """)
+            """
+                )
 
     def select_all_items(self):
         """Select all items in the QTreeView."""
@@ -150,7 +180,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Custom buttons with Vietnamese text
         yes_button = message_box.addButton("Đồng Ý", QMessageBox.ButtonRole.YesRole)
         no_button = message_box.addButton("Hủy", QMessageBox.ButtonRole.NoRole)
-        message_box.setStyleSheet("""
+        message_box.setStyleSheet(
+            """
             QMessageBox {
                 background-color: white;
                 color: black;
@@ -170,7 +201,8 @@ class MainWindow(QtWidgets.QMainWindow):
             QPushButton:hover {
                 background-color: #C0C0C0;
             }
-        """)
+        """
+        )
 
         # Show the dialog and wait for user input
         message_box.exec()
