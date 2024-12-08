@@ -46,7 +46,6 @@ class ProfilePresenter(Presenter):
             self.view.telephone_input.setText("")
 
         elif "error" in profile_data:
-            self.view.display_error("Error", profile_data["error"])
             return
         else:
             full_name = profile_data.get("Full Name", "")

@@ -82,6 +82,16 @@ class MainWindow(QtWidgets.QMainWindow):
             lambda: do_permission("unassign_permission")
         )
 
+        self.add_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
+            self,
+            "assign_permission"
+        )))
+
+        self.remove_permission_button.clicked.connect(lambda: self.open_permission_dialog(PermissionDialog(
+            self,
+            "unassign_permission"
+        )))
+
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
         def view_log():
