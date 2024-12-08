@@ -9,7 +9,12 @@ from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog
 from common import session
 from configs import DASHBOARD_UI_PATH
 from messages.messages import PERMISSION_DENIED
-from messages.permissions import LOG_VIEW, PERMISSION_VIEW
+from messages.permissions import (
+    LOG_VIEW,
+    PERMISSION_VIEW,
+    PERMISSION_GRANT,
+    PERMISSION_UNGRANT,
+)
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -63,6 +68,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.label_2.installEventFilter(self)
 
         def do_permission(action):
+            permission = (
+                PERMISSION_GRANT
+                if action == "assign_permission"
+                else PERMISSION_UNGRANT
+            )
+            if not session.SESSION.match_permissions(permission):
+                self.display_error(f"{permission}: {PERMISSION_DENIED}")
+                return
+
             items = [
                 self.treeView.model().data(value)
                 for index, value in enumerate(self.treeView.selectedIndexes())
