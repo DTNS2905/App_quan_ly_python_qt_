@@ -120,7 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self.add_permission_button.setVisible(
-            session.SESSION.match_permissions(PERMISSION_UNGRANT)
+            session.SESSION.match_permissions(PERMISSION_GRANT)
         )
 
         self.remove_permission_button.clicked.connect(
