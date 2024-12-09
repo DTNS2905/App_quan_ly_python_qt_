@@ -46,6 +46,8 @@ class PermissionItemDialog(QtWidgets.QDialog):
             def assign_permissions_to_users_for_file():
                 assign_username = self.lineEdit.text()
                 assign_permissions = self.process_selection()
+                translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
+
                 for item in selected_items:
                     try:
                         self.presenter.assign_permissions_to_users_for_file(
@@ -57,7 +59,7 @@ class PermissionItemDialog(QtWidgets.QDialog):
                         logging.error(traceback.print_exc())
                 self.display_success(
                     f"Gắn {', '.join(selected_items)} "
-                    f"với các quyền {', '.join(assign_permissions)}"
+                    f"với các quyền {', '.join(translated_permissions_item)}"
                 )
                 self.accept()
 
@@ -67,6 +69,8 @@ class PermissionItemDialog(QtWidgets.QDialog):
             def unassign_permissions_to_users_for_file():
                 assign_username = self.lineEdit.text()
                 assign_permissions = self.process_selection()
+                translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
+
                 for item in selected_items:
                     try:
                         self.presenter.unassign_permissions_to_users_for_file(
@@ -78,7 +82,7 @@ class PermissionItemDialog(QtWidgets.QDialog):
                         logging.error(traceback.print_exc())
                 self.display_success(
                     f"Gỡ {', '.join(selected_items)} "
-                    f"với các quyền {', '.join(assign_permissions)}"
+                    f"với các quyền {', '.join(translated_permissions_item)}"
                 )
                 self.accept()
 
