@@ -1,9 +1,13 @@
+import logging
+import traceback
+
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox, QLineEdit
 
 from configs import REGISTER_UI_PATH
 from presenters.auth import AuthPresenter
+from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 
 
@@ -13,6 +17,7 @@ class RegisterDialog(QtWidgets.QDialog):
         uic.loadUi(REGISTER_UI_PATH, self)
 
         self.presenter = AuthPresenter(self)
+        self.permission_presenter = PermissionPresenter(self)
 
         # Connect register button to a handler
         self.register_button.clicked.connect(self.on_register_clicked)
@@ -51,12 +56,16 @@ class RegisterDialog(QtWidgets.QDialog):
 
     def display_success(self, message):
         """Display a custom success message."""
-        success_box = CustomMessageBox("Thành công", message, QMessageBox.Icon.Information, "Đóng", self)
+        success_box = CustomMessageBox(
+            "Thành công", message, QMessageBox.Icon.Information, "Đóng", self
+        )
         success_box.exec()
 
     def display_error(self, message):
         """Display a custom error message."""
-        error_box = CustomMessageBox("Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self)
+        error_box = CustomMessageBox(
+            "Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self
+        )
         error_box.exec()
 
     def on_register_clicked(self):
@@ -64,7 +73,14 @@ class RegisterDialog(QtWidgets.QDialog):
         username = self.username_input.text().strip()
         password = self.password_input.text().strip()
         confirm_password = self.confirm_password_input.text().strip()
+        is_admin = self.checkBox.isChecked()
         self.presenter.handle_register(username, password, confirm_password)
+        if is_admin:
+            try:
+                self.permission_presenter.assign_all_permissions(username)
+                logging.info(f"Grant admin role to {username}")
+            except:
+                logging.error(traceback.print_exc())
 
     def toggle_password_visibility(self):
         """Toggle visibility for the appropriate password field."""
