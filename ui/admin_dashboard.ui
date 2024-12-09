@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Phần mềm quản lý hồ sơ bài giẳng</string>
+   <string>Phần mềm quản lý hồ sơ công tác</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -400,7 +400,7 @@ color:balck;
              </font>
             </property>
             <property name="text">
-             <string>Quản lý hồ sơ bài </string>
+             <string>Phần mềm quản lý hồ sơ công tác</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>

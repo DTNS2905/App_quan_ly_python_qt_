@@ -212,14 +212,15 @@ class PermissionPresenter(Presenter):
 
         for permission in permissions:
             if len(permission) < 3:  # Ensure permission strings are valid
+                translated_permission = self.translate_permissions([permission])[0]
                 self.view.display_error(
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'"
+                    f"Quyền không có trong cơ sở dữ liệu: '{translated_permission}'"
                 )
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua.",
+                    f"Quyền không có trong cơ sở dữ liệu: '{translated_permission}'. Bỏ Qua.",
                 )
-                failed_permissions.append(permission)
+                failed_permissions.append(translated_permission)
                 continue
 
             try:
@@ -228,38 +229,41 @@ class PermissionPresenter(Presenter):
                 success_permissions.append(permission)
             except Exception as e:
                 # Handle failures for specific permissions
-                failed_permissions.append(permission)
+                translated_permission = self.translate_permissions([permission])[0]
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_assgin} không thể gắn '{permission}' cho '{username}': {str(e)}",
+                    f"{user_assgin} không thể gắn '{translated_permission}' cho '{username}': {str(e)}",
                 )
+
+        translated_success_permissions = self.translate_permissions(success_permissions)
+        translated_failed_permissions = failed_permissions  # Already translated
 
         # Handle the outcome
         if failed_permissions:
             # Show both successes and failures if applicable
             if success_permissions:
                 success_message = (
-                    f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}"
+                    f"{user_assgin} gắn {', '.join(translated_success_permissions)} cho {username}"
                 )
                 self.view.display_success(success_message)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_assgin} gắn {', '.join(success_permissions)} cho {username}",
+                    f"{user_assgin} gắn {', '.join(translated_success_permissions)} cho {username}",
                 )
 
             error_message = (
-                f"{user_assgin} không thể gắn {', '.join(failed_permissions)}"
+                f"{user_assgin} không thể gắn {', '.join(translated_failed_permissions)}"
             )
             self.view.display_error(error_message)
         else:
             # All permissions were successfully assigned
             success_message = (
-                f"{user_assgin} gắn tất cả quyền thành công  '{username}'."
+                f"{user_assgin} gắn tất cả quyền thành công '{username}': {', '.join(translated_success_permissions)}"
             )
             self.view.display_success(success_message)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{user_assgin} gắn quyền thành công cho  '{username}",
+                f"{user_assgin} gắn quyền thành công cho '{username}': {', '.join(translated_success_permissions)}",
             )
 
     def unassign_permissions_from_user(
@@ -287,13 +291,14 @@ class PermissionPresenter(Presenter):
         success_permissions = []
 
         for permission in permissions:
-            if len(permission) < 3:  # Ensure permission strings are valid
+            if len(permission) < 3:
+                translated_permission = self.translate_permissions([permission])[0]
                 self.view.display_error(
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'"
+                    f"Quyền không có trong cơ sở dữ liệu: '{translated_permission}'"
                 )
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"Quyền không có trong cơ sở dữ liệu: '{permission}'. Bỏ Qua.",
+                    f"Quyền không có trong cơ sở dữ liệu: '{translated_permission}'. Bỏ Qua.",
                 )
                 failed_permissions.append(permission)
                 continue
@@ -303,33 +308,37 @@ class PermissionPresenter(Presenter):
                 self.model.unassign_permission_from_user(username, permission)
                 success_permissions.append(permission)
             except Exception as e:
+                translated_permission = self.translate_permissions([permission])[0]
                 # Handle failures for specific permissions
                 failed_permissions.append(permission)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_unassign} không thể gỡ '{permission}' khỏi '{username}': {str(e)}",
+                    f"{user_unassign} không thể gỡ '{translated_permission}' khỏi '{username}': {str(e)}",
                 )
+
+        translated_success_permissions = self.translate_permissions(success_permissions)
+        translated_failed_permissions = failed_permissions  # Already translated
 
         # Handle the outcome
         if failed_permissions:
             if success_permissions:
-                success_message = f"{user_unassign} gỡ {', '.join(success_permissions)} khỏi {username} thành công."
+                success_message = f"{user_unassign} gỡ {', '.join(translated_success_permissions)} khỏi {username} thành công."
                 self.view.display_success(success_message)
                 LogModel.write_log(
                     session.SESSION.get_username(),
-                    f"{user_unassign} gỡ {', '.join(success_permissions)} khỏi {username} thành công.",
+                    f"{user_unassign} gỡ {', '.join(translated_success_permissions)} khỏi {username} thành công.",
                 )
 
-            error_message = f"{user_unassign} không thể gỡ {', '.join(failed_permissions)} khỏi {username}."
+            error_message = f"{user_unassign} không thể gỡ {', '.join(translated_failed_permissions)} khỏi {username}."
             self.view.display_error(error_message)
         else:
             success_message = (
-                f"{user_unassign} đã gỡ quyền khỏi '{username}' thành công."
+                f"{user_unassign} đã gỡ quyền {translated_success_permissions} khỏi '{username}' thành công."
             )
             self.view.display_success(success_message)
             LogModel.write_log(
                 session.SESSION.get_username(),
-                f"{user_unassign} đã gỡ tất cả quyền khỏi '{username}' thành công.",
+                f"{user_unassign} đã gỡ tất cả quyền {translated_success_permissions} khỏi '{username}' thành công.",
             )
 
     def fetch_user_permissions(self):
