@@ -17,6 +17,8 @@ from messages.permissions import (
     FILE_DOWNLOAD,
     FILE_CREATE,
     FOLDER_CREATE,
+    FILE_RENAME,
+    FOLDER_RENAME,
 )
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
@@ -46,6 +48,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.showMaximized()
 
+        self.username.setText(session.SESSION.get_username())
+
         # Connect buttons to slots
         self.home_button.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1)
@@ -63,11 +67,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.add_file_button.clicked.connect(self.item_presenter.handle_add_files)
         self.add_file_button.setVisible(session.SESSION.match_permissions(FILE_CREATE))
 
+        self.rename_file_button.clicked.connect(self.item_presenter.handle_rename_file)
+        self.rename_file_button.setVisible(
+            session.SESSION.match_permissions(FILE_RENAME)
+        )
+
         self.remove_file_button.clicked.connect(self.item_presenter.handle_remove_files)
 
         self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
         self.add_folder_button.setVisible(
             session.SESSION.match_permissions(FOLDER_CREATE)
+        )
+
+        self.rename_folder_button.clicked.connect(
+            self.item_presenter.handle_rename_folder
+        )
+        self.rename_folder_button.setVisible(
+            session.SESSION.match_permissions(FOLDER_RENAME)
         )
 
         self.remove_folder_button.clicked.connect(

@@ -11,7 +11,7 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont, QIcon
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeView, QFileIconProvider
 
 from common import session
-from common.file import get_file_type
+from common.file import get_file_type, is_valid_filename, is_valid_folder_name
 from common.model import NativeSqlite3Model
 from common.time import convert_utc_time_to_timezone
 from configs import DATABASE_NAME, FILES_ROOT_PATH, FILE_TREE_VIEW_COLUMNS, TIMEZONE
@@ -355,6 +355,35 @@ class ItemModel(NativeSqlite3Model):
         finally:
             # Close the connection
             cur.close()
+
+    def rename_item(self, old_name, new_name):
+        if old_name == new_name:
+            return
+
+        if not is_valid_filename(new_name) or not is_valid_folder_name(new_name):
+            raise Exception("Tên không hợp lệ")
+
+        if self.get_item_id_by_name(new_name) is not None:
+            raise Exception("Tên đã tồn tại")
+
+        item_id = self.get_item_id_by_name(old_name)
+        if item_id is None:
+            raise Exception("Tệp/Thư mục không tồn tại")
+
+        cur = self.connection.cursor()
+        cur.execute(
+            "UPDATE items SET original_name = ? WHERE id = ?", (new_name, item_id)
+        )
+
+        if cur.rowcount == 1:
+            self.connection.commit()
+            cur.close()
+            logging.info(f"Rename item with id '{item_id}' successfully")
+        else:
+            self.connection.rollback()
+            cur.close()
+            logging.info(f"Rename item with id '{item_id}' failed")
+            raise Exception(f"Cập nhật thất bại")
 
 
 if __name__ == "__main__":
