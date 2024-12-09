@@ -233,6 +233,13 @@
     </disabled>
    </palette>
   </property>
+  <property name="font">
+   <font>
+    <family>Times New Roman</family>
+    <pointsize>12</pointsize>
+    <bold>true</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Đăng ký</string>
   </property>
@@ -255,7 +262,15 @@ background-color: white;
 .QFrame &gt; .QLineEdit {
 background-color:white;
 color:black;
-}</string>
+}
+
+.QCheckBox {
+color:red;
+font-size:12px;
+font-weight:bold;
+}
+
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -821,6 +836,13 @@ background-color: white;
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBox">
+     <property name="text">
+      <string>Quản trị viên</string>
+     </property>
     </widget>
    </item>
    <item>
