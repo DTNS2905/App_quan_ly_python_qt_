@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QInputDialog,
     QGraphicsDropShadowEffect,
-    QDialog,
+    QDialog, QFileIconProvider,
 )
 
 from common import session
@@ -38,7 +38,7 @@ from messages.permissions import (
     FILE_RENAME,
     FOLDER_RENAME, FILE_VIEW,
 )
-from models.item import ItemModel
+from models.item import ItemModel, CustomItem
 from models.log import LogModel
 from ui_components.cusom_input_dialog import CustomInputDialog
 
@@ -160,7 +160,7 @@ class ItemPresenter(Presenter):
             for index in selected_indexes:
                 original_name = model.data(index)
                 if can_all_remove or session.SESSION.match_item_permissions(
-                    original_name, FILE_DELETE
+                        original_name, FILE_DELETE
                 ):
                     file_paths.add(original_name)
                 else:
@@ -225,8 +225,8 @@ class ItemPresenter(Presenter):
             original_name = model.data(selected_index)
 
             if not (
-                can_all_download
-                or session.SESSION.match_item_permissions(original_name, FILE_DOWNLOAD)
+                    can_all_download
+                    or session.SESSION.match_item_permissions(original_name, FILE_DOWNLOAD)
             ):
                 self.view.display_error(f"Lưu {original_name}: {PERMISSION_DENIED}")
                 LogModel.write_log(
@@ -254,7 +254,7 @@ class ItemPresenter(Presenter):
             logging.error(e)
 
     def handle_add_folder(self):
-        """Thêm một thư mục mới vào thư mục đã chọn dưới đường dẫn gốc."""
+        """Thêm một thư mục mới vào thư mục đã chọn hoặc vào thư mục gốc nếu không có lựa chọn."""
         if not session.SESSION.match_permissions(FOLDER_CREATE):
             LogModel.write_log(session.SESSION.get_username(), PERMISSION_DENIED)
             self.view.display_error("Bạn không có quyền tạo thư mục.")  # Thông báo lỗi
@@ -266,17 +266,23 @@ class ItemPresenter(Presenter):
             model = self.view.treeView.model()
 
             # Check if the selected index is valid
-            if not selected_index.isValid():
-                self.view.display_error("Hãy chọn một thư mục hợp lệ.")  # Thông báo lỗi
-                return
+            if selected_index.isValid():
+                # Retrieve the selected item
+                selected_item = model.itemFromIndex(selected_index)
 
-            # Retrieve the corresponding QStandardItem
-            selected_item = model.itemFromIndex(selected_index)
+                # Check if the selected item is a directory (using UserRole data)
+                if selected_item.data(Qt.ItemDataRole.UserRole) != "directory":
+                    self.view.display_error("Không thể thêm thư mục vào một tệp.")  # Thông báo lỗi
+                    return
 
-            # Check if the selected item is a directory (using UserRole data)
-            if selected_item.data(Qt.ItemDataRole.UserRole) != "directory":
-                self.view.display_error("Không thể thêm thư mục vào một tệp.")  # Thông báo lỗi
-                return
+                # Use the selected folder as the parent node
+                parent_original_name = selected_item.text()
+            else:
+                # Default to the root node if no valid selection
+                parent_original_name = self.model.get_root_node()
+                if not parent_original_name:  # Ensure root node exists
+                    self.view.display_error("Không thể xác định thư mục gốc.")  # Thông báo lỗi
+                    return
 
             # Use the custom dialog
             dialog = CustomInputDialog(
@@ -291,16 +297,13 @@ class ItemPresenter(Presenter):
                     self.view.display_error("Tên thư mục không được để trống.")  # Thông báo lỗi
                     return
 
-                parent_original_name = model.data(selected_index)
-
                 username = session.SESSION.get_username()
-                self.model.create_folder(username, folder_name, parent_original_name)
-
                 LogModel.write_log(username, f"Thành công: Tạo thư mục '{folder_name}'")
                 self.view.display_success(
                     f"Thư mục '{folder_name}' đã được tạo thành công."
                 )  # Thông báo thành công
 
+                self.model.create_folder(username, folder_name, parent_original_name)
                 # Refresh the view to show the new folder
                 self.view.refresh_tree_view()
             else:
@@ -329,8 +332,8 @@ class ItemPresenter(Presenter):
         folder_path = original_name
 
         if not (
-            can_all_remove
-            or session.SESSION.match_item_permissions(folder_path, FOLDER_DELETE)
+                can_all_remove
+                or session.SESSION.match_item_permissions(folder_path, FOLDER_DELETE)
         ):
             self.view.display_error(f"Xóa {folder_path}: {PERMISSION_DENIED}")
             LogModel.write_log(
@@ -394,8 +397,8 @@ class ItemPresenter(Presenter):
             return
 
         if not (
-            can_all_rename
-            or session.SESSION.match_item_permissions(original_name, FILE_RENAME)
+                can_all_rename
+                or session.SESSION.match_item_permissions(original_name, FILE_RENAME)
         ):
             self.view.display_error(
                 f"Cập nhật tên tệp {original_name}: {PERMISSION_DENIED}"
@@ -418,9 +421,10 @@ class ItemPresenter(Presenter):
                 self.view.display_error("Tên tệp không được để trống.")
                 return
 
-            new_name = new_root_name + "." + file_ext
+            new_name = new_root_name + "" + file_ext
             try:
                 self.model.rename_item(original_name.strip(), new_name.strip())
+                self.view.refresh_tree_view()
             except Exception as e:
                 self.view.display_error(f"Cập nhật tên tệp {original_name}: {str(e)}")
 
@@ -451,8 +455,8 @@ class ItemPresenter(Presenter):
             return
 
         if not (
-            can_all_rename
-            or session.SESSION.match_item_permissions(original_name, FOLDER_RENAME)
+                can_all_rename
+                or session.SESSION.match_item_permissions(original_name, FOLDER_RENAME)
         ):
             self.view.display_error(
                 f"Cập nhật tên thư mục {original_name}: {PERMISSION_DENIED}"
@@ -477,6 +481,7 @@ class ItemPresenter(Presenter):
 
             try:
                 self.model.rename_item(original_name.strip(), new_name.strip())
+                self.view.refresh_tree_view()
             except Exception as e:
                 self.view.display_error(
                     f"Cập nhật tên thư mục {original_name}: {str(e)}"

@@ -141,19 +141,23 @@ class ItemModel(NativeSqlite3Model):
         """
         try:
             items = self.fetch_data()
+            print(f"Fetched items: {items}")
             logging.debug(f"Fetched items: {items}")
             root_children = build_tree(items)
+            print(f"Root children: {root_children}")
             logging.debug(f"Root children: {root_children}")
             font_size = 14
 
             icon_provider = QFileIconProvider()
 
-            def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0)):
+            def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0), user_role=None):
                 """
                 Helper to create a CustomItem with specific attributes.
                 """
                 item = CustomItem(content, font_size=font_size, bold=bold, color=color)
                 item.set_custom_icon(icon_provider.icon(icon_type))
+                if user_role:
+                    item.setData(user_role, Qt.ItemDataRole.UserRole)
                 return item
 
             def create_metadata(child, font_size):
@@ -182,71 +186,74 @@ class ItemModel(NativeSqlite3Model):
                 """
                 Process and append a child node (file or folder) to the parent node.
                 """
-                item = create_item(
-                    content=child.original_name,
-                    font_size=font_size - 1,
-                    icon_type=QFileIconProvider.IconType.Folder
-                    if child.type == "folder"
-                    else QFileIconProvider.IconType.File,
-                    bold=child.type == "folder",
-                )
+                try:
+                    # Check permissions
+                    permission = FOLDER_VIEW if child.type == "folder" else FILE_VIEW
+                    if not (
+                            session.SESSION.match_permissions(permission)
+                            or session.SESSION.match_item_permissions(child.original_name, permission)
+                    ):
+                        return
 
-                if child.type == "file":
-                    # Add metadata columns for files
-                    item_type, item_created_at, item_created_by = create_metadata(child, font_size)
-                    parent_node.appendRow([item, item_type, item_created_at, item_created_by])
-                elif child.type == "folder":
-                    # Add the folder node without metadata
-                    parent_node.appendRow([item])
+                    # Determine icon type and user role
+                    icon_type = (
+                        QFileIconProvider.IconType.Folder
+                        if child.type == "folder"
+                        else QFileIconProvider.IconType.File
+                    )
+                    user_role = "directory" if child.type == "folder" else "file"
 
-            def traverse(children, font_size):
+                    # Create the item for the child
+                    item = create_item(
+                        content=child.original_name,
+                        font_size=font_size,
+                        icon_type=icon_type,
+                        bold=child.type == "folder",
+                        user_role=user_role,
+                    )
+
+                    if child.type == "file":
+                        # Add metadata columns for files
+                        item_type, item_created_at, item_created_by = create_metadata(child, font_size)
+                        parent_node.appendRow([item, item_type, item_created_at, item_created_by])
+                    elif child.type == "folder":
+                        # Add the folder node
+                        parent_node.appendRow([item])
+                        return item  # Return folder item to process its children
+
+                except Exception as e:
+                    logging.error(f"Error processing child: {child.original_name} - {e}")
+                    logging.error(traceback.format_exc())
+
+            def traverse(children, parent_node, font_size):
                 """
-                Traverse the root-level children and populate the tree view.
+                Iteratively traverse the children and populate the tree view under the given parent node.
                 """
-                for child in children:
-                    try:
-                        # Check permissions
-                        permission = FOLDER_VIEW if child.type == "folder" else FILE_VIEW
-                        if not (
-                                session.SESSION.match_permissions(permission)
-                                or session.SESSION.match_item_permissions(
-                            child.original_name, permission
-                        )
-                        ):
-                            continue
+                stack = [(child, parent_node) for child in children]
 
-                        # Create the main tree item for the child
-                        child_item = create_item(
-                            content=child.original_name,
-                            font_size=font_size,
-                            icon_type=QFileIconProvider.IconType.Folder
-                            if child.type == "folder"
-                            else QFileIconProvider.IconType.File,
-                            bold=child.type == "folder",
-                        )
-
-                        if child.type == "file":
-                            # Add metadata columns for files
-                            item_type, item_created_at, item_created_by = create_metadata(child, font_size)
-                            self.get_root_node().appendRow([child_item, item_type, item_created_at, item_created_by])
-                        elif child.type == "folder":
-                            # Add the folder node and traverse its children
-                            self.get_root_node().appendRow([child_item])
-                            traverse(child.children, font_size - 1)
-
-                    except Exception as e:
-                        logging.error(f"Error processing child: {child.original_name} - {e}")
-                        logging.error(traceback.format_exc())
+                while stack:
+                    child, current_parent = stack.pop()
+                    folder_item = process_child(current_parent, child, font_size)
+                    if folder_item and child.type == "folder":
+                        # Push children of the folder to the stack
+                        stack.extend((grandchild, folder_item) for grandchild in child.children)
 
             # Process all root children
             if not root_children:
                 logging.info("No data found to populate the tree.")
                 return
 
-            traverse(root_children, font_size)
+            # Get the root node
+            root_node = self.get_root_node()
+            if not root_node:
+                logging.error("Root node is missing. Cannot populate data.")
+                return
+
+            # Traverse the root children
+            traverse(root_children, root_node, font_size)
 
             # Notify the view to expand the tree view
-            self.view.refresh_tree_view()
+            self.notify_tree_expansion()
 
         except Exception as e:
             logging.error(f"Error populating data: {e}")
