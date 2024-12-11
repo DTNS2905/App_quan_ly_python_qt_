@@ -279,7 +279,7 @@ class ItemPresenter(Presenter):
                 parent_original_name = selected_item.text()
             else:
                 # Default to the root node if no valid selection
-                parent_original_name = self.model.get_root_node()
+                parent_original_name = "root"
                 if not parent_original_name:  # Ensure root node exists
                     self.view.display_error("Không thể xác định thư mục gốc.")  # Thông báo lỗi
                     return
