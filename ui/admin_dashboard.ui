@@ -219,17 +219,37 @@ padding:3px;
 border-radius:5px;
 }
 
+#rename_file_button::hover{
+background-color: rgb(108, 180, 238);
+}
+
 #rename_file_button {
-background-color: rgb(81, 163, 244) ;
+background-color: rgb(86, 145, 190) ;
 color:white;
 border:none;
 padding:3px;
 border-radius:5px;
 }
 
+#rename_folder_button::hover{
+background-color: rgb(108, 180, 238) ;
+}
+
 #rename_folder_button {
-background-color: rgb(81, 163, 244) ;
+background-color: rgb(86, 145, 190) ;
 color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+#log_button::hover{
+background-color: rgb(108, 180, 238) ;
+
+}
+
+#log_button{
+background-color: rgb(86, 145, 190) ;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -1066,9 +1086,9 @@ fill:red;</string>
              <widget class="QWidget" name="scrollAreaWidgetContents">
               <property name="geometry">
                <rect>
-                <x>-102</x>
+                <x>0</x>
                 <y>0</y>
-                <width>733</width>
+                <width>759</width>
                 <height>355</height>
                </rect>
               </property>
@@ -1246,7 +1266,10 @@ border: 0px solid black;
                     <property name="midLineWidth">
                      <number>2</number>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout">
+                    <layout class="QHBoxLayout" name="horizontalLayout_10">
+                     <property name="spacing">
+                      <number>10</number>
+                     </property>
                      <property name="leftMargin">
                       <number>0</number>
                      </property>
@@ -1259,82 +1282,7 @@ border: 0px solid black;
                      <property name="bottomMargin">
                       <number>0</number>
                      </property>
-                     <item row="0" column="3">
-                      <widget class="QPushButton" name="add_folder_button">
-                       <property name="text">
-                        <string>Thêm thư mục</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="2">
-                      <widget class="QPushButton" name="rename_file_button">
-                       <property name="text">
-                        <string>Sửa tên tài liệu</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QPushButton" name="remove_file_button">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="mouseTracking">
-                        <bool>true</bool>
-                       </property>
-                       <property name="focusPolicy">
-                        <enum>Qt::FocusPolicy::NoFocus</enum>
-                       </property>
-                       <property name="acceptDrops">
-                        <bool>false</bool>
-                       </property>
-                       <property name="styleSheet">
-                        <string notr="true"/>
-                       </property>
-                       <property name="text">
-                        <string>Xóa tài liệu</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/file-minus.svg</normaloff>:/icons_white/icons/icons_white/file-minus.svg</iconset>
-                       </property>
-                       <property name="autoDefault">
-                        <bool>false</bool>
-                       </property>
-                       <property name="flat">
-                        <bool>false</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="6">
-                      <widget class="QPushButton" name="log_button">
-                       <property name="text">
-                        <string>Mở bảng lịch sử</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/airplay.svg</normaloff>:/icons_white/icons/icons_white/airplay.svg</iconset>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="4">
-                      <widget class="QPushButton" name="remove_folder_button">
-                       <property name="text">
-                        <string>Xóa thư mục</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="../resources.qrc">
-                         <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
+                     <item>
                       <widget class="QPushButton" name="add_file_button">
                        <property name="enabled">
                         <bool>true</bool>
@@ -1384,25 +1332,208 @@ border: 0px solid black;
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="5">
-                      <widget class="QPushButton" name="rename_folder_button">
+                     <item>
+                      <widget class="QPushButton" name="add_folder_button">
                        <property name="text">
-                        <string>Sửa tên thư mục</string>
+                        <string>Thêm thư mục</string>
                        </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/folder-plus.svg</normaloff>:/icons_white/icons/icons_white/folder-plus.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="add_perrmission_button">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="mouseTracking">
+                        <bool>true</bool>
+                       </property>
+                       <property name="tabletTracking">
+                        <bool>false</bool>
+                       </property>
+                       <property name="focusPolicy">
+                        <enum>Qt::FocusPolicy::NoFocus</enum>
+                       </property>
+                       <property name="contextMenuPolicy">
+                        <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
+                       </property>
+                       <property name="layoutDirection">
+                        <enum>Qt::LayoutDirection::LeftToRight</enum>
+                       </property>
+                       <property name="autoFillBackground">
+                        <bool>false</bool>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true"/>
+                       </property>
+                       <property name="text">
+                        <string>Thêm quyền cho tài liệu</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/user-plus.svg</normaloff>:/icons_white/icons/icons_white/user-plus.svg</iconset>
+                       </property>
+                       <property name="autoDefault">
+                        <bool>false</bool>
+                       </property>
+                       <property name="default">
+                        <bool>false</bool>
+                       </property>
+                       <property name="flat">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="remove_file_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="mouseTracking">
+                        <bool>true</bool>
+                       </property>
+                       <property name="focusPolicy">
+                        <enum>Qt::FocusPolicy::NoFocus</enum>
+                       </property>
+                       <property name="acceptDrops">
+                        <bool>false</bool>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true"/>
+                       </property>
+                       <property name="text">
+                        <string>Xóa tài liệu</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/file-minus.svg</normaloff>:/icons_white/icons/icons_white/file-minus.svg</iconset>
+                       </property>
+                       <property name="autoDefault">
+                        <bool>false</bool>
+                       </property>
+                       <property name="flat">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="remove_folder_button">
+                       <property name="text">
+                        <string>Xóa thư mục</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/folder-minus.svg</normaloff>:/icons_white/icons/icons_white/folder-minus.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="remove_permission_button_2">
+                       <property name="text">
+                        <string>Gỡ quyền cho tài liệu</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/user-minus.svg</normaloff>:/icons_white/icons/icons_white/user-minus.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QFrame" name="verticalFrame">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_5">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QFrame" name="frame_5">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="mouseTracking">
+                           <bool>true</bool>
+                          </property>
+                          <property name="autoFillBackground">
+                           <bool>false</bool>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true"/>
+                          </property>
+                          <property name="lineWidth">
+                           <number>0</number>
+                          </property>
+                          <property name="midLineWidth">
+                           <number>2</number>
+                          </property>
+                          <layout class="QGridLayout" name="gridLayout_4">
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QFrame" name="verticalFrame">
+                   <widget class="QWidget" name="horizontalWidget" native="true">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_9">
+                     <property name="spacing">
+                      <number>10</number>
+                     </property>
                      <property name="leftMargin">
                       <number>0</number>
                      </property>
@@ -1416,114 +1547,71 @@ border: 0px solid black;
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QFrame" name="frame_5">
+                      <widget class="QPushButton" name="rename_folder_button">
                        <property name="sizePolicy">
-                        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="mouseTracking">
-                        <bool>true</bool>
+                       <property name="text">
+                        <string>Sửa tên thư mục</string>
                        </property>
-                       <property name="autoFillBackground">
-                        <bool>false</bool>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/edit-3.svg</normaloff>:/icons_white/icons/icons_white/edit-3.svg</iconset>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true"/>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="rename_file_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
-                       <property name="lineWidth">
-                        <number>0</number>
+                       <property name="text">
+                        <string>Sửa tên tài liệu</string>
                        </property>
-                       <property name="midLineWidth">
-                        <number>2</number>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/edit-3.svg</normaloff>:/icons_white/icons/icons_white/edit-3.svg</iconset>
                        </property>
-                       <layout class="QGridLayout" name="gridLayout_4">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item row="0" column="0">
-                         <widget class="QPushButton" name="add_perrmission_button">
-                          <property name="enabled">
-                           <bool>true</bool>
-                          </property>
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="mouseTracking">
-                           <bool>true</bool>
-                          </property>
-                          <property name="tabletTracking">
-                           <bool>false</bool>
-                          </property>
-                          <property name="focusPolicy">
-                           <enum>Qt::FocusPolicy::NoFocus</enum>
-                          </property>
-                          <property name="contextMenuPolicy">
-                           <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
-                          </property>
-                          <property name="layoutDirection">
-                           <enum>Qt::LayoutDirection::LeftToRight</enum>
-                          </property>
-                          <property name="autoFillBackground">
-                           <bool>false</bool>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true"/>
-                          </property>
-                          <property name="text">
-                           <string>Thêm quyền cho tài liệu</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="../resources.qrc">
-                            <normaloff>:/icons_white/icons/icons_white/user-plus.svg</normaloff>:/icons_white/icons/icons_white/user-plus.svg</iconset>
-                          </property>
-                          <property name="autoDefault">
-                           <bool>false</bool>
-                          </property>
-                          <property name="default">
-                           <bool>false</bool>
-                          </property>
-                          <property name="flat">
-                           <bool>false</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="1">
-                         <widget class="QPushButton" name="remove_permission_button_2">
-                          <property name="text">
-                           <string>Gỡ quyền cho tài liệu</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="../resources.qrc">
-                            <normaloff>:/icons_white/icons/icons_white/user-minus.svg</normaloff>:/icons_white/icons/icons_white/user-minus.svg</iconset>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="2">
-                         <widget class="QPushButton" name="item_permission_button">
-                          <property name="text">
-                           <string>Xem quyền cho tài liệu</string>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="../resources.qrc">
-                            <normaloff>:/icons_white/icons/icons_white/file.svg</normaloff>:/icons_white/icons/icons_white/file.svg</iconset>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="log_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Mở bảng lịch sử</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/airplay.svg</normaloff>:/icons_white/icons/icons_white/airplay.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="item_permission_button">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Xem quyền cho tài liệu</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/file.svg</normaloff>:/icons_white/icons/icons_white/file.svg</iconset>
+                       </property>
                       </widget>
                      </item>
                     </layout>
