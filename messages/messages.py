@@ -31,5 +31,13 @@ PROFILE_UPDATE_SUCCESS = "Cập nhật hồ sơ thành công"
 DB_ERROR = "Lỗi trên cơ sở dữ liệu"
 CREATE_OR_UPDATE_PROFILE_ERROR = "Tạo hoặc cập nhật có vấn đề"
 
+INVALID_USER_ID = "Thông tin người dùng không hợp lệ"
+INVALID_ITEM_NAME = "Thông tin của tài liệu hoặc thư mục không có "
+ASSIGN_ITEM_FOR_USER_ERROR = "Bỏ qua việc gắn quyền cho người dùng do lỗi:"
+ASSIGN_ITEM_FOR_USER_SUCCESS = "Quyền được gắn thành công"
+UNASSIGN_ITEM_FOR_USER_SUCCESS = "Quyền được gỡ thành công"
+UNASSIGN_ITEM_FOR_USER_ERROR = "Bỏ qua việc gỡ quyền cho người dùng do lỗi:"
+
+
 
 

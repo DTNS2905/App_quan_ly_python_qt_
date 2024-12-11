@@ -173,18 +173,70 @@ class PermissionPresenter(Presenter):
                 logging.error(f"Failed to assign permission '{permission}': {e}")
 
     def assign_permissions_to_users_for_file(
-        self, item_name: str, username: str, permissions: list[str]
-    ):
-        return self.model.assign_permissions_to_users_for_file(
-            item_name, username, permissions
-        )
+            self, item_name: str, username: str, permissions: list[str]
+    ) -> None:
+        """
+        Assign multiple permissions to a user for a specific file.
+
+        :param item_name: The name of the file (original_name in the items table).
+        :param username: The username to assign permissions to.
+        :param permissions: List of permissions to assign.
+        :raises ValueError: If any of the inputs are invalid or empty.
+        :raises Exception: If the operation fails for any reason.
+        """
+        if not item_name:
+            raise ValueError("Tên tệp không được để trống.")
+        if not username:
+            raise ValueError("Tên người dùng không được để trống.")
+        if not permissions or not all(isinstance(p, str) for p in permissions):
+            raise ValueError("Danh sách quyền phải không rỗng và chứa các chuỗi hợp lệ.")
+
+        try:
+            logging.info(
+                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+            )
+            self.model.assign_permissions_to_users_for_file(item_name, username, permissions)
+            logging.info(
+                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục'{item_name}'."
+            )
+        except Exception as e:
+            logging.error(
+                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
+            )
+            raise
 
     def unassign_permissions_to_users_for_file(
         self, item_name: str, username: str, permissions: list[str]
     ):
-        return self.model.unassign_permissions_to_users_for_file(
-            item_name, username, permissions
-        )
+        """
+               Assign multiple permissions to a user for a specific file.
+
+               :param item_name: The name of the file (original_name in the items table).
+               :param username: The username to assign permissions to.
+               :param permissions: List of permissions to assign.
+               :raises ValueError: If any of the inputs are invalid or empty.
+               :raises Exception: If the operation fails for any reason.
+               """
+        if not item_name:
+            raise ValueError("Tên tệp không được để trống.")
+        if not username:
+            raise ValueError("Tên người dùng không được để trống.")
+        if not permissions or not all(isinstance(p, str) for p in permissions):
+            raise ValueError("Danh sách quyền phải không rỗng và chứa các chuỗi hợp lệ.")
+
+        try:
+            logging.info(
+                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+            )
+            self.model.unassign_permissions_to_users_for_file(item_name, username, permissions)
+            logging.info(
+                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+            )
+        except Exception as e:
+            logging.error(
+                f"Không thể gỡ quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
+            )
+            raise
 
     def assign_permissions_to_user(
         self, username: str, permissions: list[str], user_assgin: str
@@ -361,7 +413,7 @@ class PermissionPresenter(Presenter):
             self.view.string_list_model.setStringList(suggestions)
         except Exception as e:
             # Handle potential errors during database fetching
-            logging.error(f"Error fetching suggestions: {e}")
+            logging.error(f"Không thể tìm gợi ý cho người dùng - lỗi kỹ thuật: {e}")
             self.view.string_list_model.setStringList([])
 
     def add_default_permissions_for_register(self):

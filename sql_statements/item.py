@@ -37,6 +37,16 @@ CREATE_PERMISSION_USER_ITEM_TABLE_SQL = '''
     )
 '''
 
+FETCH_NAME_FILE_OR_FOLDER_ON_TEXTCHANGED = '''
+    SELECT items.original_name
+        FROM items
+        JOIN user_item_permissions uip ON items.id = uip.item_id
+        JOIN permissions p ON uip.permission_id = p.id
+        JOIN users u ON u.id = uip.user_id
+        WHERE items.original_name LIKE ?
+          AND u.username = ?
+          AND p.permission = ?
+'''
 
 
 

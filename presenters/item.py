@@ -2,8 +2,8 @@ import logging
 import os
 import traceback
 
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import QPointF, Qt
+from PyQt6.QtGui import QColor, QBrush
 from PyQt6.QtWidgets import (
     QFileDialog,
     QMessageBox,
@@ -36,7 +36,7 @@ from messages.permissions import (
     FOLDER_CREATE,
     FOLDER_DELETE,
     FILE_RENAME,
-    FOLDER_RENAME,
+    FOLDER_RENAME, FILE_VIEW,
 )
 from models.item import ItemModel
 from models.log import LogModel
@@ -51,6 +51,8 @@ class ItemPresenter(Presenter):
         """Set up the view with the file model."""
         self.view.set_model(self.model.get_model())
 
+        self.model.on_tree_expansion = self.expand_tree_view
+
         # Customize tree view appearance
         effect = QGraphicsDropShadowEffect()
         effect.setOffset(QPointF(3.0, 3.0))
@@ -58,7 +60,7 @@ class ItemPresenter(Presenter):
         effect.setColor(QColor("#111"))
 
         self.view.treeView.setGraphicsEffect(effect)
-        self.view.treeView.setHeaderHidden(True)
+        self.view.treeView.setHeaderHidden(False)
         self.view.treeView.setAnimated(False)
         self.view.treeView.setIndentation(20)
         self.view.treeView.setSortingEnabled(True)
@@ -77,7 +79,7 @@ class ItemPresenter(Presenter):
         return self.model.refresh_model()
 
     def handle_add_files(self):
-        """Handle adding multiple files to the root directory."""
+        """Handle adding multiple files to the selected directory."""
         if not session.SESSION.match_permissions(FILE_CREATE):
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(
@@ -88,33 +90,54 @@ class ItemPresenter(Presenter):
         try:
             # Open file dialog to select multiple files
             file_paths, _ = QFileDialog.getOpenFileNames(
-                self.view, "Chọn tài liệu", "", "Tất cả tài liệu(*)"
+                self.view, "Chọn tài liệu", "", "All Files (*)"
             )
             if not file_paths:
                 return  # User canceled the dialog
 
+            # Get the selected index from the tree view
             selected_index = self.view.treeView.currentIndex()
-            model = self.view.treeView.model()
-            parent_original_name = model.data(selected_index)
+            parent_original_name = None
 
+            if selected_index.isValid():
+                # Validate the selected node
+                model = self.view.treeView.model()
+                parent_original_name = model.data(selected_index, Qt.ItemDataRole.DisplayRole)
+                parent_node_type = model.data(selected_index, Qt.ItemDataRole.UserRole)
+
+                if parent_node_type == "file":
+                    # Files cannot act as parents
+                    self.view.display_error("không thể thêm tài liệu")
+                    LogModel.write_log(
+                        session.SESSION.get_username(),
+                        f"Lỗi không thể thêm các tài liệu dưới một tài liệu khác: {parent_original_name}",
+                    )
+                    return
+            else:
+                # If no valid node is selected, default to the root
+                parent_original_name = None
+
+            # Add each file
+            username = session.SESSION.get_username()
             for file_path in file_paths:
-                username = session.SESSION.get_username()
                 self.model.create_file(username, file_path, parent_original_name)
 
             # Notify the view about the success
             self.view.display_success(
-                f"{', '.join(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.get_root_path()}."
+                f"Tài liệu được thêm thành công {parent_original_name or 'root'}: {', '.join(file_paths)}."
             )
             LogModel.write_log(
-                session.SESSION.get_username(),
-                f"{', '.join(file_paths)} {ADD_FILE_SUCCESS} cho {self.model.get_root_path()}.",
+                username,
+                f"Các tài liệu được thêm {', '.join(file_paths)} tới {parent_original_name or 'root'}.",
             )
 
-            # Refresh the view
+            # Refresh the tree view
             self.view.refresh_tree_view()
+
         except Exception as e:
             # Notify the view about the failure
             self.view.display_error(f"{ADD_FILE_ERROR}: {e}")
+            logging.error(f"lỗi trong lúc thêm tài liệu: {e}")
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
@@ -174,6 +197,7 @@ class ItemPresenter(Presenter):
                             self.view.display_error(
                                 f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}"
                             )
+                            return
 
                     self.view.display_success(
                         f" {FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)} "
@@ -237,6 +261,23 @@ class ItemPresenter(Presenter):
             return
 
         try:
+            # Get the selected index and model
+            selected_index = self.view.treeView.currentIndex()
+            model = self.view.treeView.model()
+
+            # Check if the selected index is valid
+            if not selected_index.isValid():
+                self.view.display_error("Hãy chọn một thư mục hợp lệ.")  # Thông báo lỗi
+                return
+
+            # Retrieve the corresponding QStandardItem
+            selected_item = model.itemFromIndex(selected_index)
+
+            # Check if the selected item is a directory (using UserRole data)
+            if selected_item.data(Qt.ItemDataRole.UserRole) != "directory":
+                self.view.display_error("Không thể thêm thư mục vào một tệp.")  # Thông báo lỗi
+                return
+
             # Use the custom dialog
             dialog = CustomInputDialog(
                 self.view, "Thư mục mới", "Điền tên thư mục:", "Thêm", "Hủy"
@@ -247,13 +288,9 @@ class ItemPresenter(Presenter):
                     LogModel.write_log(
                         session.SESSION.get_username(), FOLDER_CREATE_ERROR
                     )
-                    self.view.display_error(
-                        "Tên thư mục không được để trống."
-                    )  # Thông báo lỗi
+                    self.view.display_error("Tên thư mục không được để trống.")  # Thông báo lỗi
                     return
 
-                selected_index = self.view.treeView.currentIndex()
-                model = self.view.treeView.model()
                 parent_original_name = model.data(selected_index)
 
                 username = session.SESSION.get_username()
@@ -444,3 +481,42 @@ class ItemPresenter(Presenter):
                 self.view.display_error(
                     f"Cập nhật tên thư mục {original_name}: {str(e)}"
                 )
+
+    def update_suggestions(self, text):
+        """Fetch matching name of items from the database and update the completer's suggestions."""
+        suggestions = []
+        if not text.strip():
+            # Clear suggestions if the input is empty
+            self.view.string_list_model.setStringList(suggestions)
+            return
+
+        try:
+            # Fetch suggestions from the database
+            if not session.SESSION.match_permissions(FILE_VIEW):
+                username = session.SESSION.get_username()
+                suggestions = self.model.fetch_items_based_on_suggestions_and_permissions(text, username)
+            else:
+                suggestions = self.model.fetch_all_items_based_on_suggestions(text)
+
+            self.view.string_list_model.setStringList(suggestions)
+        except Exception as e:
+            # Handle potential errors during database fetching
+            logging.error(f" Không thể tìm gợi ý cho tài liệu hoặc thư mục - lỗi kỹ thuật: {e}")
+            self.view.string_list_model.setStringList([])
+
+    def search_tree(self, search_text: str):
+        """
+        Handle tree search logic and notify the view to update the display.
+        """
+        if not search_text.strip():
+            self.clear_highlights()
+            return
+
+        matches = self.model.search_tree_iterative(search_text)
+        self.view.expand_and_highlight(matches)
+
+    def clear_highlights(self):
+        self.model.clear_item_highlight()
+
+    def expand_tree_view(self):
+        self.view.treeView.expandAll()

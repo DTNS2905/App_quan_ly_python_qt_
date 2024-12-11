@@ -2,9 +2,9 @@ import logging
 import traceback
 
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal
+from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal, QStringListModel
 from PyQt6.QtGui import QShortcut, QKeySequence
-from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog
+from PyQt6.QtWidgets import QMessageBox, QHeaderView, QDialog, QCompleter, QAbstractItemView
 
 from common import session
 from configs import DASHBOARD_UI_PATH
@@ -18,7 +18,7 @@ from messages.permissions import (
     FILE_CREATE,
     FOLDER_CREATE,
     FILE_RENAME,
-    FOLDER_RENAME,
+    FOLDER_RENAME, FILE_DELETE, FOLDER_DELETE,
 )
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
@@ -64,21 +64,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.home_button.clicked.connect(self.change_button_style_on_click)
         self.manage_user_button.clicked.connect(self.change_button_style_on_click)
 
-        self.add_file_button.clicked.connect(self.item_presenter.handle_add_files)
-        self.add_file_button.setVisible(session.SESSION.match_permissions(FILE_CREATE))
+        # add file button
+        self.add_file_button.clicked.connect(
+            self.item_presenter.handle_add_files
+        )
+        self.add_file_button.setVisible(
+            session.SESSION.match_permissions(FILE_CREATE)
+        )
 
-        self.rename_file_button.clicked.connect(self.item_presenter.handle_rename_file)
+        # rename file button
+        self.rename_file_button.clicked.connect(
+            self.item_presenter.handle_rename_file
+        )
         self.rename_file_button.setVisible(
             session.SESSION.match_permissions(FILE_RENAME)
         )
 
-        self.remove_file_button.clicked.connect(self.item_presenter.handle_remove_files)
-
-        self.add_folder_button.clicked.connect(self.item_presenter.handle_add_folder)
-        self.add_folder_button.setVisible(
-            session.SESSION.match_permissions(FOLDER_CREATE)
+        # Remove file button
+        self.remove_file_button.clicked.connect(
+            self.item_presenter.handle_remove_files
+        )
+        self.remove_file_button.setVisible(
+            session.SESSION.match_permissions(FILE_DELETE)
         )
 
+        # Remove folder button
+        self.add_folder_button.clicked.connect(
+            self.item_presenter.handle_add_folder
+        )
+        self.add_folder_button.setVisible(session.SESSION.match_permissions(
+            FOLDER_CREATE)
+        )
+
+        # rename folder button
         self.rename_folder_button.clicked.connect(
             self.item_presenter.handle_rename_folder
         )
@@ -86,9 +104,34 @@ class MainWindow(QtWidgets.QMainWindow):
             session.SESSION.match_permissions(FOLDER_RENAME)
         )
 
+        # Remove folder button
         self.remove_folder_button.clicked.connect(
             self.item_presenter.handle_remove_folder
         )
+        self.remove_folder_button.setVisible(
+            session.SESSION.match_permissions(FOLDER_DELETE)
+        )
+
+        # Initialize QCompleter
+        self.completer = QCompleter(self)
+        self.completer.setCaseSensitivity(
+            Qt.CaseSensitivity.CaseInsensitive
+        )  # Corrected: Use enum
+        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
+        self.completer.setCompletionMode(
+            QCompleter.CompletionMode.PopupCompletion
+        )  # Use popup for suggestions
+
+        # Set the model for the completer
+        self.string_list_model = QStringListModel()  # Start with an empty model
+        self.completer.setModel(self.string_list_model)
+
+        # Attach the completer to the lineEdit
+        self.search_input.setCompleter(self.completer)
+
+        self.search_input.textChanged.connect(self.on_search_text_changed)
+
+        self.search_button.clicked.connect(self.search_files_folders)
 
         self.label_2.installEventFilter(self)
 
@@ -158,6 +201,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.open_dialog(LogDialog(self))
 
         self.log_button.clicked.connect(lambda: view_log())
+        self.log_button.setVisible(
+            session.SESSION.match_permissions(LOG_VIEW)
+        )
 
         def view_item_permission():
             if not session.SESSION.match_permissions(PERMISSION_VIEW):
@@ -317,3 +363,37 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def refresh_permission_view(self):
         self.permission_presenter.populate_table()
+
+    def expand_and_highlight(self, matches):
+        """
+        Expand and scroll to matching nodes.
+
+        Args:
+            matches (list[QModelIndex]): A list of QModelIndex objects for matching nodes.
+        """
+        for match in matches:
+            self.treeView.expand(match)  # Expand matching node
+            self.treeView.scrollTo(match, QAbstractItemView.ScrollHint.PositionAtCenter)  # Scroll to it
+
+    def search_files_folders(self):
+        """
+        Notify the presenter about the search text and expand/scroll to matches.
+        This will clear highlights if the search input is empty.
+        """
+        search_text = self.search_input.text()
+
+        self.item_presenter.search_tree(search_text)  # Perform search if text is not empty
+
+    def on_search_text_changed(self):
+        """
+        Handle text changes in the search input.
+        Clears highlights and updates suggestions based on the current input text.
+        """
+        search_text = self.search_input.text()
+
+        if not search_text.strip():  # If input is empty, clear highlights and suggestions
+            self.item_presenter.clear_highlights()  # Reset all highlights
+            return
+
+        # Update suggestions as the user types
+        self.item_presenter.update_suggestions(search_text)

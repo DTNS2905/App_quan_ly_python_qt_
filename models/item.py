@@ -7,7 +7,8 @@ import traceback
 import uuid
 from dataclasses import dataclass
 
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont, QIcon
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont, QIcon, QBrush
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeView, QFileIconProvider
 
 from common import session
@@ -19,7 +20,7 @@ from messages.permissions import FILE_VIEW, FOLDER_VIEW
 from sql_statements.item import (
     CREATE_ITEM_TABLE_SQL,
     CREATE_PERMISSION_USER_ITEM_TABLE_SQL,
-    INIT_DATA,
+    INIT_DATA, FETCH_NAME_FILE_OR_FOLDER_ON_TEXTCHANGED,
 )
 
 
@@ -35,24 +36,45 @@ class ItemDTO:
     updated_at: str
 
 
-def build_tree(items: list[ItemDTO]):
+def build_tree(items: list[ItemDTO]) -> list[ItemDTO]:
+    """
+    Build a tree structure from a flat list of ItemDTO objects.
+
+    Args:
+        items (list[ItemDTO]): List of ItemDTO objects with parent-child relationships.
+
+    Returns:
+        list[ItemDTO]: List of children under the root (parent_id == -1).
+    """
+    # Create a dictionary for quick lookup of items by their ID
     item_dict = {item.id: item for item in items}
-    root_node = []
+
+    # Initialize children for all items
+    for item in items:
+        item.children = []
+
+    # Build the tree structure
+    root_children = []
     for item in items:
         if item.parent_id == -1:
-            root_node = item
+            # Skip the "root" node, but track its children
+            continue
         else:
-            parent = item_dict[item.parent_id]
-            if not hasattr(parent, "children"):
-                parent.children = []
-            parent.children.append(item)
+            # Assign the item as a child of its parent
+            parent = item_dict.get(item.parent_id)
+            if parent:
+                parent.children.append(item)
 
-    return root_node
+            # If the parent is the "root," add it to the root_children list
+            if parent and parent.parent_id == -1:
+                root_children.append(item)
+
+    return root_children
 
 
 class CustomItem(QStandardItem):
     def __init__(
-        self, content, font_size=12, bold=False, color=QColor(0, 0, 0), *args, **kwargs
+            self, content, font_size=12, bold=False, color=QColor(0, 0, 0), *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
 
@@ -77,7 +99,7 @@ class ItemModel(NativeSqlite3Model):
 """
 
     def __init__(
-        self, database_name=DATABASE_NAME, table_create_sql=CREATE_ITEM_TABLE_SQL
+            self, database_name=DATABASE_NAME, table_create_sql=CREATE_ITEM_TABLE_SQL
     ):
         super().__init__(database_name, table_create_sql)
         self._init_junction_table()
@@ -113,70 +135,122 @@ class ItemModel(NativeSqlite3Model):
         return self.model.invisibleRootItem()
 
     def populate_data(self):
-        items = self.fetch_data()
-        root_item_data = build_tree(items)
-        font_size = 14
+        """
+        Populate the tree view with all files and folders directly under the root.
+        Ensures rows with no data or invalid children are skipped.
+        """
+        try:
+            items = self.fetch_data()
+            logging.debug(f"Fetched items: {items}")
+            root_children = build_tree(items)
+            logging.debug(f"Root children: {root_children}")
+            font_size = 14
 
-        # Initialize QFileIconProvider
-        icon_provider = QFileIconProvider()
+            icon_provider = QFileIconProvider()
 
-        # Get the root folder icon
-        root_icon = icon_provider.icon(QFileIconProvider.IconType.Folder)
-        root_node = CustomItem(root_item_data.original_name, font_size, True)
-        root_node.set_custom_icon(root_icon)
+            def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0)):
+                """
+                Helper to create a CustomItem with specific attributes.
+                """
+                item = CustomItem(content, font_size=font_size, bold=bold, color=color)
+                item.set_custom_icon(icon_provider.icon(icon_type))
+                return item
 
-        def traverse(parent_node: CustomItem, parent_data: ItemDTO, f_size):
-            for index, child in enumerate(getattr(parent_data, "children", [])):
-                try:
-                    permission = FOLDER_VIEW if child.type == "folder" else FILE_VIEW
-                    if (
-                        child.original_name != "root"
-                        and not session.SESSION.match_permissions(permission)
-                        and not session.SESSION.match_item_permissions(
+            def create_metadata(child, font_size):
+                """
+                Fetch and create metadata columns for a file.
+                """
+                file_type = get_file_type(child.original_name)
+                created_at = convert_utc_time_to_timezone(
+                    child.created_at, TIMEZONE
+                ).strftime("%Y-%m-%d %H:%M:%S")
+
+                cur = self.connection.cursor()
+                cur.execute(
+                    "SELECT fullname FROM profiles WHERE user_id = ?", (child.user_id,)
+                )
+                result = cur.fetchone()
+                fullname = result[0] if result else "Unknown"
+
+                return (
+                    CustomItem(file_type, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(created_at, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(fullname, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                )
+
+            def process_child(parent_node, child, font_size):
+                """
+                Process and append a child node (file or folder) to the parent node.
+                """
+                item = create_item(
+                    content=child.original_name,
+                    font_size=font_size - 1,
+                    icon_type=QFileIconProvider.IconType.Folder
+                    if child.type == "folder"
+                    else QFileIconProvider.IconType.File,
+                    bold=child.type == "folder",
+                )
+
+                if child.type == "file":
+                    # Add metadata columns for files
+                    item_type, item_created_at, item_created_by = create_metadata(child, font_size)
+                    parent_node.appendRow([item, item_type, item_created_at, item_created_by])
+                elif child.type == "folder":
+                    # Add the folder node without metadata
+                    parent_node.appendRow([item])
+
+            def traverse(children, font_size):
+                """
+                Traverse the root-level children and populate the tree view.
+                """
+                for child in children:
+                    try:
+                        # Check permissions
+                        permission = FOLDER_VIEW if child.type == "folder" else FILE_VIEW
+                        if not (
+                                session.SESSION.match_permissions(permission)
+                                or session.SESSION.match_item_permissions(
                             child.original_name, permission
                         )
-                    ):
-                        continue
+                        ):
+                            continue
 
-                    icon = icon_provider.icon(
-                        QFileIconProvider.IconType.Folder
-                        if child.type == "folder"
-                        else QFileIconProvider.IconType.File
-                    )
-                    item = CustomItem(
-                        child.original_name, f_size - 1, child.type == "folder"
-                    )
-                    item.set_custom_icon(icon)
-                    item_type = CustomItem(
-                        get_file_type(child.original_name),
-                        f_size - 1,
-                        child.type == "folder",
-                    )
-                    created_at = convert_utc_time_to_timezone(
-                        child.created_at, TIMEZONE
-                    ).strftime("%Y-%m-%d %H:%M:%S")
-                    item_created_at = CustomItem(
-                        created_at, f_size - 1, child.type == "folder"
-                    )
-                    cur = self.connection.cursor()
-                    cur.execute(
-                        "SELECT fullname FROM profiles WHERE user_id = ?",
-                        (child.user_id,),
-                    )
-                    fullname = cur.fetchone()[0]
-                    item_created_by = CustomItem(
-                        fullname, f_size - 1, child.type == "folder"
-                    )
-                    parent_node.setChild(index, 0, item)
-                    parent_node.setChild(index, 1, item_type)
-                    parent_node.setChild(index, 2, item_created_at)
-                    parent_node.setChild(index, 3, item_created_by)
-                    traverse(item, child, f_size - 1)
-                except:
-                    logging.error(traceback.print_exc())
+                        # Create the main tree item for the child
+                        child_item = create_item(
+                            content=child.original_name,
+                            font_size=font_size,
+                            icon_type=QFileIconProvider.IconType.Folder
+                            if child.type == "folder"
+                            else QFileIconProvider.IconType.File,
+                            bold=child.type == "folder",
+                        )
 
-        traverse(root_node, root_item_data, font_size)
-        self.get_root_node().appendRow(root_node)
+                        if child.type == "file":
+                            # Add metadata columns for files
+                            item_type, item_created_at, item_created_by = create_metadata(child, font_size)
+                            self.get_root_node().appendRow([child_item, item_type, item_created_at, item_created_by])
+                        elif child.type == "folder":
+                            # Add the folder node and traverse its children
+                            self.get_root_node().appendRow([child_item])
+                            traverse(child.children, font_size - 1)
+
+                    except Exception as e:
+                        logging.error(f"Error processing child: {child.original_name} - {e}")
+                        logging.error(traceback.format_exc())
+
+            # Process all root children
+            if not root_children:
+                logging.info("No data found to populate the tree.")
+                return
+
+            traverse(root_children, font_size)
+
+            # Notify the view to expand the tree view
+            self.view.refresh_tree_view()
+
+        except Exception as e:
+            logging.error(f"Error populating data: {e}")
+            logging.error(traceback.format_exc())
 
     def refresh_model(self):
         self.model = QStandardItemModel(0, len(FILE_TREE_VIEW_COLUMNS))
@@ -188,35 +262,80 @@ class ItemModel(NativeSqlite3Model):
         return self._root_path
 
     def create_file(
-        self, username: str, file_path: str, parent_original_name: str = None
+            self, username: str, file_path: str, parent_original_name: str = "root"
     ):
-        cur = self.connection.cursor()
-        cur.execute("SELECT id FROM users WHERE username = ?", (username,))
-        user_id = cur.fetchone()[0]
-        cur.execute(
-            "SELECT id FROM items WHERE original_name = ?", (parent_original_name,)
-        )
-        result = cur.fetchone()
-        if result:
-            parent_id = result[0]
-        else:
-            parent_id = 0
-        original_name = os.path.basename(file_path)
-        code = str(uuid.uuid4())
-        cur.execute(
-            "insert into items (code, type, original_name, parent_id, user_id) values (?, ?, ?, ?, ?)",
-            (code, "file", original_name, parent_id, user_id),
-        )
-        if cur.rowcount > 0:
+        """
+        Creates a new file in the system and updates the database and tree structure.
+
+        Args:
+            username (str): The username of the file creator.
+            file_path (str): The path to the file to be added.
+            parent_original_name (str, optional): The name of the parent folder. Defaults to None.
+
+        Returns:
+            int: The ID of the newly created file in the database.
+
+        Raises:
+            Exception: If the file creation fails at any step.
+        """
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+
+        cur = None
+        try:
+            # Get the user ID
+            cur = self.connection.cursor()
+            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
+            user_row = cur.fetchone()
+            if not user_row:
+                raise ValueError(f"User '{username}' not found.")
+            user_id = user_row[0]
+
+            # Get the parent ID
+            if parent_original_name:
+                cur.execute(
+                    "SELECT id, type FROM items WHERE original_name = ?", (parent_original_name,)
+                )
+                parent_row = cur.fetchone()
+                if not parent_row:
+                    raise ValueError(f"Parent '{parent_original_name}' not found.")
+                parent_id, parent_type = parent_row
+                if parent_type == "file":
+                    raise ValueError(f"Cannot add a file under another file: {parent_original_name}.")
+            else:
+                parent_id = 0  # Root directory
+
+            # Prepare file details
+            original_name = os.path.basename(file_path)
+            code = str(uuid.uuid4())
+
+            # Insert file record into the database
+            cur.execute(
+                "INSERT INTO items (code, type, original_name, parent_id, user_id) VALUES (?, ?, ?, ?, ?)",
+                (code, "file", original_name, parent_id, user_id),
+            )
+            if cur.rowcount == 0:
+                raise Exception(f"Failed to insert file '{original_name}' into the database.")
+
+            # Commit changes and copy the file to the system's storage location
+            file_id = cur.lastrowid
             self.connection.commit()
-            cur.close()
             shutil.copy(file_path, os.path.join(self._root_path, code))
-            logging.info(f"Create file name '{original_name}' successfully")
-            return cur.lastrowid
-        else:
-            self.connection.rollback()
-            cur.close()
-            raise Exception(f"Error: create file name '{original_name}' failed")
+
+            # Log success
+            logging.info(f"File '{original_name}' created successfully with ID {file_id}.")
+
+            return file_id
+
+        except Exception as e:
+            if cur:
+                self.connection.rollback()
+            logging.error(f"Error creating file '{file_path}': {e}")
+            raise e
+
+        finally:
+            if cur:
+                cur.close()
 
     def open_file(self, original_name):
         cur = self.connection.cursor()
@@ -249,8 +368,7 @@ class ItemModel(NativeSqlite3Model):
             return f.read()
 
     def create_folder(
-        self, username: str, original_name: str, parent_original_name: str = None
-    ):
+            self, username: str, original_name: str, parent_original_name: str = None):
         cur = self.connection.cursor()
         cur.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = cur.fetchone()[0]
@@ -384,6 +502,115 @@ class ItemModel(NativeSqlite3Model):
             cur.close()
             logging.info(f"Rename item with id '{item_id}' failed")
             raise Exception(f"Cập nhật thất bại")
+
+    def fetch_all_items_based_on_suggestions(self, text):
+        """Fetch items from the database that match the input."""
+        cur = self.connection.cursor()
+
+        try:
+            # Use SQL LIKE to match usernames containing the input text
+            cur.execute(
+                "SELECT original_name FROM items WHERE original_name LIKE ?", (f"%{text}%",)
+            )
+            rows = cur.fetchall()
+
+            # Extract usernames from the result
+            return [row[0] for row in rows]
+        except sqlite3.Error as e:
+            logging.error(f"Database error: {e}")
+            return []
+        finally:
+            cur.close()
+
+    def fetch_items_based_on_suggestions_and_permissions(self, text, username, required_permission=FILE_VIEW):
+        """Fetch items from the database that match the input and validate user permissions based on username."""
+        cur = self.connection.cursor()
+
+        try:
+            # Fetch items based on input text and user permissions using username
+            query = FETCH_NAME_FILE_OR_FOLDER_ON_TEXTCHANGED
+            cur.execute(query, (f"%{text}%", username, required_permission))
+            rows = cur.fetchall()
+
+            # Extract item names from the result
+            return [row[0] for row in rows]
+        except sqlite3.Error as e:
+            logging.error(f"Database error: {e}")
+            return []
+        finally:
+            cur.close()
+
+    def search_tree_iterative(self, search_text: str):
+        """
+        Perform iterative search on the tree structure, highlighting matching nodes.
+
+        Args:
+            search_text (str): The text to search for in the tree.
+
+        Returns:
+            list[QModelIndex]: A list of QModelIndex objects for matching nodes.
+        """
+        search_text = search_text.lower()
+        matches = []
+
+        # Start from the root item
+        root_index = self.model.index(0, 0)
+        if not root_index.isValid():
+            logging.warning("Root node is missing.")
+            return matches
+
+        stack = [root_index]
+
+        while stack:
+            current_index = stack.pop()
+            item = self.model.itemFromIndex(current_index)
+
+            if item is None:
+                continue
+
+            # Check if the current item's text matches the search text
+            if search_text in item.text().lower():
+                matches.append(current_index)
+                # Set both the foreground (text color) and background color
+                item.setForeground(QBrush(Qt.GlobalColor.red))  # Red text color
+                item.setBackground(QBrush(QColor(0, 0, 255)))  # Blue background (adjust as needed)
+            else:
+                item.setForeground(QBrush(Qt.GlobalColor.black))  # Reset text color to black
+                item.setBackground(QBrush(Qt.GlobalColor.white))  # Reset background to white
+
+            # Add children indices to the stack
+            for row in range(item.rowCount()):
+                stack.append(item.child(row).index())
+
+        return matches
+
+    def clear_item_highlight(self):
+        """
+        Clear all search highlights in the tree and reset the items to their original state.
+        """
+        root_index = self.model.index(0, 0)
+        stack = [root_index] if root_index.isValid() else []
+
+        while stack:
+            index = stack.pop()
+            item = self.model.itemFromIndex(index)
+            if item:
+                # Reset the foreground (text color) to black
+                item.setForeground(QBrush(Qt.GlobalColor.black))
+                # Reset the background color to white
+                item.setBackground(QBrush(Qt.GlobalColor.white))
+
+            # Add children to the stack for further iteration
+            for i in range(item.rowCount()):
+                stack.append(item.child(i).index())
+
+    def notify_tree_expansion(self):
+        """
+        Notify the presenter or view to expand the tree view.
+        """
+        # Trigger a signal or callback to the presenter/view
+        if hasattr(self, "on_tree_expansion"):
+            self.on_tree_expansion()
 
 
 if __name__ == "__main__":

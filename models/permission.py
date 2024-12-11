@@ -5,6 +5,8 @@ from dataclasses import dataclass
 
 from common.model import NativeSqlite3Model
 from configs import DATABASE_NAME
+from messages.messages import INVALID_USER_ID, INVALID_ITEM_NAME, ASSIGN_ITEM_FOR_USER_ERROR, \
+    UNASSIGN_ITEM_FOR_USER_ERROR, ASSIGN_ITEM_FOR_USER_SUCCESS, UNASSIGN_ITEM_FOR_USER_SUCCESS
 from sql_statements.permission import (
     ADD_PERMISSION_SQL,
     PERMISSION_USER_VIEW_SQL,
@@ -66,7 +68,7 @@ class PermissionModel(NativeSqlite3Model):
     _get_permission_id_sql = GET_PERMISSION_ID_SQL
 
     def __init__(
-        self, database_name=DATABASE_NAME, table_create_sql=CREATE_PERMISSION_TABLE_SQL
+            self, database_name=DATABASE_NAME, table_create_sql=CREATE_PERMISSION_TABLE_SQL
     ):
         super().__init__(database_name, table_create_sql)
         self.init_junction_table()
@@ -253,14 +255,14 @@ class PermissionModel(NativeSqlite3Model):
         return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
 
     def assign_permissions_to_users_for_file(
-        self, item_name: str, username: str, permissions: list[str]
+            self, item_name: str, username: str, permissions: list[str]
     ):
         """
-        Assign multiple users and permissions to a single file.
+        Assign multiple permissions to a user for a single file.
 
         :param item_name: Path to the SQLite database.
-        :param username: The name of the file (original_name in the items table).
-        :param permissions: List of usernames to assign permissions to.
+        :param username: The username to assign permissions to.
+        :param permissions: List of permissions to assign.
         """
 
         cur = self.connection.cursor()
@@ -270,16 +272,14 @@ class PermissionModel(NativeSqlite3Model):
             cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
             item = cur.fetchone()
             if not item:
-                logging.warning(f"Item '{item_name}' not found.")
-                return
+                raise Exception(f"{INVALID_ITEM_NAME} cho '{item_name}'")
             item_id = item[0]
 
-            # Fetch user_id using the username
-            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
-            user = cur.fetchone()
-            if not user:
-                logging.warning(f"User '{username}' not found. Skipping...")
-            user_id = user[0]
+            # Fetch user_id using the get_user_id_by_username method
+            try:
+                user_id = self.get_user_id_by_username(username)
+            except Exception as e:
+                raise Exception(f"{INVALID_USER_ID}:{e}")
 
             for permission_name in permissions:
                 # Fetch permission_id using the permission name
@@ -290,11 +290,10 @@ class PermissionModel(NativeSqlite3Model):
                 permission = cur.fetchone()
                 if not permission:
                     logging.warning(
-                        f"Permission '{permission_name}' not found. Skipping..."
+                        f"Quyền '{permission_name}' không tìm thấy. bỏ qua..."
                     )
                     continue
                 permission_id = permission[0]
-                print(f"permission_id: {permission_id}")
 
                 # Insert into user_item_permissions
                 try:
@@ -304,41 +303,48 @@ class PermissionModel(NativeSqlite3Model):
                     )
                 except sqlite3.IntegrityError as e:
                     logging.error(f"Skipping duplicate assignment: {e}")
-                    print(traceback.print_exc())
 
             # Commit the transaction
             self.connection.commit()
-            cur.close()
             logging.info(
-                f"Permissions successfully assigned to users for item '{item_name}'."
+                f" {ASSIGN_ITEM_FOR_USER_SUCCESS} cho '{username}' đối với '{item_name}'."
             )
 
         except sqlite3.Error as e:
             logging.error(f"Database error: {e}")
-            print(traceback.print_exc())
+        except Exception as e:
+            logging.error(f"Error: {e}")
         finally:
-            # Close the connection
+            # Close the cursor
             cur.close()
 
     def unassign_permissions_to_users_for_file(
-        self, item_name: str, username: str, permissions: list[str]
+            self, item_name: str, username: str, permissions: list[str]
     ):
+        """
+        Unassign multiple permissions from a user for a single file.
+
+        :param item_name: Path to the SQLite database.
+        :param username: The username to unassign permissions from.
+        :param permissions: List of permissions to unassign.
+        """
+
         cur = self.connection.cursor()
+
         try:
             # Fetch item_id using the item's original name
             cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
             item = cur.fetchone()
             if not item:
-                logging.warning(f"Item '{item_name}' not found.")
-                return
+                raise Exception(f"{INVALID_ITEM_NAME} cho '{item_name}'")
             item_id = item[0]
 
-            # Fetch user_id using the username
-            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
-            user = cur.fetchone()
-            if not user:
-                logging.warning(f"User '{username}' not found. Skipping...")
-            user_id = user[0]
+            # Fetch user_id using the get_user_id_by_username method
+            try:
+                user_id = self.get_user_id_by_username(username)
+            except Exception as e:
+                logging.error(f"Skipping due to error during unassignment: {e}")
+                raise Exception(f"{INVALID_USER_ID} cho {username}")
 
             for permission_name in permissions:
                 # Fetch permission_id using the permission name
@@ -349,34 +355,32 @@ class PermissionModel(NativeSqlite3Model):
                 permission = cur.fetchone()
                 if not permission:
                     logging.warning(
-                        f"Permission '{permission_name}' not found. Skipping..."
+                        f"quyềm '{permission_name}' không tìm thấy. bỏ qua..."
                     )
                     continue
                 permission_id = permission[0]
-                print(f"permission_id: {permission_id}")
 
-                # Insert into user_item_permissions
+                # Remove from user_item_permissions
                 try:
                     cur.execute(
                         UNASSIGN_PERMISSION_AND_USER_FOR_ITEM_SQL,
                         (item_id, user_id, permission_id),
                     )
                 except sqlite3.IntegrityError as e:
-                    logging.error(f"Skipping duplicate assignment: {e}")
-                    print(traceback.print_exc())
+                    logging.error(f"{UNASSIGN_ITEM_FOR_USER_ERROR}: '{e}'")
 
             # Commit the transaction
             self.connection.commit()
-            cur.close()
             logging.info(
-                f"Permissions successfully unassigned to users for item '{item_name}'."
+                f"{UNASSIGN_ITEM_FOR_USER_SUCCESS} cho '{username}' đối với '{item_name}'."
             )
 
         except sqlite3.Error as e:
             logging.error(f"Database error: {e}")
-            print(traceback.print_exc())
+        except Exception as e:
+            logging.error(f"Error: {e}")
         finally:
-            # Close the connection
+            # Close the cursor
             cur.close()
 
     def fetch_usernames_based_on_suggestions(self, text):

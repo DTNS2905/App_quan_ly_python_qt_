@@ -50,7 +50,8 @@ class PermissionDialog(QtWidgets.QDialog):
                 else PERMISSION_UNGRANT
             )
             if not session.SESSION.match_permissions(permission):
-                self.display_error(f"{permission}: {PERMISSION_DENIED}")
+                translated_permissions_session = self.presenter.translate_permissions(permission)
+                self.display_error(f"{translated_permissions_session}: {PERMISSION_DENIED}")
                 return
 
             if action == "assign_permission":
@@ -71,21 +72,21 @@ class PermissionDialog(QtWidgets.QDialog):
         )
 
         # Initialize QCompleter
-        self.completer = QCompleter(self)
-        self.completer.setCaseSensitivity(
+        self.permission_completer = QCompleter(self)
+        self.permission_completer.setCaseSensitivity(
             Qt.CaseSensitivity.CaseInsensitive
         )  # Corrected: Use enum
-        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
-        self.completer.setCompletionMode(
+        self.permission_completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
+        self.permission_completer.setCompletionMode(
             QCompleter.CompletionMode.PopupCompletion
         )  # Use popup for suggestions
 
         # Set the model for the completer
         self.string_list_model = QStringListModel()  # Start with an empty model
-        self.completer.setModel(self.string_list_model)
+        self.permission_completer.setModel(self.string_list_model)
 
         # Attach the completer to the lineEdit
-        self.lineEdit.setCompleter(self.completer)
+        self.lineEdit.setCompleter(self.permission_completer)
 
         self.lineEdit.textChanged.connect(self.presenter.update_suggestions)
 
@@ -119,3 +120,4 @@ class PermissionDialog(QtWidgets.QDialog):
             "Lỗi", message, QMessageBox.Icon.Warning, "Đóng", self
         )
         error_box.exec()
+

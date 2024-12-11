@@ -89,21 +89,21 @@ class PermissionItemDialog(QtWidgets.QDialog):
             self.perform_button.clicked.connect(unassign_permissions_to_users_for_file)
 
         # Initialize QCompleter
-        self.completer = QCompleter(self)
-        self.completer.setCaseSensitivity(
+        self.perrmission_item_completer = QCompleter(self)
+        self.perrmission_item_completer.setCaseSensitivity(
             Qt.CaseSensitivity.CaseInsensitive
         )  # Corrected: Use enum
-        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
-        self.completer.setCompletionMode(
+        self.perrmission_item_completer.setFilterMode(Qt.MatchFlag.MatchContains)  # Match substrings
+        self.perrmission_item_completer.setCompletionMode(
             QCompleter.CompletionMode.PopupCompletion
         )  # Use popup for suggestions
 
         # Set the model for the completer
         self.string_list_model = QStringListModel()  # Start with an empty model
-        self.completer.setModel(self.string_list_model)
+        self.perrmission_item_completer.setModel(self.string_list_model)
 
         # Attach the completer to the lineEdit
-        self.lineEdit.setCompleter(self.completer)
+        self.lineEdit.setCompleter(self.perrmission_item_completer)
 
         self.lineEdit.textChanged.connect(self.presenter.update_suggestions)
 
