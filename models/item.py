@@ -134,6 +134,9 @@ class ItemModel(NativeSqlite3Model):
     def get_root_node(self):
         return self.model.invisibleRootItem()
 
+    def get_path_for_files_storage(self):
+        return self._root_path
+
     def populate_data(self):
         """
         Populate the tree view with all files and folders directly under the root.
@@ -344,23 +347,17 @@ class ItemModel(NativeSqlite3Model):
             if cur:
                 cur.close()
 
-    def open_file(self, original_name):
+    def get_item_details(self, original_name):
+        """
+        Fetches the item details by the original name.
+        :param original_name: The original name of the file.
+        :return: Tuple of (id, code, type) or None if not found.
+        """
         cur = self.connection.cursor()
         cur.execute(
             "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
         )
-        item_id, code, file_type = cur.fetchone()
-        file_path = os.path.join(self._root_path, code)
-        if file_type != "file":
-            return
-
-        # Open the file using the default application based on the platform
-        if sys.platform.startswith("win32"):
-            os.startfile(file_path)  # Windows
-        elif sys.platform.startswith("darwin"):
-            os.system(f'Open "{file_path}"')  # macOS
-        else:
-            os.system(f'open "{file_path}"')  # Linux
+        return cur.fetchone()
 
     def get_file_bytes(self, original_name):
         cur = self.connection.cursor()
@@ -583,7 +580,6 @@ class ItemModel(NativeSqlite3Model):
                 item.setBackground(QBrush(QColor(0, 0, 255)))  # Blue background (adjust as needed)
             else:
                 item.setForeground(QBrush(Qt.GlobalColor.black))  # Reset text color to black
-                item.setBackground(QBrush(Qt.GlobalColor.white))  # Reset background to white
 
             # Add children indices to the stack
             for row in range(item.rowCount()):

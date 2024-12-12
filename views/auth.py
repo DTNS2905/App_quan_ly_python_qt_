@@ -59,6 +59,7 @@ class LoginDialog(QtWidgets.QDialog):
     def open_register_dialog(self):
         """Open the RegisterDialog."""
         self.RegisterDialog.show()  # Non-modal dialog
+
     def closeEvent(self, event):
         self.presenter.close()
         event.accept()

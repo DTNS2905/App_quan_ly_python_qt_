@@ -13,7 +13,7 @@ from messages.permissions import (
     PERMISSION_GRANT,
     PERMISSION_UNGRANT,
     DEFAULT_PERMISSION,
-    USER_DELETE,
+    USER_DELETE, DEFAULT_TEMPORARY_ADMIN_PERMISSION,
 )
 from models.log import LogModel
 
@@ -172,6 +172,14 @@ class PermissionPresenter(Presenter):
             except Exception as e:
                 logging.error(f"Failed to assign permission '{permission}': {e}")
 
+    def assign_some_permissions_as_admin(self, username: str):
+        default_permissions = DEFAULT_TEMPORARY_ADMIN_PERMISSION
+        for permission in default_permissions:
+            try:
+                self.model.assign_permission_to_user(username, permission)
+            except Exception as e:
+                logging.error(f"Failed to assign permission '{permission}': {e}")
+
     def assign_permissions_to_users_for_file(
             self, item_name: str, username: str, permissions: list[str]
     ) -> None:
@@ -187,7 +195,7 @@ class PermissionPresenter(Presenter):
         if not item_name:
             raise ValueError("Tên tệp không được để trống.")
         if not username:
-            raise ValueError("Tên người dùng không được để trống.")
+            raise ValueError("Tên người dùng không được để trống")
         if not permissions or not all(isinstance(p, str) for p in permissions):
             raise ValueError("Danh sách quyền phải không rỗng và chứa các chuỗi hợp lệ.")
 
@@ -206,7 +214,7 @@ class PermissionPresenter(Presenter):
             raise
 
     def unassign_permissions_to_users_for_file(
-        self, item_name: str, username: str, permissions: list[str]
+            self, item_name: str, username: str, permissions: list[str]
     ):
         """
                Assign multiple permissions to a user for a specific file.
@@ -239,7 +247,7 @@ class PermissionPresenter(Presenter):
             raise
 
     def assign_permissions_to_user(
-        self, username: str, permissions: list[str], user_assgin: str
+            self, username: str, permissions: list[str], user_assgin: str
     ):
         """
         Assign multiple permissions to a user.
@@ -319,7 +327,7 @@ class PermissionPresenter(Presenter):
             )
 
     def unassign_permissions_from_user(
-        self, username: str, permissions: list[str], user_unassign: str
+            self, username: str, permissions: list[str], user_unassign: str
     ):
         """
         Unassign multiple permissions from a user.
@@ -329,8 +337,11 @@ class PermissionPresenter(Presenter):
             permissions (list[str]): List of permissions to unassign.
             user_unassign (str): The user performing the unassignment.
         """
+        is_allowed = session.SESSION.match_permissions(PERMISSION_UNGRANT)
+        if username == "admin":
+            is_allowed = False
 
-        if not session.SESSION.match_permissions(PERMISSION_UNGRANT):
+        if not is_allowed:
             # Display error and log permission denial
             self.view.display_error(PERMISSION_DENIED)
             LogModel.write_log(

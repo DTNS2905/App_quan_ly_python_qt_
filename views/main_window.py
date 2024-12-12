@@ -220,7 +220,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set up treeView at FILES_ROOT_PATH
         self.item_presenter.setup_view()
 
-        self.treeView.doubleClicked.connect(self.item_presenter.handle_download_item)
+        self.treeView.doubleClicked.connect(self.handle_open_file)
+
+        self.download_button.clicked.connect(self.item_presenter.handle_download_items)
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
@@ -397,3 +399,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Update suggestions as the user types
         self.item_presenter.update_suggestions(search_text)
+
+    def handle_open_file(self, index):
+        # Retrieve the file name from the QStandardItemModel
+        model = self.item_presenter.get_model_for_view()
+        original_name = model.itemFromIndex(index).text()
+
+        # Call the Presenter to open the file
+        self.item_presenter.open_file(original_name)

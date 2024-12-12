@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import traceback
 
 from PyQt6.QtCore import QPointF, Qt
@@ -215,43 +216,103 @@ class ItemPresenter(Presenter):
             )
             self.view.display_error(f"{FILE_REMOVE_FAIL}:{e}")
 
-    def handle_download_item(self):
-        # Replace this with your actual data bytes
+    def handle_download_items(self):
+        """
+        Handles downloading of selected items in the tree view.
+        Filters for unique rows and processes them.
+        """
+
+        # Check if the user has global download permissions
         can_all_download = session.SESSION.match_permissions(FILE_DOWNLOAD)
 
         try:
-            selected_index = self.view.treeView.currentIndex()
-            model = self.view.treeView.model()
-            original_name = model.data(selected_index)
+            # Retrieve selected indexes from the tree view
+            selected_indexes = self.view.treeView.selectionModel().selectedIndexes()
+            logging.info(f"Initial selected indexes: {selected_indexes}")
 
-            if not (
-                    can_all_download
-                    or session.SESSION.match_item_permissions(original_name, FILE_DOWNLOAD)
-            ):
-                self.view.display_error(f"Lưu {original_name}: {PERMISSION_DENIED}")
-                LogModel.write_log(
-                    session.SESSION.get_username(),
-                    f"Lưu '{original_name}': {PERMISSION_DENIED}",
-                )
+            # Filter only one index per selected row (first column)
+            selected_rows = set()
+            filtered_indexes = []
+            for index in selected_indexes:
+                if index.column() == 0:  # Process only the first column
+                    if index.row() not in selected_rows:
+                        selected_rows.add(index.row())
+                        filtered_indexes.append(index)
+
+            if not filtered_indexes:
+                self.view.display_error("Không có tệp nào được chọn để tải xuống.")
                 return
 
-            data_bytes = self.model.get_file_bytes(original_name)
-            if data_bytes is None:
-                self.view.display_error(f"'{original_name}' không phải là tệp đơn")
+            logging.info(f"Filtered indexes (one per row): {filtered_indexes}")
+
+            # Prompt the user to select a folder for saving the files
+            folder_path = QFileDialog.getExistingDirectory(self.view, "Chọn thư mục để lưu tệp")
+            if not folder_path:
+                self.view.display_error("Thư mục lưu không được chọn.")
                 return
 
-            file_path, _ = QFileDialog.getSaveFileName(
-                self.view, "Lưu tệp", original_name, "All Files (*)"
-            )
-            if file_path:
-                with open(file_path, "wb") as f:
-                    f.write(data_bytes)
-                self.view.display_success(
-                    f"Lưu '{original_name}' về {file_path} thành công"
+            # Iterate over each selected file
+            processed_files = set()
+            successfully_downloaded_files = []  # Collect successful downloads
+            for index in filtered_indexes:
+                model = self.view.treeView.model()
+                original_name = model.data(index)
+
+                # Skip duplicates or invalid entries
+                if not original_name or original_name in processed_files:
+                    self.view.display_error(f"Bỏ qua những tài liệu không hợp lệ hoặc trùng tên : {original_name}")
+                    logging.debug(f"Skipping invalid or duplicate item: {original_name}")
+                    continue
+
+                # Check permissions for each file
+                if not (
+                        can_all_download
+                        or session.SESSION.match_item_permissions(original_name, FILE_DOWNLOAD)
+                ):
+                    error_message = f"Lưu '{original_name}': {PERMISSION_DENIED}"
+                    self.view.display_error(error_message)
+                    LogModel.write_log(
+                        session.SESSION.get_username(),
+                        error_message,
+                    )
+                    continue
+
+                # Retrieve the file data
+                data_bytes = self.model.get_file_bytes(original_name)
+                if data_bytes is None:
+                    self.view.display_error(f"'{original_name}' không phải là tệp đơn")
+                    continue
+
+                # Construct the file path
+                file_path = os.path.join(folder_path, original_name)
+
+                # Attempt to save the file
+                try:
+                    with open(file_path, "wb") as f:
+                        f.write(data_bytes)
+                    processed_files.add(original_name)
+                    successfully_downloaded_files.append(original_name)
+                    logging.info(f"Lưu '{original_name}' về {file_path} thành công")
+
+                except Exception as write_error:
+                    error_message = f"Lưu '{original_name}' thất bại: {str(write_error)}"
+                    self.view.display_error(error_message)
+                    logging.error(f"Error saving file '{original_name}': {write_error}")
+
+            # Display a single success message with all downloaded files
+            if successfully_downloaded_files:
+                success_message = (
+                        f"Các tệp sau đã được lưu thành công:\n"
+                        + "\n".join(successfully_downloaded_files)
                 )
+                self.view.display_success(success_message)
+                logging.info(success_message)
+
         except Exception as e:
-            self.view.display_error(f"Lưu thất bại: {str(e)}")
-            logging.error(e)
+            # Handle unexpected errors
+            error_message = f"Lưu thất bại: {str(e)}"
+            self.view.display_error(error_message)
+            logging.error(f"Unexpected error during download: {e}")
 
     def handle_add_folder(self):
         """Thêm một thư mục mới vào thư mục đã chọn hoặc vào thư mục gốc nếu không có lựa chọn."""
@@ -525,3 +586,40 @@ class ItemPresenter(Presenter):
 
     def expand_tree_view(self):
         self.view.treeView.expandAll()
+
+    def open_file(self, original_name):
+        try:
+            # Fetch the file details from the model
+            item_details = self.model.get_item_details(original_name)
+            if not item_details:
+                self.view.display_error(f"Không tìm thấy tệp: {original_name}")
+                return
+
+            item_id, code, file_type = item_details
+            if file_type != "file":
+                self.view.display_error(f"'{original_name}' không phải là tệp đơn")
+                return
+
+            # Construct the file path
+            files_storage_path = self.model.get_path_for_files_storage()
+            file_path = os.path.join(files_storage_path, code)
+
+            # Open the file using platform-specific commands
+            self._open_file_platform(file_path)
+
+        except Exception as e:
+            self.view.display_error(f"Lỗi khi mở tệp: {str(e)}")
+
+    def _open_file_platform(self, file_path):
+        """
+        Opens the file using the default application based on the platform.
+        """
+        if sys.platform.startswith("win32"):
+            os.startfile(file_path)  # Windows
+        elif sys.platform.startswith("darwin"):
+            os.system(f'open "{file_path}"')  # macOS
+        else:
+            os.system(f'xdg-open "{file_path}"')  # Linux
+
+    def get_model_for_view(self):
+        return self.model.get_model()

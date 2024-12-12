@@ -580,6 +580,7 @@
     <file>icons/icons_white/activity.svg</file>
   </qresource>
   <qresource prefix="images">
+    <file>ui/images/new_background_1.jpg</file>
     <file>ui/images/icon-app.ico</file>
     <file>ui/images/z6098200034683_81935c17db22495d87649c2c18433ce1_enhanced.jpg</file>
     <file>ui/images/z6098206412945_c18442c295b849f00bada2cde9bc1511_enhanced.jpg</file>

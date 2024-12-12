@@ -77,7 +77,7 @@ class RegisterDialog(QtWidgets.QDialog):
         self.presenter.handle_register(username, password, confirm_password)
         if is_admin:
             try:
-                self.permission_presenter.assign_all_permissions(username)
+                self.permission_presenter.assign_some_permissions_as_admin(username)
                 logging.info(f"Grant admin role to {username}")
             except:
                 logging.error(traceback.print_exc())
