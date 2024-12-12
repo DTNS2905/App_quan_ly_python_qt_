@@ -192,6 +192,14 @@ class MainWindow(QtWidgets.QMainWindow):
             session.SESSION.match_permissions(PERMISSION_UNGRANT)
         )
 
+        self.download_button.clicked.connect(
+            self.item_presenter.handle_download_items
+        )
+
+        self.download_button.setVisible(
+            session.SESSION.match_permissions(FILE_DOWNLOAD)
+        )
+
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
 
         def view_log():
@@ -222,7 +230,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.treeView.doubleClicked.connect(self.handle_open_file)
 
-        self.download_button.clicked.connect(self.item_presenter.handle_download_items)
+
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
