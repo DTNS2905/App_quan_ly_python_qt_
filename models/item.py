@@ -36,6 +36,9 @@ class ItemDTO:
     updated_at: str
 
 
+
+
+
 def build_tree(items: list[ItemDTO]) -> list[ItemDTO]:
     """
     Build a tree structure from a flat list of ItemDTO objects.
@@ -214,10 +217,11 @@ class ItemModel(NativeSqlite3Model):
                         bold=child.type == "folder",
                         user_role=user_role,
                     )
+                    # information about assignment
 
                     if child.type == "file":
                         # Add metadata columns for files
-                        item_type, item_created_at, item_created_by = create_metadata(child, font_size)
+                        item_type, item_created_at, item_created_by, = create_metadata(child, font_size)
                         parent_node.appendRow([item, item_type, item_created_at, item_created_by])
                     elif child.type == "folder":
                         # Add the folder node

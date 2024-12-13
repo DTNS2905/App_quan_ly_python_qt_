@@ -280,6 +280,9 @@ border-radius:5px;
               <height>50</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(250, 249, 246)</string>
+            </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
               <widget class="QLabel" name="label">
@@ -999,7 +1002,7 @@ fill:red;</string>
              <widget class="QWidget" name="scrollAreaWidgetContents">
               <property name="geometry">
                <rect>
-                <x>-128</x>
+                <x>0</x>
                 <y>0</y>
                 <width>759</width>
                 <height>355</height>
