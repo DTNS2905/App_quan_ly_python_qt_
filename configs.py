@@ -16,6 +16,7 @@ else:
 FILES_ROOT_PATH = os.path.join(APP_PATH, "files_storage")
 
 DATABASE_NAME = "app_quan_ly_pyqt6.db"
+INSTRUCT_PATH = Path(__file__).parent / "README.md"
 LOG_PATH = Path(__file__).parent / "logs"
 LOGIN_UI_PATH = Path(__file__).parent / "ui/login.ui"
 DASHBOARD_UI_PATH = Path(__file__).parent / "ui/admin_dashboard.ui"

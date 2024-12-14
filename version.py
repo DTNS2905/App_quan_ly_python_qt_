@@ -16,6 +16,6 @@ def show_version_info(parent):
 def create_about_action(parent, help_menu):
     from PyQt6.QtGui import QAction
 
-    version_action = QAction("About", parent)
+    version_action = QAction("Thông tin", parent)
     version_action.triggered.connect(lambda: show_version_info(parent))
     help_menu.addAction(version_action)

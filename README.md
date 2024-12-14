@@ -1,4 +1,4 @@
-# Phần Mềm Quản Lý Bài
+# Phần Mềm Quản Lý Hồ Sơ Bài Giảng
 
 ## Mô tả:
 
