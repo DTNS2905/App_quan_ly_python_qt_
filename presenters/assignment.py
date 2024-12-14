@@ -1,6 +1,9 @@
-import datetime
+from datetime import datetime
 import logging
 
+import pytz
+
+import common.time
 from common.presenter import Presenter
 from messages.assignment import PRE_ASSIGNMENT, CURRENT_ASSIGNMENT, POST_ASSIGNMENT
 from models.assignment import AssignmentModel
@@ -64,3 +67,12 @@ class AssignmentPresenter(Presenter):
             return CURRENT_ASSIGNMENT, end_time_dt - now
         else:
             return POST_ASSIGNMENT, datetime.timedelta(0)
+
+    def _convert_times_to_timezone(self, begin_time_dt, end_time_dt, timezone):
+        begin_time_utc = begin_time_dt.replace(tzinfo=pytz.utc)
+        end_time_utc = end_time_dt.replace(tzinfo=pytz.utc)
+
+        begin_time_converted = common.time.convert_utc_time_to_timezone(begin_time_utc.isoformat(), zone=timezone)
+        end_time_converted = common.time.convert_utc_time_to_timezone(end_time_utc.isoformat(), zone=timezone)
+
+        return begin_time_converted.strftime("%Y-%m-%d %H:%M:%S"), end_time_converted.strftime("%Y-%m-%d %H:%M:%S")

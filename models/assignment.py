@@ -18,7 +18,7 @@ class AssignmentModel(NativeSqlite3Model):
     _fetch_assignment_query = """
             SELECT a.assignment_name, a.start_time, a.end_time
             FROM assignments a
-            JOIN users u ON u.user_id = a.assigned_to OR u.user_id = a.assigned_by
+            JOIN users u ON u.id = a.assigned_to OR u.id = a.assigned_by
             WHERE a.assignment_id = ? AND u.user_name = ?
         """
 
@@ -48,9 +48,12 @@ class AssignmentModel(NativeSqlite3Model):
 
             # Insert into assignments table
             with self.connection as conn:
-                with conn.cursor() as cur:
+                cur = conn.cursor()
+                try:
                     cur.execute(self._add_deadline_for_item,
                                 (assignment_name, item_id, assigned_by, assigned_to, start_time, end_time))
+                finally:
+                    cur.close()
         except ValueError as ve:
             raise ValueError(f"Invalid input: {ve}")
         except sqlite3.Error as e:
@@ -59,9 +62,12 @@ class AssignmentModel(NativeSqlite3Model):
     def fetch_assignment(self, assignment_id, user_name):
         try:
             with self.connection as conn:
-                with conn.cursor() as cur:
+                cur = conn.cursor()
+                try:
                     cur.execute(self._fetch_assignment_query, (assignment_id, user_name))
                     return cur.fetchone()
+                finally:
+                    cur.close()
         except sqlite3.Error as e:
             raise Exception(f"Database operation failed: {e}")
 
@@ -72,16 +78,19 @@ class AssignmentModel(NativeSqlite3Model):
         :param user_name: The name of the user.
         :return: The user_id if found, otherwise raises an exception.
         """
-        query = "SELECT user_id FROM users WHERE user_name = ?"
+        query = "SELECT id FROM users WHERE username = ?"
         try:
             with self.connection as conn:
-                with conn.cursor() as cur:
+                cur = conn.cursor()
+                try:
                     cur.execute(query, (user_name,))
                     result = cur.fetchone()
                     if result:
                         return result[0]
                     else:
                         raise ValueError(f"No user found with name '{user_name}'.")
+                finally:
+                    cur.close()
         except sqlite3.Error as e:
             raise Exception(f"Database operation failed: {e}")
 
@@ -92,15 +101,18 @@ class AssignmentModel(NativeSqlite3Model):
         :param item_name: The name of the item.
         :return: The item_id if found, otherwise raises an exception.
         """
-        query = "SELECT item_id FROM items WHERE item_name = ?"
+        query = "SELECT id FROM items WHERE original_name = ?"
         try:
             with self.connection as conn:
-                with conn.cursor() as cur:
+                cur = conn.cursor()
+                try:
                     cur.execute(query, (item_name,))
                     result = cur.fetchone()
                     if result:
                         return result[0]
                     else:
                         raise ValueError(f"No item found with name '{item_name}'.")
+                finally:
+                    cur.close()
         except sqlite3.Error as e:
             raise Exception(f"Database operation failed: {e}")

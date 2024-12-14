@@ -1,6 +1,6 @@
 CREATE_ASSIGNMENT_TABLE = '''
 CREATE TABLE IF NOT EXISTS assignments (
-    assignment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     assignment_name TEXT NOT NULL,
     item_id INTEGER NOT NULL,
     assigned_by INTEGER NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS assignments (
 '''
 
 ADD_DEADLINE_FOR_ITEM = '''
-INSERT INTO assignments (assignment_name,item_id, assigned_by, assigned_to, begin_time, end_time) VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO assignments (assignment_name,item_id, assigned_by, assigned_to, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?)
  '''
 
 GET_TIME_STATUS_BASED_ON_USERNAME_AND_ASSIGNMENT_ID = """
