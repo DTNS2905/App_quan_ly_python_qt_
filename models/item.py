@@ -165,25 +165,55 @@ class ItemModel(NativeSqlite3Model):
 
             def create_metadata(child, font_size):
                 """
-                Fetch and create metadata columns for a file.
+                Fetch and create metadata columns for a file or folder.
                 """
-                file_type = get_file_type(child.original_name)
-                created_at = convert_utc_time_to_timezone(
-                    child.created_at, TIMEZONE
-                ).strftime("%Y-%m-%d %H:%M:%S")
+                try:
 
-                cur = self.connection.cursor()
-                cur.execute(
-                    "SELECT fullname FROM profiles WHERE user_id = ?", (child.user_id,)
-                )
-                result = cur.fetchone()
-                fullname = result[0] if result else "Unknown"
+                    cur = self.connection.cursor()
+                    cur.execute("SELECT username FROM users WHERE id = ?", (child.user_id,))
+                    result = cur.fetchone()
+                    fullname = result[0] if result else "Unknown"
+                    # Mandatory metadata for files
+                    file_type = get_file_type(child.original_name)
+                    created_at = convert_utc_time_to_timezone(child.created_at, TIMEZONE).strftime(
+                        "%Y-%m-%d %H:%M:%S")
 
-                return (
-                    CustomItem(file_type, font_size=font_size - 1, color=QColor(50, 50, 50)),
-                    CustomItem(created_at, font_size=font_size - 1, color=QColor(50, 50, 50)),
-                    CustomItem(fullname, font_size=font_size - 1, color=QColor(50, 50, 50)),
-                )
+                    cur = self.connection.cursor()
+                    # Optional metadata
+                    cur.execute('''
+                        SELECT 
+                            a.start_time, 
+                            a.end_time, 
+                            assigned_by_user.username AS assigned_by_name, 
+                            assigned_to_user.username AS assigned_to_name
+                        FROM assignments AS a
+                        LEFT JOIN users AS assigned_by_user ON a.assigned_by = assigned_by_user.id
+                        LEFT JOIN users AS assigned_to_user ON a.assigned_to = assigned_to_user.id
+                        WHERE a.item_id = ?
+                    ''', (child.id,))
+                    assignment_result = cur.fetchone()
+                    print(f"assignment_result : {assignment_result}")
+
+                    user_assign = assignment_result[2] if assignment_result else "Không có"
+                    assigned_user = assignment_result[3] if assignment_result else "Không có"
+                    begin_time = f"{assignment_result[0]}" if assignment_result else "Không có"
+                    end_time = f"{assignment_result[1]}" if assignment_result else "Không có"
+
+                    return (
+                        CustomItem(file_type, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(created_at, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(fullname, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(begin_time, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(end_time, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(user_assign, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(assigned_user , font_size=font_size - 1, color=QColor(50, 50, 50)),
+
+                    )
+
+                except Exception as e:
+                    logging.error(f"Error fetching metadata for {child.original_name}: {e}")
+                    logging.error(traceback.format_exc())
+                    return None
 
             def process_child(parent_node, child, font_size):
                 """
@@ -216,12 +246,30 @@ class ItemModel(NativeSqlite3Model):
                     )
 
                     if child.type == "file":
-                        # Add metadata columns for files
-                        item_type, item_created_at, item_created_by = create_metadata(child, font_size)
-                        parent_node.appendRow([item, item_type, item_created_at, item_created_by])
+                        # Fetch metadata for files
+                        metadata = create_metadata(child, font_size)
+                        if metadata:
+                            item_type, item_created_at, item_created_by, user_assign, assigned_user, begin_time, end_time = metadata
+                            parent_node.appendRow(
+                                [
+                                    item, item_type, item_created_at, item_created_by,
+                                    user_assign, assigned_user, begin_time, end_time
+                                ]
+                            )
                     elif child.type == "folder":
-                        # Add the folder node
-                        parent_node.appendRow([item])
+                        # Fetch metadata for folder
+                        metadata = create_metadata(child, font_size)
+                        if metadata:
+                            item_type, item_created_at, item_created_by, user_assign, assigned_user, begin_time, end_time = metadata
+                            parent_node.appendRow(
+                                [
+                                    item, item_type, item_created_at, item_created_by,
+                                    user_assign, assigned_user, begin_time, end_time
+                                ]
+                            )
+                        else:
+                            parent_node.appendRow([item])
+
                         return item  # Return folder item to process its children
 
                 except Exception as e:

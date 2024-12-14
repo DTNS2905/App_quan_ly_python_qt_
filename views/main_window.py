@@ -28,10 +28,12 @@ from messages.permissions import (
     FILE_DELETE,
     FOLDER_DELETE,
 )
+from presenters.assignment import AssignmentPresenter
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 from version import create_about_action
+from views.add_deadlline import AssignmentDialog
 from views.auth import LoginDialog
 from views.instruct_dialog import InstructDialog
 from views.item_permission import ItemPermissionDialog
@@ -45,6 +47,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Phần mềm hỗ trợ quản lý bài giảng")
+
         uic.loadUi(DASHBOARD_UI_PATH, self)
 
         menu_bar = self.menuBar()
@@ -55,10 +58,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.item_presenter = ItemPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
         self.permission_presenter.populate_table()
+        self.assignment_presenter = AssignmentPresenter(self)
 
         self.showMaximized()
 
-        self.username.setText(session.SESSION.get_username())
+        username = session.SESSION.get_username()
+        self.username.setText(username)
+
+        self.remind_assignment(username)
 
         # Connect buttons to slots
         self.home_button.clicked.connect(
@@ -132,6 +139,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.search_input.textChanged.connect(self.on_search_text_changed)
 
         self.search_button.clicked.connect(self.search_files_folders)
+
+        self.assignment_button.clicked.connect(lambda: self.open_add_deadline_dialog(AssignmentDialog(self)))
 
         self.label_2.installEventFilter(self)
 
@@ -422,3 +431,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Call the Presenter to open the file
         self.item_presenter.open_file(original_name)
+
+    def open_add_deadline_dialog(self, dialog_instance):
+        selected_indexes = self.treeView.selectionModel().selectedIndexes()
+
+        # Get the first selected item (assuming single selection mode)
+        selected_index = selected_indexes[0]
+
+        item = self.treeView.model().itemFromIndex(selected_index)
+
+        # Extract the file or folder name
+        file_or_folder_name = item.text()
+        print(f"item select: {file_or_folder_name}")
+
+        # Pass the name to the dialog instance or perform any logic
+        dialog_instance.set_selected_item(file_or_folder_name)
+
+        # Open the dialog
+        self.open_dialog(dialog_instance)
+
+    def remind_assignment(self, username):
+        self.assignment_presenter.remind_if_no_time_left(username)

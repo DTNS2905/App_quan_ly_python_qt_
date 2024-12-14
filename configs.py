@@ -12,7 +12,6 @@ if getattr(sys, "frozen", False):
 else:
     APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
-
 FILES_ROOT_PATH = os.path.join(APP_PATH, "files_storage")
 
 DATABASE_NAME = "app_quan_ly_pyqt6.db"
@@ -25,7 +24,11 @@ LOG_UI_PATH = Path(__file__).parent / "ui/log.ui"
 PERMISSION_PATH = Path(__file__).parent / "ui/permission_dialog.ui"
 PROFILE_PATH = Path(__file__).parent / "ui/profile.ui"
 ITEM_PERMISSION_PATH = Path(__file__).parent / "ui/item_permission.ui"
-FILE_TREE_VIEW_COLUMNS = ["Tên", "Loại", "Ngày Tạo", "Người Tạo"]
+ADD_DEADLINE_PATH = Path(__file__).parent / "ui/add_deadline.ui"
+FILE_TREE_VIEW_COLUMNS = [
+    "Tên", "Loại", "Ngày Tạo", "Người Tạo", "Thời gian bắt đầu", "Thời gian kết thúc", "Người giao việc",
+    "Người được giao"
+]
 TIMEZONE = "Asia/Bangkok"
 
 os.makedirs(LOG_PATH, exist_ok=True)
