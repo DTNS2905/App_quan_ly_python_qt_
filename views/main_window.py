@@ -20,6 +20,7 @@ from messages.permissions import (
     FILE_RENAME,
     FOLDER_RENAME, FILE_DELETE, FOLDER_DELETE,
 )
+from presenters.assignment import AssignmentPresenter
 from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
@@ -47,6 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.item_presenter = ItemPresenter(self)
         self.permission_presenter = PermissionPresenter(self)
         self.permission_presenter.populate_table()
+        self.assignment_presenter = AssignmentPresenter(self)
 
         self.showMaximized()
 
@@ -424,7 +426,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Get the first selected item (assuming single selection mode)
         selected_index = selected_indexes[0]
 
-        item = self.treeview.model().itemFromIndex(selected_index)
+        item = self.treeView.model().itemFromIndex(selected_index)
 
         # Extract the file or folder name
         file_or_folder_name = item.text()
