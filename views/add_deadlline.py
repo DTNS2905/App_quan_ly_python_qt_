@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtWidgets import QMessageBox
@@ -32,23 +33,49 @@ class AssignmentDialog(QtWidgets.QDialog):
         start_time = self.start_time_input.dateTime().toString("HH:mm dd/MM/yyyy")
         end_time = self.end_time_input.dateTime().toString("HH:mm dd/MM/yyyy")
 
+        # Validation
         try:
+            # Parse start_time and end_time to datetime objects
+            start_time_dt = datetime.strptime(start_time, "%H:%M %d/%m/%Y")
+            end_time_dt = datetime.strptime(end_time, "%H:%M %d/%m/%Y")
+
+            # Ensure start_time is earlier than end_time
+            if start_time_dt >= end_time_dt:
+                raise ValueError("Thời gian bắt đầu phải sớm hơn thời gian kết thúc")
+
+            # Optionally ensure both times are in the future
+            now = datetime.now()
+            if start_time_dt <= now:
+                raise ValueError("Thời gian bắt đâu phải tính từ hiện tại")
+            if end_time_dt <= now:
+                raise ValueError("Thời gian kết thúc phải tính từ hiện tại")
+
+            # Proceed to set the deadline
             self.assignment_presenter.set_deadline(
-                assignment_name, item_name, assigned_by_name, assigned_to_name,start_time,end_time
-            )  # IDs can be hardcoded or dynamic
-            self.display_success(f"hạn chót được thêm thành công cho '{assignment_name}'.")
-            LogModel.write_log(
-                f"{assigned_by_name} đã thêm hạn chótthành công cho '{assignment_name}' đối với '{assigned_by_name}"
+                assignment_name, item_name, assigned_by_name, assigned_to_name, start_time, end_time
             )
+            self.display_success(f"Hạn chót được thêm thành công cho '{assignment_name}'.")
+            LogModel.write_log(
+                session.SESSION.get_username(),
+                f"{assigned_by_name} đã thêm hạn chót thành công cho '{assignment_name}' đối với '{assigned_to_name}'."
+            )
+
         except ValueError as ve:
-            self.display_error("thêm hạn chót thất bại")
-            logging.error(f"thêm hạn chót thất bại: {ve}")
+            # Handle validation errors
+            self.display_error(f"Thêm hạn chót thất bại: {ve}")
+            logging.error(f"Thêm hạn chót thất bại: {ve}")
             LogModel.write_log(
-                f"{assigned_by_name} đã thêm hạn chót thất bại cho '{assignment_name}' đối với '{assigned_by_name}"
+                session.SESSION.get_username(),
+                f"{assigned_by_name} đã thêm hạn chót thất bại cho '{assignment_name}' đối với '{assigned_to_name}': {ve}"
             )
+
         except Exception as e:
-            self.display_error("có lỗi xảy ra")
-            logging.error(f"có lỗi xảy ra: {e}")
+            # Handle other exceptions
+            self.display_error("Có lỗi xảy ra")
+            logging.error(f"Có lỗi xảy ra: {e}")
+            LogModel.write_log(
+                f"{assigned_by_name} đã thêm hạn chót thất bại cho '{assignment_name}' đối với '{assigned_to_name}': {e}"
+            )
 
     def display_success(self, message):
         success_box = CustomMessageBox("Success", message, QMessageBox.Icon.Information, "Đóng", self)

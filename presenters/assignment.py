@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 import pytz
@@ -25,13 +25,13 @@ class AssignmentPresenter(Presenter):
         # Call model to save the data
         self.model.add_deadline(assignment_name, item_name, assigned_by_name, assigned_to_name, start_time_iso, end_time_iso)
 
-    def get_time_status(self, assignment_id, user_name):
+    def get_time_status(self, user_name):
         # Fetch assignment data
-        result = self.model.fetch_assignment(assignment_id, user_name)
+        result = self.model.fetch_assignment(user_name)
         if not result:
-            logging.error(f"No assignment found with ID {assignment_id} for user {user_name}.")
+            logging.error(f"No assignment found for user {user_name}.")
             self.view.display_error(f"Lỗi không thể lấy được thời gian cho tài liệu và tệp")
-            raise ValueError(f"No assignment found with ID {assignment_id} for user {user_name}.")
+            raise ValueError(f"No assignment found for user {user_name}.")
 
         assignment_name, start_time, end_time = result
 
@@ -66,7 +66,7 @@ class AssignmentPresenter(Presenter):
         elif start_time_dt <= now <= end_time_dt:
             return CURRENT_ASSIGNMENT, end_time_dt - now
         else:
-            return POST_ASSIGNMENT, datetime.timedelta(0)
+            return POST_ASSIGNMENT, timedelta(0)
 
     def _convert_times_to_timezone(self, begin_time_dt, end_time_dt, timezone):
         begin_time_utc = begin_time_dt.replace(tzinfo=pytz.utc)
@@ -76,3 +76,23 @@ class AssignmentPresenter(Presenter):
         end_time_converted = common.time.convert_utc_time_to_timezone(end_time_utc.isoformat(), zone=timezone)
 
         return begin_time_converted.strftime("%Y-%m-%d %H:%M:%S"), end_time_converted.strftime("%Y-%m-%d %H:%M:%S")
+
+    def remind_if_no_time_left(self, user_name):
+        """
+        Checks the assignment's time status and reminds the user via a message box if no time is left.
+        """
+        try:
+            # Fetch the time status for the assignment
+            status_data = self.get_time_status(user_name)
+
+            # Check if there is no time left
+            time_left = status_data["time_left"]
+            if isinstance(time_left, timedelta) and time_left <= timedelta(0):
+                # Show reminder message box
+                self.view.display_success(
+                    f"Không còn thời gian cho công việc: '{status_data['assignment_name']}'!",
+                )
+
+        except ValueError as e:
+            logging.error(f"Failed to check time status: {e}")
+            self.view.display_error("Lỗi: Không thể kiểm tra thời gian còn lại cho tài liệu.")

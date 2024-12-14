@@ -52,7 +52,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.showMaximized()
 
-        self.username.setText(session.SESSION.get_username())
+        username = session.SESSION.get_username()
+        self.username.setText(username)
+
+        self.remind_assignment(username)
 
         # Connect buttons to slots
         self.home_button.clicked.connect(
@@ -437,3 +440,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Open the dialog
         self.open_dialog(dialog_instance)
+
+    def remind_assignment(self, username):
+        self.assignment_presenter.remind_if_no_time_left(username)

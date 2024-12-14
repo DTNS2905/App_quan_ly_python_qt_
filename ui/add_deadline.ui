@@ -461,7 +461,7 @@ QCalendarWidget QAbstractItemView {
        </widget>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="begin_time_input">
+       <widget class="QDateTimeEdit" name="start_time_input">
         <property name="palette">
          <palette>
           <active>
