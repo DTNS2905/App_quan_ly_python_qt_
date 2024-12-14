@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>967</width>
-    <height>543</height>
+    <height>563</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -167,11 +167,12 @@ padding:3px;
 border-radius:5px;
 }
 
-#log_button::hover, #download_button::hover, #rename_folder_button::hover, #rename_file_button::hover, #item_permission_button::hover{
+#log_button::hover, #download_button::hover, #rename_folder_button::hover, #rename_file_button::hover, #item_permission_button::hover, #assignment_button::hover{
 background-color: rgb(108, 180, 238);
 }
 
-#log_button, #download_button, #rename_folder_button, #rename_file_button, #item_permission_button {
+#log_button, #download_button, #rename_folder_button, #rename_file_button, #item_permission_button,
+#assignment_button {
 background-color: rgb(86, 145, 190);
 border:none;
 padding:3px;
@@ -1002,10 +1003,10 @@ fill:red;</string>
              <widget class="QWidget" name="scrollAreaWidgetContents">
               <property name="geometry">
                <rect>
-                <x>0</x>
+                <x>-128</x>
                 <y>0</y>
                 <width>759</width>
-                <height>355</height>
+                <height>375</height>
                </rect>
               </property>
               <property name="sizeIncrement">

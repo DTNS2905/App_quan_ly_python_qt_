@@ -24,6 +24,7 @@ from presenters.item import ItemPresenter
 from presenters.permission import PermissionPresenter
 from ui_components.custom_messgae_box import CustomMessageBox
 from version import create_about_action
+from views.add_deadlline import AssignmentDialog
 from views.auth import LoginDialog
 from views.item_permission import ItemPermissionDialog
 from views.log_dialog import LogDialog
@@ -36,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Phần mềm hỗ trợ quản lý bài giảng")
+
         uic.loadUi(DASHBOARD_UI_PATH, self)
 
         menu_bar = self.menuBar()
@@ -133,6 +135,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.search_button.clicked.connect(self.search_files_folders)
 
+        # self.assignment_button.clicked.connect(lambda: self.open_adđ_deadline_dialog(AssignmentDialog))
+
         self.label_2.installEventFilter(self)
 
         def do_permission(action):
@@ -229,8 +233,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.item_presenter.setup_view()
 
         self.treeView.doubleClicked.connect(self.handle_open_file)
-
-
 
         # Add Ctrl+A shortcut for Select All in treeView
         select_all_shortcut = QShortcut(QKeySequence("Ctrl+A"), self.treeView)
@@ -415,3 +417,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Call the Presenter to open the file
         self.item_presenter.open_file(original_name)
+
+    def open_adđ_deadline_dialog(self, dialog_instance):
+        selected_indexes = self.treeView.selectionModel().selectedIndexes()
+
+        # Get the first selected item (assuming single selection mode)
+        selected_index = selected_indexes[0]
+
+        item = self.treeview.model().itemFromIndex(selected_index)
+
+        # Extract the file or folder name
+        file_or_folder_name = item.text()
+        print(f"item select: {file_or_folder_name}")
+
+        # Pass the name to the dialog instance or perform any logic
+        dialog_instance.set_selected_item(file_or_folder_name)
+
+        # Open the dialog
+        self.open_dialog(dialog_instance)

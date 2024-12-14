@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>306</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#perform_button::hover{
+background-color: rgb(0, 116, 0);
+color:white;
+}
+
+#perform_button {
+background-color:rgb(0, 85, 0);
+color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+#cancel_button::hover{
+background-color:rgb(200, 0, 0);
+color:white;
+}
+#cancel_button {
+background-color:rgb(170, 0, 0);
+color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+.QPushButton {
+background:transparent;
+border:none
+}
+#Dialog {
+background-color:white;
+}</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QFrame" name="verticalFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#perform_button::hover{
+background-color: rgb(0, 116, 0);
+color:white;
+}
+
+#perform_button {
+background-color:rgb(0, 85, 0);
+color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+#cancel_button::hover{
+background-color:rgb(200, 0, 0);
+color:white;
+}
+#cancel_button {
+background-color:rgb(170, 0, 0);
+color:white;
+border:none;
+padding:3px;
+border-radius:5px;
+}
+
+.QPushButton {
+background:transparent;
+border:none
+}
+</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <property name="midLineWidth">
+      <number>1</number>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="perform_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: white</string>
+        </property>
+        <property name="text">
+         <string>Thực thi</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancel_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: white</string>
+        </property>
+        <property name="text">
+         <string>Hủy</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QFrame" name="verticalFrame_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel {
+color:black;
+}
+
+.QLineEdit {
+color:black;
+background-color:rgb(255, 255, 255);
+}
+
+QDateTimeEdit {
+    background-color: rgb(255, 255, 255);    /* Light gray background */
+    border: 2px solid rgb(86, 86, 86);   /* Gray border */
+    border-radius: 0px;          /* Rounded corners */
+    padding: 0px;                /* Inner padding */
+    color: #333333;              /* Text color */
+}
+
+QDateTimeEdit QAbstractSpinBox::selection {
+    background-color: #0066cc;     /* Blue background for highlighted text */
+    color: #ffffff;                /* White color for highlighted text */
+}
+
+QDateTimeEdit:focus {
+    border: 1px solid #0066cc;   /* Blue border on focus */
+    background-color: #ffffff;   /* White background on focus */
+}
+
+/* Styling for the up and down arrow buttons */
+QDateTimeEdit::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right; /* Position the up arrow button */
+    width: 15px;
+    height: 15px;
+    border: none;
+    background: #cccccc;         /* Gray background for button */
+    border-radius: 2px;
+}
+
+QDateTimeEdit::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right; /* Position the down arrow button */
+    width: 15px;
+    height: 15px;
+    border: none;
+    background: #cccccc;         /* Gray background for button */
+    border-radius: 2px;
+}
+
+/* Hover and pressed effects for the buttons */
+QDateTimeEdit::up-button:hover, QDateTimeEdit::down-button:hover {
+    background: #999999;         /* Darker gray on hover */
+}
+
+QDateTimeEdit::up-button:pressed, QDateTimeEdit::down-button:pressed {
+    background: #666666;         /* Even darker gray on press */
+}
+
+QDateTimeEdit QAbstractItemView {
+    background-color: #ffffff;   /* Background for calendar */
+    border: 1px solid #cccccc;   /* Border for calendar */
+    selection-background-color: #0066cc; /* Blue background for selected date */
+    selection-color: #ffffff;    /* White text for selected date */
+    color: #333333;              /* Default text color */
+    font-size: 14px;             /* Font size */
+}
+
+/* Month and year navigation area */
+QCalendarWidget QToolButton {
+    background-color: #0066cc;   /* Blue background for navigation buttons */
+    color: #ffffff;              /* White text color for month/year */
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+/* Hover effect for navigation buttons */
+QCalendarWidget QToolButton:hover {
+    background-color: #005bb5;   /* Darker blue on hover */
+}
+
+/* Month and year text */
+QCalendarWidget QToolButton[icon-visible=&quot;false&quot;] {
+    background-color: #e0e0e0;   /* Light gray background for month text */
+    color: #333333;              /* Dark gray text for month name */
+    font-size: 16px;             /* Increase font size for emphasis */
+    font-weight: bold;           /* Bold text */
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+/* Navigation arrows */
+QCalendarWidget QToolButton::menu-indicator {
+    width: 0px;                  /* Hide dropdown arrow for month navigation */
+}
+
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #f5f5f5;   /* Background color for navigation bar */
+}
+
+/* Weekday header (e.g., Sun, Mon) */
+QCalendarWidget QHeaderView::section {
+    background-color: #cccccc;   /* Gray background for weekday header */
+	border:none;
+    color: #ffffff;              /* Text color for weekday header */
+    padding: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Days in the calendar */
+QCalendarWidget QAbstractItemView {
+    background-color: #f0f0f0;   /* White background for days */
+    color: #000000;              /* Black text for days */
+    selection-background-color: #0066cc; /* Blue for selected day */
+    selection-color: #ffffff;    /* White text for selected day */
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Sunken</enum>
+     </property>
+     <property name="midLineWidth">
+      <number>1</number>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Tên công việc</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="verticalFrame_3">
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="assignment_input">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="frame">
+            <bool>false</bool>
+           </property>
+           <property name="echoMode">
+            <enum>QLineEdit::EchoMode::Normal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Tên người dùng</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="username_input">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="frame">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Thời gian bắt đầu</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="begin_time_input">
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Base">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Window">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>51</red>
+              <green>51</green>
+              <blue>51</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="wrapping">
+         <bool>true</bool>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="date">
+         <date>
+          <year>1999</year>
+          <month>12</month>
+          <day>31</day>
+         </date>
+        </property>
+        <property name="time">
+         <time>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+         </time>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::Section::DaySection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>d/M/yyyy  h:mm</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>false</bool>
+        </property>
+        <property name="currentSectionIndex">
+         <number>0</number>
+        </property>
+        <property name="timeSpec">
+         <enum>Qt::TimeSpec::UTC</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Thời gian kết  thúc</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dateTimeEdit_2">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="wrapping">
+         <bool>true</bool>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectionMode::CorrectToNearestValue</enum>
+        </property>
+        <property name="keyboardTracking">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="displayFormat">
+         <string>d/M/yyyy  h:mm </string>
+        </property>
+        <property name="calendarPopup">
+         <bool>false</bool>
+        </property>
+        <property name="timeSpec">
+         <enum>Qt::TimeSpec::UTC</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

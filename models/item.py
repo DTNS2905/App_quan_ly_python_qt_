@@ -17,6 +17,7 @@ from common.model import NativeSqlite3Model
 from common.time import convert_utc_time_to_timezone
 from configs import DATABASE_NAME, FILES_ROOT_PATH, FILE_TREE_VIEW_COLUMNS, TIMEZONE
 from messages.permissions import FILE_VIEW, FOLDER_VIEW
+from sql_statements.assignment import GET_TIME_STATUS_BASED_ON_ITEM_ID_AND_USERNAME
 from sql_statements.item import (
     CREATE_ITEM_TABLE_SQL,
     CREATE_PERMISSION_USER_ITEM_TABLE_SQL,
@@ -34,9 +35,6 @@ class ItemDTO:
     original_name: str
     created_at: str
     updated_at: str
-
-
-
 
 
 def build_tree(items: list[ItemDTO]) -> list[ItemDTO]:
@@ -180,12 +178,26 @@ class ItemModel(NativeSqlite3Model):
                     "SELECT fullname FROM profiles WHERE user_id = ?", (child.user_id,)
                 )
                 result = cur.fetchone()
+
                 fullname = result[0] if result else "Unknown"
+                cur.execute(
+                    ''' SELECT a.begin_time, a.end_time
+                        FROM assignments AS a
+                        JOIN users AS u
+                        ON a.assigned_by = u.user_id OR a.assigned_to = u.user_id
+                        WHERE a.assignment_id = ? AND u.user_name = ?''',
+                    (child.id, fullname))
+                assignment_result = cur.fetchone()
+                response = assignment_result[0] if assignment_result else None
 
                 return (
                     CustomItem(file_type, font_size=font_size - 1, color=QColor(50, 50, 50)),
                     CustomItem(created_at, font_size=font_size - 1, color=QColor(50, 50, 50)),
                     CustomItem(fullname, font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(response['user_assign'], font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(response['assigned_user'], font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(response['begin_time'], font_size=font_size - 1, color=QColor(50, 50, 50)),
+                    CustomItem(response['end_time'], font_size=font_size - 1, color=QColor(50, 50, 50)),
                 )
 
             def process_child(parent_node, child, font_size):
@@ -221,8 +233,15 @@ class ItemModel(NativeSqlite3Model):
 
                     if child.type == "file":
                         # Add metadata columns for files
-                        item_type, item_created_at, item_created_by, = create_metadata(child, font_size)
-                        parent_node.appendRow([item, item_type, item_created_at, item_created_by])
+                        item_type, item_created_at, item_created_by, user_assign, assigned_user, begin_time, end_time\
+                            = create_metadata(child, font_size)
+                        print(f'process_child: \n{create_metadata(child, font_size)}')
+                        parent_node.appendRow(
+                            [
+                                item, item_type, item_created_at, item_created_by,
+                                user_assign, assigned_user, begin_time, end_time
+                            ]
+                        )
                     elif child.type == "folder":
                         # Add the folder node
                         parent_node.appendRow([item])
