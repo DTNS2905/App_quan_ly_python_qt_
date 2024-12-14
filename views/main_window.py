@@ -135,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.search_button.clicked.connect(self.search_files_folders)
 
-        # self.assignment_button.clicked.connect(lambda: self.open_adđ_deadline_dialog(AssignmentDialog))
+        self.assignment_button.clicked.connect(lambda: self.open_add_deadline_dialog(AssignmentDialog(self)))
 
         self.label_2.installEventFilter(self)
 
@@ -418,7 +418,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Call the Presenter to open the file
         self.item_presenter.open_file(original_name)
 
-    def open_adđ_deadline_dialog(self, dialog_instance):
+    def open_add_deadline_dialog(self, dialog_instance):
         selected_indexes = self.treeView.selectionModel().selectedIndexes()
 
         # Get the first selected item (assuming single selection mode)

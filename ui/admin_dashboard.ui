@@ -1542,6 +1542,13 @@ border: 0px solid black;
                        </property>
                       </widget>
                      </item>
+                     <item>
+                      <widget class="QPushButton" name="assignment_button">
+                       <property name="text">
+                        <string>PushButton</string>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </widget>
                   </item>
