@@ -32,7 +32,7 @@ class AssignmentDialog(QtWidgets.QDialog):
         end_time = self.end_time_input.dateTime().toString("HH:mm dd/MM/yyyy")
 
         try:
-            self.presenter.set_deadline(assignment_name, item_name, assigned_by_name, assigned_to_name, begin_time,
+            self.assignment_presenter.set_deadline(assignment_name, item_name, assigned_by_name, assigned_to_name, begin_time,
                                         end_time)  # IDs can be hardcoded or dynamic
             QMessageBox.information(self, "Success", f"Deadline set for '{assignment_name}'.")
         except ValueError as ve:

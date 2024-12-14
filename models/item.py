@@ -181,11 +181,11 @@ class ItemModel(NativeSqlite3Model):
 
                 fullname = result[0] if result else "Unknown"
                 cur.execute(
-                    ''' SELECT a.begin_time, a.end_time
+                    ''' SELECT a.start_time, a.end_time
                         FROM assignments AS a
                         JOIN users AS u
-                        ON a.assigned_by = u.user_id OR a.assigned_to = u.user_id
-                        WHERE a.assignment_id = ? AND u.user_name = ?''',
+                        ON a.assigned_by = u.id OR a.assigned_to = u.user_id
+                        WHERE a.assignment_id = ? AND u.username = ?''',
                     (child.id, fullname))
                 assignment_result = cur.fetchone()
                 response = assignment_result[0] if assignment_result else None
