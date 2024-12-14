@@ -1545,7 +1545,11 @@ border: 0px solid black;
                      <item>
                       <widget class="QPushButton" name="assignment_button">
                        <property name="text">
-                        <string>PushButton</string>
+                        <string>Đặt giới hạn cho tài liệu</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/icons_white/icons/icons_white/clock.svg</normaloff>:/icons_white/icons/icons_white/clock.svg</iconset>
                        </property>
                       </widget>
                      </item>

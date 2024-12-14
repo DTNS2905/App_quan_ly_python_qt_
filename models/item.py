@@ -184,8 +184,8 @@ class ItemModel(NativeSqlite3Model):
                     ''' SELECT a.start_time, a.end_time
                         FROM assignments AS a
                         JOIN users AS u
-                        ON a.assigned_by = u.id OR a.assigned_to = u.user_id
-                        WHERE a.assignment_id = ? AND u.username = ?''',
+                        ON a.assigned_by = u.id OR a.assigned_to = u.id
+                        WHERE a.id = ? AND u.username = ?''',
                     (child.id, fullname))
                 assignment_result = cur.fetchone()
                 response = assignment_result[0] if assignment_result else None
