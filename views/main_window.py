@@ -65,8 +65,6 @@ class MainWindow(QtWidgets.QMainWindow):
         username = session.SESSION.get_username()
         self.username.setText(username)
 
-        self.remind_assignment(username)
-
         # Connect buttons to slots
         self.home_button.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1)
@@ -208,6 +206,8 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
+
+        self.remind_assignment(username)
 
         def view_log():
             if not session.SESSION.match_permissions(LOG_VIEW):
@@ -425,9 +425,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.item_presenter.update_suggestions(search_text)
 
     def handle_open_file(self, index):
+        # Map the selected index to the first column in the same row
+        first_column_index = index.siblingAtColumn(0)
+
         # Retrieve the file name from the QStandardItemModel
         model = self.item_presenter.get_model_for_view()
-        original_name = model.itemFromIndex(index).text()
+        original_name = model.itemFromIndex(first_column_index).text()
 
         # Call the Presenter to open the file
         self.item_presenter.open_file(original_name)
@@ -435,17 +438,35 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_add_deadline_dialog(self, dialog_instance):
         selected_indexes = self.treeView.selectionModel().selectedIndexes()
 
-        # Get the first selected item (assuming single selection mode)
+        # Validate if any item is selected
+        if not selected_indexes:
+            self.display_error("Không có tài liệu nào được chọn")
+            return
+
+            # Get the first selected index (current column or any selected column)
         selected_index = selected_indexes[0]
 
-        item = self.treeView.model().itemFromIndex(selected_index)
+        # Map the selected row to the first column
+        first_column_index = selected_index.siblingAtColumn(0)
+
+        # Validate if the mapped index is valid
+        if not first_column_index.isValid():
+            self.display_error("Không có tìa liệu được chọn")
+            return
+
+        item = self.treeView.model().itemFromIndex(first_column_index)
+
+        # Validate if the item exists
+        if item is None:
+            return  # Exit the method if the item is None
 
         # Extract the file or folder name
         file_or_folder_name = item.text()
-        print(f"item select: {file_or_folder_name}")
 
         # Pass the name to the dialog instance or perform any logic
         dialog_instance.set_selected_item(file_or_folder_name)
+
+        dialog_instance.finished.connect(self.refresh_tree_view)
 
         # Open the dialog
         self.open_dialog(dialog_instance)

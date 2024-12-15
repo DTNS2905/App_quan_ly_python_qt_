@@ -128,7 +128,6 @@ class PermissionPresenter(Presenter):
     def populate_item_table(self):
         user_permissions = self.model.fetch_user_item_permissions()
         self.view.item_permission_table.setRowCount(0)  # Clear table
-        print(user_permissions)
 
         for row, user_permission in enumerate(user_permissions):
             try:

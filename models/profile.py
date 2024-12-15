@@ -108,4 +108,3 @@ class ProfileModel(NativeSqlite3Model):
 
 if __name__ == "__main__":
     model = ProfileModel(database_name=r'D:\freelances\Tuan\app_quan_ly_python_qt\app_quan_ly_pyqt6.db')
-    print(model.get_profile_by_username("admin"))

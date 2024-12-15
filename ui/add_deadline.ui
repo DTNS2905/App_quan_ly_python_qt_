@@ -685,20 +685,6 @@ QCalendarWidget QAbstractItemView {
         <property name="showGroupSeparator" stdset="0">
          <bool>true</bool>
         </property>
-        <property name="date">
-         <date>
-          <year>1999</year>
-          <month>12</month>
-          <day>30</day>
-         </date>
-        </property>
-        <property name="time">
-         <time>
-          <hour>17</hour>
-          <minute>0</minute>
-          <second>0</second>
-         </time>
-        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::Section::DaySection</enum>
         </property>
@@ -710,9 +696,6 @@ QCalendarWidget QAbstractItemView {
         </property>
         <property name="currentSectionIndex">
          <number>0</number>
-        </property>
-        <property name="timeSpec">
-         <enum>Qt::TimeSpec::UTC</enum>
         </property>
        </widget>
       </item>
@@ -761,9 +744,6 @@ QCalendarWidget QAbstractItemView {
         <property name="calendarPopup">
          <bool>false</bool>
         </property>
-        <property name="timeSpec">
-         <enum>Qt::TimeSpec::UTC</enum>
-        </property>
        </widget>
       </item>
      </layout>
@@ -772,5 +752,22 @@ QCalendarWidget QAbstractItemView {
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancel_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>249</x>
+     <y>276</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>392</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

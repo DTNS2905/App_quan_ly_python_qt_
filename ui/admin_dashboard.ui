@@ -168,12 +168,14 @@ border-radius:5px;
 }
 
 #log_button::hover, #download_button::hover, #rename_folder_button::hover, #rename_file_button::hover, #item_permission_button::hover, #assignment_button::hover{
+color:white;
 background-color: rgb(108, 180, 238);
 }
 
 #log_button, #download_button, #rename_folder_button, #rename_file_button, #item_permission_button,
 #assignment_button {
 background-color: rgb(86, 145, 190);
+color:white;
 border:none;
 padding:3px;
 border-radius:5px;
@@ -1003,7 +1005,7 @@ fill:red;</string>
              <widget class="QWidget" name="scrollAreaWidgetContents">
               <property name="geometry">
                <rect>
-                <x>-128</x>
+                <x>0</x>
                 <y>0</y>
                 <width>759</width>
                 <height>375</height>
