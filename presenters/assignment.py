@@ -4,9 +4,11 @@ import logging
 import pytz
 
 import common.time
+from common import session
 from common.presenter import Presenter
 from messages.assignment import PRE_ASSIGNMENT, CURRENT_ASSIGNMENT, POST_ASSIGNMENT
 from models.assignment import AssignmentModel
+from models.log import LogModel
 
 
 class AssignmentPresenter(Presenter):
@@ -30,7 +32,10 @@ class AssignmentPresenter(Presenter):
         result = self.model.fetch_assignment(user_name)
         if not result:
             logging.error(f"No assignment found for user {user_name}.")
-            self.view.display_error(f"Lỗi không thể lấy được thời gian cho tài liệu và tệp")
+            LogModel.write_log(
+                user_name,
+                f"Cảnh báo: Không tìm thấy công việc được giao cho người dùng: {user_name}."
+            )
             raise ValueError(f"No assignment found for user {user_name}.")
 
         assignment_name, start_time, end_time = result
@@ -95,4 +100,8 @@ class AssignmentPresenter(Presenter):
 
         except ValueError as e:
             logging.error(f"Failed to check time status: {e}")
-            self.view.display_error("Lỗi: Không thể kiểm tra thời gian còn lại cho tài liệu.")
+            LogModel.write_log(
+                session.SESSION.get_username(),
+                "Cảnh báo: Không thể kiểm tra thời gian còn lại cho tài liệu."
+            )
+    

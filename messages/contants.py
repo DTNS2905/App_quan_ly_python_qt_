@@ -21,7 +21,7 @@ PERMISSION_TRANSLATIONS = {
     f"{USER_DELETE}": "Xóa người dùng",
     f"{CREATE_ASSIGNMENT}": "Tạo hạn chót",
     f"{REMOVE_ASSIGNMENT}": "Xóa hạn chót",
-    
+
     # Add more translations as needed
 }
 
