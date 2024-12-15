@@ -55,7 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
         username = session.SESSION.get_username()
         self.username.setText(username)
 
-        self.remind_assignment(username)
+
 
         # Connect buttons to slots
         self.home_button.clicked.connect(
@@ -210,6 +210,8 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self.logout_button.clicked.connect(lambda: self.log_out(LoginDialog(self)))
+
+        self.remind_assignment(username)
 
         def view_log():
             if not session.SESSION.match_permissions(LOG_VIEW):
@@ -459,8 +461,12 @@ class MainWindow(QtWidgets.QMainWindow):
         # Pass the name to the dialog instance or perform any logic
         dialog_instance.set_selected_item(file_or_folder_name)
 
+        dialog_instance.finished.connect(self.refresh_tree_view)
+
         # Open the dialog
         self.open_dialog(dialog_instance)
+
+
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)

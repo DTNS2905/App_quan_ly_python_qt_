@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS assignments (
     item_id INTEGER NOT NULL,
     assigned_by INTEGER NOT NULL,
     assigned_to INTEGER NOT NULL,
-    start_time TEXT NOT NULL CHECK (start_time LIKE '____-__-__ __:__:__'),
-    end_time TEXT NOT NULL CHECK (end_time LIKE '____-__-__ __:__:__' AND end_time > start_time),
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL CHECK (end_time > start_time),
     FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_by) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES users(user_id) ON DELETE CASCADE

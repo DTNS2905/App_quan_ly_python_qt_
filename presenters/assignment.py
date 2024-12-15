@@ -57,13 +57,19 @@ class AssignmentPresenter(Presenter):
 
     def _validate_deadline_input(self, begin_time, end_time):
         try:
-            begin_time_dt = datetime.strptime(begin_time, "%H:%M %d/%m/%Y")
-            end_time_dt = datetime.strptime(end_time, "%H:%M %d/%m/%Y")
+            # begin_time_dt = datetime.strptime(begin_time, "%d/%m/%Y %H:%M ")
+            # end_time_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M ")
+
+            begin_time_dt = begin_time
+            end_time_dt = end_time
+
+            print(begin_time_dt)
+            print(end_time_dt)
             if begin_time_dt >= end_time_dt:
                 raise ValueError("begin_time must be before end_time.")
             return begin_time_dt, end_time_dt
         except ValueError:
-            raise ValueError("Deadline must be in 'h:m d/m/y' format, e.g., '12:30 01/01/2024'.")
+            raise ValueError("Deadline must be in 'd/m/y h:m ' format, e.g., ' 01/01/2024 12:30'.")
 
     def _determine_assignment_status(self, now, start_time_dt, end_time_dt):
         if now < start_time_dt:
@@ -80,7 +86,7 @@ class AssignmentPresenter(Presenter):
         begin_time_converted = common.time.convert_utc_time_to_timezone(begin_time_utc.isoformat(), zone=timezone)
         end_time_converted = common.time.convert_utc_time_to_timezone(end_time_utc.isoformat(), zone=timezone)
 
-        return begin_time_converted.strftime("%Y-%m-%d %H:%M:%S"), end_time_converted.strftime("%Y-%m-%d %H:%M:%S")
+        return begin_time_converted.strftime("%Y-%m-%d %H:%M"), end_time_converted.strftime("%Y-%m-%d %H:%M")
 
     def remind_if_no_time_left(self, user_name):
         """
@@ -104,4 +110,3 @@ class AssignmentPresenter(Presenter):
                 session.SESSION.get_username(),
                 "Cảnh báo: Không thể kiểm tra thời gian còn lại cho tài liệu."
             )
-    
