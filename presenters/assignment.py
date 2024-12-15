@@ -15,17 +15,15 @@ class AssignmentPresenter(Presenter):
     def __init__(self, view):
         super().__init__(view, AssignmentModel())
 
+
     def set_deadline(self, assignment_name, item_name, assigned_by_name, assigned_to_name, start_time, end_time, timezone="Asia/Bangkok"):
         # Retrieve the file name from the QStandardItemModel
 
         # Validate input
         begin_time_dt, end_time_dt = self._validate_deadline_input(start_time, end_time)
 
-        # Convert times to timezone
-        start_time_iso, end_time_iso = self._convert_times_to_timezone(begin_time_dt, end_time_dt, timezone)
-
         # Call model to save the data
-        self.model.add_deadline(assignment_name, item_name, assigned_by_name, assigned_to_name, start_time_iso, end_time_iso)
+        self.model.add_deadline(assignment_name, item_name, assigned_by_name, assigned_to_name, begin_time_dt, end_time_dt)
 
     def get_time_status(self, user_name):
         # Fetch assignment data

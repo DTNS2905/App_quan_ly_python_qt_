@@ -19,6 +19,7 @@ class AssignmentDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         uic.loadUi(ADD_DEADLINE_PATH, self)
+        self.setWindowTitle("Cửa sổ chỉnh giới hạn cho tài liệu")
 
         self.selected_item = None  # Store the selected item name
         self.assignment_presenter = AssignmentPresenter(self)
