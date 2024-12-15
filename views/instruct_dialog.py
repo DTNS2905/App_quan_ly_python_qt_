@@ -1,3 +1,4 @@
+import logging
 import traceback
 import markdown
 from PyQt6.QtWidgets import QTextBrowser, QDialog, QVBoxLayout
@@ -15,7 +16,7 @@ class InstructDialog(QDialog):
 
             self.show_dialog()
         except:
-            print(traceback.print_exc())
+            logging.error(traceback.print_exc())
 
     def show_dialog(self):
         html_content = markdown.markdown(self.content)

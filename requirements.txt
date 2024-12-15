@@ -6,4 +6,4 @@ bcrypt~=4.2.0
 sql~=2022.4.0
 PyQt6~=6.7.1
 pytz~=2024.2
-markdown
+markdown~=3.7

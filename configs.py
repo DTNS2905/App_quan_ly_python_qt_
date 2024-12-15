@@ -15,7 +15,7 @@ else:
 FILES_ROOT_PATH = os.path.join(APP_PATH, "files_storage")
 
 DATABASE_NAME = "app_quan_ly_pyqt6.db"
-INSTRUCT_PATH = Path(__file__).parent / "README.md"
+INSTRUCT_PATH = os.path.join(APP_PATH, "README.md")
 LOG_PATH = Path(__file__).parent / "logs"
 LOGIN_UI_PATH = Path(__file__).parent / "ui/login.ui"
 DASHBOARD_UI_PATH = Path(__file__).parent / "ui/admin_dashboard.ui"
@@ -26,8 +26,14 @@ PROFILE_PATH = Path(__file__).parent / "ui/profile.ui"
 ITEM_PERMISSION_PATH = Path(__file__).parent / "ui/item_permission.ui"
 ADD_DEADLINE_PATH = Path(__file__).parent / "ui/add_deadline.ui"
 FILE_TREE_VIEW_COLUMNS = [
-    "Tên", "Loại", "Ngày Tạo", "Người Tạo", "Thời gian bắt đầu", "Thời gian kết thúc", "Người giao việc",
-    "Người được giao"
+    "Tên",
+    "Loại",
+    "Ngày Tạo",
+    "Người Tạo",
+    "Thời gian bắt đầu",
+    "Thời gian kết thúc",
+    "Người giao việc",
+    "Người được giao",
 ]
 TIMEZONE = "Asia/Bangkok"
 

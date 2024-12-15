@@ -1,6 +1,6 @@
-SW_NAME = "Phần Mềm Quản Lý Bài"
-BUILD_NUMBER = "20241208095109"
-VERSION = "1.0.0"
+SW_NAME = "Phần Mềm Quản Lý Hồ Sơ Công Tác"
+BUILD_NUMBER = "20241215095109"
+VERSION = "1.0.1"
 
 
 def show_version_info(parent):
