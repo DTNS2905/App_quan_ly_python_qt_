@@ -137,27 +137,28 @@ class ItemPresenter(Presenter):
 
         except Exception as e:
             # Notify the view about the failure
-            self.view.display_error(f"{ADD_FILE_ERROR}: {e}")
+            self.view.display_error(f"{ADD_FILE_ERROR}")
             logging.error(f"lỗi trong lúc thêm tài liệu: {e}")
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
-
         can_all_remove = session.SESSION.match_permissions(FILE_DELETE)
+
         try:
-            selected_indexes = self.view.treeView.selectedIndexes()
-            selected_indexes = [
-                value for index, value in enumerate(selected_indexes) if index % 4 == 0
-            ]
+            # Map all selected indexes to column 0 of their respective rows
+            selected_indexes = list(
+                {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
+            )
 
             if not selected_indexes:
                 self.view.display_error(SELECTED_FILE_ERROR)
                 return
 
-            # Collect unique file paths from selected indexes (to avoid duplicates)
+            # Collect unique file paths from selected indexes
             file_paths = set()
-            model = self.view.treeView.model()
             not_deleted_files = set()
+            model = self.view.treeView.model()
+
             for index in selected_indexes:
                 original_name = model.data(index)
                 if can_all_remove or session.SESSION.match_item_permissions(
@@ -167,17 +168,18 @@ class ItemPresenter(Presenter):
                 else:
                     not_deleted_files.add(original_name)
 
-            if len(not_deleted_files) > 0:
+            # Display permission errors for files the user cannot delete
+            if not_deleted_files:
                 self.view.display_error(
-                    f"Xóa {', '.join(not_deleted_files)}: {PERMISSION_DENIED}"
+                    f"Không thể xóa {', '.join(not_deleted_files)}: {PERMISSION_DENIED}"
                 )
 
-            if len(file_paths) > 0:
+            if file_paths:
                 # Confirmation dialog for batch file deletion
                 reply = QMessageBox.question(
                     self.view,
                     "Xác nhận xóa",
-                    f"Bạn chắc chắn muốn xóa {', '.join(file_paths)} ?",
+                    f"Bạn chắc chắn muốn xóa {', '.join(file_paths)}?",
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                     QMessageBox.StandardButton.No,
                 )
@@ -185,12 +187,14 @@ class ItemPresenter(Presenter):
                 if reply == QMessageBox.StandardButton.Yes:
                     for file_path in file_paths:
                         try:
-                            self.model.delete_file(file_path)  # Remove each file
+                            # Remove each file
+                            self.model.delete_file(file_path)
                             LogModel.write_log(
                                 session.SESSION.get_username(),
-                                f" {FILE_REMOVE_SUCCESS} cho {file_path} ",
+                                f"{FILE_REMOVE_SUCCESS} cho {file_path}",
                             )
                         except Exception as e:
+                            # Log and display error for failed deletions
                             LogModel.write_log(
                                 session.SESSION.get_username(),
                                 f"{FILE_REMOVE_FAIL} cho {file_path}: {e}",
@@ -198,10 +202,10 @@ class ItemPresenter(Presenter):
                             self.view.display_error(
                                 f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}"
                             )
-                            return
 
+                    # Display success message for successfully deleted files
                     self.view.display_success(
-                        f" {FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)} "
+                        f"{FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)}"
                     )
 
                     # Refresh the view after deletion
@@ -211,10 +215,11 @@ class ItemPresenter(Presenter):
                     self.view.display_error(FILE_REMOVE_FAIL)
 
         except Exception as e:
+            # Handle unexpected errors
             LogModel.write_log(
-                session.SESSION.get_username(), f"{FILE_REMOVE_FAIL}:{e}"
+                session.SESSION.get_username(), f"{FILE_REMOVE_FAIL}: {e}"
             )
-            self.view.display_error(f"{FILE_REMOVE_FAIL}:{e}")
+            self.view.display_error(f"{FILE_REMOVE_FAIL}")
 
     def handle_download_items(self):
         """
@@ -377,9 +382,16 @@ class ItemPresenter(Presenter):
             LogModel.write_log(session.SESSION.get_username(), f"Lỗi tạo thư mục: {e}")
 
     def handle_remove_folder(self):
-        """Remove the selected folder."""
+        """Handle removing a single selected folder."""
+
         can_all_remove = session.SESSION.match_permissions(FOLDER_DELETE)
-        selected_indexes = self.view.treeView.selectedIndexes()
+
+        # Map all selected indexes to column 0 of their respective rows
+        selected_indexes = list(
+            {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
+        )
+
+        # Ensure only one folder is selected
         if not selected_indexes:
             LogModel.write_log(
                 session.SESSION.get_username(), FOLDER_SELECTED_NOT_FOUND
@@ -387,11 +399,23 @@ class ItemPresenter(Presenter):
             self.view.display_error(FOLDER_SELECTED_NOT_FOUND)
             return
 
+        if len(selected_indexes) > 1:
+            self.view.display_error("Chỉ cho phép chọn 1 thư mục để xóa")
+            return
+
+        # Get the model and the selected index
         model = self.view.treeView.model()
-        index = selected_indexes[0]
+        index = selected_indexes[0]  # Only one index is allowed
+
+        # Get the folder name
         original_name = model.data(index)
+        if not original_name:
+            self.view.display_error("Không thể lấy thông tin của thư mục được chọn.")
+            return
+
         folder_path = original_name
 
+        # Check permissions
         if not (
                 can_all_remove
                 or session.SESSION.match_item_permissions(folder_path, FOLDER_DELETE)
@@ -403,10 +427,11 @@ class ItemPresenter(Presenter):
             )
             return
 
+        # Confirmation dialog for folder deletion
         reply = QMessageBox.question(
             self.view,
             "Xác nhận xóa",
-            f"bạn chắc chắn muốn xóa thư mục ?",
+            f"Bạn chắc chắn muốn xóa thư mục '{folder_path}'?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -433,7 +458,13 @@ class ItemPresenter(Presenter):
 
     def handle_rename_file(self):
         can_all_rename = session.SESSION.match_permissions(FILE_RENAME)
-        selected_indexes = self.view.treeView.selectedIndexes()
+
+        # Map all selected indexes to column 0 of their respective rows
+        selected_indexes = list(
+            {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
+        )
+
+        # Validate selection
         if not selected_indexes:
             LogModel.write_log(
                 session.SESSION.get_username(), f"{FOLDER_SELECTED_NOT_FOUND}"
@@ -441,22 +472,28 @@ class ItemPresenter(Presenter):
             self.view.display_error(FOLDER_SELECTED_NOT_FOUND)
             return
 
-        selected_indexes = [
-            value for index, value in enumerate(selected_indexes) if index % 4 == 0
-        ]
-
-        model = self.view.treeView.model()
-        index = selected_indexes
-        if len(index) > 1:
+        # Ensure only one item is selected
+        if len(selected_indexes) > 1:
             self.view.display_error("Chỉ cho phép chọn 1 tệp để cập nhật tên")
             return
 
-        original_name = model.data(index[0])
+        # Get the model and the selected index
+        model = self.view.treeView.model()
+        index = selected_indexes[0]  # Only one index is allowed
+
+        # Get the original name of the selected item
+        original_name = model.data(index)
+        if not original_name:
+            self.view.display_error("Không thể lấy thông tin của mục được chọn.")
+            return
+
+        # Check if the selected item is a file
         _, file_ext = os.path.splitext(original_name)
         if not file_ext:
             self.view.display_error("Đây không phải là tệp")
             return
 
+        # Check permissions
         if not (
                 can_all_rename
                 or session.SESSION.match_item_permissions(original_name, FILE_RENAME)
@@ -470,6 +507,7 @@ class ItemPresenter(Presenter):
             )
             return
 
+        # Show the rename dialog
         dialog = CustomInputDialog(
             self.view, "Sửa tên tệp", "Điền tên tệp:", "Cập nhật"
         )
@@ -482,16 +520,22 @@ class ItemPresenter(Presenter):
                 self.view.display_error("Tên tệp không được để trống.")
                 return
 
-            new_name = new_root_name + "" + file_ext
+            new_name = new_root_name + file_ext
             try:
                 self.model.rename_item(original_name.strip(), new_name.strip())
                 self.view.refresh_tree_view()
             except Exception as e:
-                self.view.display_error(f"Cập nhật tên tệp {original_name}: {str(e)}")
+                self.view.display_error(f"Không Cập nhật tên tệp {original_name}")
 
     def handle_rename_folder(self):
         can_all_rename = session.SESSION.match_permissions(FOLDER_RENAME)
-        selected_indexes = self.view.treeView.selectedIndexes()
+
+        # Map all selected indexes to column 0 of their respective rows
+        selected_indexes = list(
+            {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
+        )
+
+        # Validate selection
         if not selected_indexes:
             LogModel.write_log(
                 session.SESSION.get_username(), f"{FOLDER_SELECTED_NOT_FOUND}"
@@ -499,22 +543,28 @@ class ItemPresenter(Presenter):
             self.view.display_error(FOLDER_SELECTED_NOT_FOUND)
             return
 
-        selected_indexes = [
-            value for index, value in enumerate(selected_indexes) if index % 4 == 0
-        ]
-
-        model = self.view.treeView.model()
-        index = selected_indexes
-        if len(index) > 1:
+        # Ensure only one item is selected
+        if len(selected_indexes) > 1:
             self.view.display_error("Chỉ cho phép chọn 1 thư mục để cập nhật tên")
             return
 
-        original_name = model.data(index[0])
+        # Get the model and the selected index
+        model = self.view.treeView.model()
+        index = selected_indexes[0]  # Only one index is allowed
+
+        # Get the original name of the selected item
+        original_name = model.data(index)
+        if not original_name:
+            self.view.display_error("Không thể lấy thông tin của mục được chọn.")
+            return
+
+        # Check if the selected item is a folder (no file extension)
         _, file_ext = os.path.splitext(original_name)
         if file_ext:
             self.view.display_error("Đây không phải là thư mục")
             return
 
+        # Check permissions
         if not (
                 can_all_rename
                 or session.SESSION.match_item_permissions(original_name, FOLDER_RENAME)
@@ -528,6 +578,7 @@ class ItemPresenter(Presenter):
             )
             return
 
+        # Show the rename dialog
         dialog = CustomInputDialog(
             self.view, "Sửa tên thư mục", "Điền tên thư mục:", "Cập nhật"
         )
@@ -535,7 +586,7 @@ class ItemPresenter(Presenter):
             new_name = dialog.get_text()
             if not new_name:
                 LogModel.write_log(
-                    session.SESSION.get_username(), "Tên tệp không được để trống."
+                    session.SESSION.get_username(), "Tên thư mục không được để trống."
                 )
                 self.view.display_error("Tên thư mục không được để trống.")
                 return
@@ -545,7 +596,7 @@ class ItemPresenter(Presenter):
                 self.view.refresh_tree_view()
             except Exception as e:
                 self.view.display_error(
-                    f"Cập nhật tên thư mục {original_name}: {str(e)}"
+                    f"Cập nhật tên thư mục {original_name}"
                 )
 
     def update_suggestions(self, text):
@@ -608,7 +659,7 @@ class ItemPresenter(Presenter):
             self._open_file_platform(file_path)
 
         except Exception as e:
-            self.view.display_error(f"Lỗi khi mở tệp: {str(e)}")
+            self.view.display_error(f"Lỗi khi mở tệp")
 
     def _open_file_platform(self, file_path):
         """
