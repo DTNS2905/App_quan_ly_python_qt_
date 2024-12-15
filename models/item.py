@@ -602,33 +602,40 @@ class ItemModel(NativeSqlite3Model):
         search_text = search_text.lower()
         matches = []
 
-        # Start from the root item
-        root_index = self.model.index(0, 0)
-        if not root_index.isValid():
-            logging.warning("Root node is missing.")
-            return matches
+        # Collect all top-level items since root is hidden
+        row_count = self.model.rowCount()
+        top_level_indices = [self.model.index(row, 0) for row in range(row_count)]
 
-        stack = [root_index]
+        # Stack-based DFS for tree traversal
+        stack = top_level_indices
 
         while stack:
             current_index = stack.pop()
-            item = self.model.itemFromIndex(current_index)
 
+            if not current_index.isValid():
+                continue
+
+            item = self.model.itemFromIndex(current_index)
             if item is None:
                 continue
 
             # Check if the current item's text matches the search text
-            if search_text in item.text().lower():
+            item_text = item.text().lower()
+            if search_text in item_text:
                 matches.append(current_index)
-                # Set both the foreground (text color) and background color
+                # Highlight matching item
                 item.setForeground(QBrush(Qt.GlobalColor.red))  # Red text color
-                item.setBackground(QBrush(QColor(0, 0, 255)))  # Blue background (adjust as needed)
+                item.setBackground(QBrush(QColor(0, 0, 255)))  # Blue background
             else:
-                item.setForeground(QBrush(Qt.GlobalColor.black))  # Reset text color to black
+                # Reset item appearance
+                item.setForeground(QBrush(Qt.GlobalColor.black))
+                item.setBackground(QBrush(Qt.GlobalColor.white))  # White background
 
-            # Add children indices to the stack
+            # Push children onto the stack
             for row in range(item.rowCount()):
-                stack.append(item.child(row).index())
+                child_index = item.child(row).index()
+                if child_index.isValid():
+                    stack.append(child_index)
 
         return matches
 
@@ -636,11 +643,18 @@ class ItemModel(NativeSqlite3Model):
         """
         Clear all search highlights in the tree and reset the items to their original state.
         """
-        root_index = self.model.index(0, 0)
-        stack = [root_index] if root_index.isValid() else []
+        # Collect all top-level items since root is hidden
+        row_count = self.model.rowCount()
+        top_level_indices = [self.model.index(row, 0) for row in range(row_count)]
+
+        # Stack-based traversal for resetting highlights
+        stack = top_level_indices
 
         while stack:
             index = stack.pop()
+            if not index.isValid():
+                continue
+
             item = self.model.itemFromIndex(index)
             if item:
                 # Reset the foreground (text color) to black
@@ -650,7 +664,9 @@ class ItemModel(NativeSqlite3Model):
 
             # Add children to the stack for further iteration
             for i in range(item.rowCount()):
-                stack.append(item.child(i).index())
+                child_index = item.child(i).index()
+                if child_index.isValid():
+                    stack.append(child_index)
 
     def notify_tree_expansion(self):
         """
