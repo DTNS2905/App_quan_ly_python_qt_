@@ -33,9 +33,6 @@ class AssignmentDialog(QtWidgets.QDialog):
         # Convert to GMT+7
         gmt_plus_7_datetime = current_utc_datetime.toTimeZone(gmt_plus_7)
 
-        print("UTC Time:", current_utc_datetime.toString("dd/MM/yyyy hh:mm"))
-        print("GMT+7 Time:", gmt_plus_7_datetime.toString("dd/MM/yyyy hh:mm"))
-
         # Set the converted time in your QDateTimeEdit widgets
         self.start_time_input.setDateTime(gmt_plus_7_datetime)
         self.end_time_input.setDateTime(gmt_plus_7_datetime)
@@ -105,4 +102,3 @@ class AssignmentDialog(QtWidgets.QDialog):
 
     def set_selected_item(self, item_name):
         self.selected_item = item_name
-        print(f"Selected item for deadline: {self.selected_item}")  # Debug or use as needed

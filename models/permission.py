@@ -409,6 +409,3 @@ if __name__ == "__main__":
     )
     # model.add_permission("test")
     # model.assign_permission_to_user("admin", "file:view")
-    # print(model.fetch_user_permissions())
-    # print(model.get_permission_by_username("admin"))
-    print(model.get_item_permission_by_username("admin"))

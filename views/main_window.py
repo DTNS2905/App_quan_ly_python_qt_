@@ -55,8 +55,6 @@ class MainWindow(QtWidgets.QMainWindow):
         username = session.SESSION.get_username()
         self.username.setText(username)
 
-
-
         # Connect buttons to slots
         self.home_button.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.stackedWidgetPage1)
@@ -451,12 +449,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Validate if the item exists
         if item is None:
-            print("No item found at the selected index.")
             return  # Exit the method if the item is None
 
         # Extract the file or folder name
         file_or_folder_name = item.text()
-        print(f"Item selected: {file_or_folder_name}")
 
         # Pass the name to the dialog instance or perform any logic
         dialog_instance.set_selected_item(file_or_folder_name)
@@ -465,8 +461,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Open the dialog
         self.open_dialog(dialog_instance)
-
-
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)

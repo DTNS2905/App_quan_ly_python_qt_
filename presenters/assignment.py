@@ -63,8 +63,6 @@ class AssignmentPresenter(Presenter):
             begin_time_dt = begin_time
             end_time_dt = end_time
 
-            print(begin_time_dt)
-            print(end_time_dt)
             if begin_time_dt >= end_time_dt:
                 raise ValueError("begin_time must be before end_time.")
             return begin_time_dt, end_time_dt

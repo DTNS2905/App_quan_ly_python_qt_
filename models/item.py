@@ -144,10 +144,8 @@ class ItemModel(NativeSqlite3Model):
         """
         try:
             items = self.fetch_data()
-            print(f"Fetched items: {items}")
             logging.debug(f"Fetched items: {items}")
             root_children = build_tree(items)
-            print(f"Root children: {root_children}")
             logging.debug(f"Root children: {root_children}")
             font_size = 14
 
@@ -192,7 +190,6 @@ class ItemModel(NativeSqlite3Model):
                         WHERE a.item_id = ?
                     ''', (child.id,))
                     assignment_result = cur.fetchone()
-                    print(f"assignment_result : {assignment_result}")
 
                     user_assign = assignment_result[2] if assignment_result else "Không có"
                     assigned_user = assignment_result[3] if assignment_result else "Không có"
