@@ -57,11 +57,12 @@ class AuthPresenter(Presenter):
             # Add the user to the model
             self.model.add_user(username, password)
             self.view.display_success(REGISTER_SUCCESS)
+            self.view.clear_inputs()
             permissions = self.permission_model.get_permission_by_username(username).permissions
             self.view.accept()
             return username,permissions
         except Exception as e:
-            self.view.display_error(f"{REGISTER_ERROR}: {str(e)}")
+            self.view.display_error(f"{REGISTER_ERROR}")
 
     def add_default_user(self, username, password):
         self.model.add_user(username, password)

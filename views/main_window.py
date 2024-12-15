@@ -24,9 +24,7 @@ from messages.permissions import (
     FILE_CREATE,
     FOLDER_CREATE,
     FILE_RENAME,
-    FOLDER_RENAME,
-    FILE_DELETE,
-    FOLDER_DELETE,
+    FOLDER_RENAME, FILE_DELETE, FOLDER_DELETE, CREATE_ASSIGNMENT,
 )
 from presenters.assignment import AssignmentPresenter
 from presenters.item import ItemPresenter
@@ -139,6 +137,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.search_button.clicked.connect(self.search_files_folders)
 
         self.assignment_button.clicked.connect(lambda: self.open_add_deadline_dialog(AssignmentDialog(self)))
+
+        self.assignment_button.setVisible(
+            session.SESSION.match_permissions(CREATE_ASSIGNMENT)
+        )
 
         self.label_2.installEventFilter(self)
 

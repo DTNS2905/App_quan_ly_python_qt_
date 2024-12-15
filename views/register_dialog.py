@@ -93,3 +93,14 @@ class RegisterDialog(QtWidgets.QDialog):
         else:
             field.setEchoMode(QLineEdit.EchoMode.Password)  # Show dots
             button.setIcon(QIcon(":/icons/icons/eye-off.svg"))  # Show "eye closed" icon
+
+    def clear_inputs(self):
+        """Clear all input fields."""
+        self.username_input.clear()
+        self.password_input.clear()
+        self.confirm_password_input.clear()
+
+    def closeEvent(self, event):
+        """Override closeEvent to reset inputs when the dialog is closed."""
+        self.clear_inputs()
+        super().closeEvent(event)
