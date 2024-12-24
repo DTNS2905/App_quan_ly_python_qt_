@@ -436,6 +436,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Call the Presenter to open the file
         self.item_presenter.open_file(original_name)
+        self.clear_selection_and_index()
 
     def open_add_deadline_dialog(self, dialog_instance):
         selected_indexes = self.treeView.selectionModel().selectedIndexes()
