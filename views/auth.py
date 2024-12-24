@@ -1,8 +1,9 @@
 import logging
+import sys
 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QLineEdit, QMessageBox
+from PyQt6.QtWidgets import QLineEdit, QMessageBox, QApplication
 
 from common import session
 from common.session import UserSession
@@ -80,3 +81,10 @@ class LoginDialog(QtWidgets.QDialog):
     def display_error(self, message):
         error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
+
+    def closeEvent(self, event):
+        logging.info("closeEvent triggered: app is closing.")
+        # Ensure the application quits
+        QApplication.quit()
+        sys.exit(0)
+        super().closeEvent(event)

@@ -1,4 +1,5 @@
 import logging
+import sys
 import traceback
 
 from PyQt6 import QtWidgets, uic
@@ -9,7 +10,7 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QDialog,
     QCompleter,
-    QAbstractItemView,
+    QAbstractItemView, QApplication,
 )
 
 from common import session
@@ -505,3 +506,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)
+
+    def closeEvent(self, event):
+        # Ensure the application quits
+
+        QApplication.quit()
+        sys.exit(0)
+        super().closeEvent(event)
