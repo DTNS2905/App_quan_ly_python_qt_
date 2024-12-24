@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 
 from common import session
 from common.presenter import Presenter
+from messages.contants import ID_ROLE
 from messages.messages import (
     PERMISSION_DENIED,
     ADD_FILE_SUCCESS,
@@ -98,13 +99,24 @@ class ItemPresenter(Presenter):
 
             # Get the selected index from the tree view
             selected_index = self.view.treeView.currentIndex()
+
             parent_original_name = None
+            parent_id = None
 
             if selected_index.isValid():
                 # Validate the selected node
                 model = self.view.treeView.model()
+                # Retrieve the item's displayed name
                 parent_original_name = model.data(selected_index, Qt.ItemDataRole.DisplayRole)
+
+                # Retrieve the item's ID using the custom role
+                parent_id = model.data(selected_index, ID_ROLE)
+
+                # Retrieve the item's type or other metadata (e.g., UserRole if used for this purpose)
                 parent_node_type = model.data(selected_index, Qt.ItemDataRole.UserRole)
+
+                # Debugging outputs to verify the data retrieval
+                print(f"Name: {parent_original_name}, ID: {parent_id}, Type: {parent_node_type}")
 
                 if parent_node_type == "file":
                     # Files cannot act as parents
@@ -121,7 +133,7 @@ class ItemPresenter(Presenter):
             # Add each file
             username = session.SESSION.get_username()
             for file_path in file_paths:
-                self.model.create_file(username, file_path, parent_original_name)
+                self.model.create_file(username, file_path, parent_original_name, parent_id)
 
             # Notify the view about the success
             self.view.display_success(

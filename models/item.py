@@ -23,6 +23,8 @@ from sql_statements.item import (
     INIT_DATA, FETCH_NAME_FILE_OR_FOLDER_ON_TEXTCHANGED,
 )
 
+from messages.contants import ID_ROLE
+
 
 @dataclass
 class ItemDTO:
@@ -151,13 +153,19 @@ class ItemModel(NativeSqlite3Model):
 
             icon_provider = QFileIconProvider()
 
-            def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0), user_role=None):
+            def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0), user_role=None,
+                            item_id=None):
                 """
                 Helper to create a CustomItem with specific attributes.
                 """
                 item = CustomItem(content, font_size=font_size, bold=bold, color=color)
                 item.set_custom_icon(icon_provider.icon(icon_type))
-                if user_role:
+                # Store the ID in a custom role
+                if item_id is not None:
+                    item.setData(item_id, ID_ROLE)  # Store the ID in ID_ROLE
+
+                # Optionally store other user data
+                if user_role is not None:
                     item.setData(user_role, Qt.ItemDataRole.UserRole)
                 return item
 
@@ -203,7 +211,7 @@ class ItemModel(NativeSqlite3Model):
                         CustomItem(begin_time, font_size=font_size - 1, color=QColor(50, 50, 50)),
                         CustomItem(end_time, font_size=font_size - 1, color=QColor(50, 50, 50)),
                         CustomItem(user_assign, font_size=font_size - 1, color=QColor(50, 50, 50)),
-                        CustomItem(assigned_user , font_size=font_size - 1, color=QColor(50, 50, 50)),
+                        CustomItem(assigned_user, font_size=font_size - 1, color=QColor(50, 50, 50)),
 
                     )
 
@@ -240,6 +248,7 @@ class ItemModel(NativeSqlite3Model):
                         icon_type=icon_type,
                         bold=child.type == "folder",
                         user_role=user_role,
+                        item_id=child.id
                     )
 
                     if child.type == "file":
@@ -317,7 +326,7 @@ class ItemModel(NativeSqlite3Model):
         return self._root_path
 
     def create_file(
-            self, username: str, file_path: str, parent_original_name: str = "root"
+            self, username: str, file_path: str, parent_original_name: str = "root", parent_id: int = None
     ):
         """
         Creates a new file in the system and updates the database and tree structure.
@@ -326,6 +335,7 @@ class ItemModel(NativeSqlite3Model):
             username (str): The username of the file creator.
             file_path (str): The path to the file to be added.
             parent_original_name (str, optional): The name of the parent folder. Defaults to None.
+            parent_id (int) :
 
         Returns:
             int: The ID of the newly created file in the database.
@@ -347,18 +357,33 @@ class ItemModel(NativeSqlite3Model):
             user_id = user_row[0]
 
             # Get the parent ID
+            # Retrieve all potential parent rows
             if parent_original_name:
                 cur.execute(
                     "SELECT id, type FROM items WHERE original_name = ?", (parent_original_name,)
                 )
-                parent_row = cur.fetchone()
-                if not parent_row:
+                parent_rows = cur.fetchall()  # Fetch all matching rows
+                if not parent_rows:
                     raise ValueError(f"Parent '{parent_original_name}' not found.")
-                parent_id, parent_type = parent_row
+
+                # Search for the matching parent_id
+                matching_row = next(
+                    (row for row in parent_rows if row[0] == parent_id), None
+                )  # Replace `function_parent_id` with your function call or value
+
+                if not matching_row:
+                    raise ValueError(
+                        f"No matching parent ID found: Function returned {parent_id}, "
+                        f"but none match in the database for '{parent_original_name}'."
+                    )
+
+                db_parent_id, parent_type = matching_row
+
+                # Validate that the parent is not a file
                 if parent_type == "file":
-                    raise ValueError(f"Cannot add a file under another file: {parent_original_name}.")
+                    raise ValueError(f"Cannot add an item under a file: '{parent_original_name}'.")
             else:
-                parent_id = 0  # Root directory
+                db_parent_id = 0  # Assume root directory as parent
 
             # Prepare file details
             original_name = os.path.basename(file_path)
@@ -367,7 +392,7 @@ class ItemModel(NativeSqlite3Model):
             # Insert file record into the database
             cur.execute(
                 "INSERT INTO items (code, type, original_name, parent_id, user_id) VALUES (?, ?, ?, ?, ?)",
-                (code, "file", original_name, parent_id, user_id),
+                (code, "file", original_name, db_parent_id, user_id),
             )
             if cur.rowcount == 0:
                 raise Exception(f"Failed to insert file '{original_name}' into the database.")

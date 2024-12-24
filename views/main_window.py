@@ -2,8 +2,8 @@ import logging
 import traceback
 
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal, QStringListModel
-from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtCore import Qt, QObject, QEvent, pyqtSignal, QStringListModel, QModelIndex
+from PyQt6.QtGui import QShortcut, QKeySequence, QMouseEvent
 from PyQt6.QtWidgets import (
     QMessageBox,
     QHeaderView,
@@ -472,6 +472,35 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Open the dialog
         self.open_dialog(dialog_instance)
+
+    def eventFilter(self, source, event):
+
+        # Check if the source is part of the tree view
+        if source == self.treeView or source == self.treeView.viewport():
+            if event.type() == QEvent.Type.MouseButtonPress:
+
+                if isinstance(event, QMouseEvent):
+                    index = self.treeView.indexAt(event.position().toPoint())
+
+                    if not index.isValid():
+                        self.clear_selection_and_index()
+
+        # Pass event to parent class
+        return super().eventFilter(source, event)
+
+    def mousePressEvent(self, event):
+        # Check if the click is outside the treeView
+        if not self.treeView.underMouse():
+            self.clear_selection_and_index()
+        super().mousePressEvent(event)
+
+    def clear_selection_and_index(self):
+        """
+        Clears both the selection and the current index.
+        """
+        self.treeView.selectionModel().clearSelection()  # Clear the selection
+        self.treeView.setCurrentIndex(QModelIndex())  # Clear the current index
+
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)

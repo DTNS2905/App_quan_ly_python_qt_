@@ -1,3 +1,5 @@
+from PyQt6.QtCore import Qt
+
 from messages.permissions import *
 
 HEADERS_FILE_TREE = ["Tên tài liệu/Thư mục", "Kích cỡ", "Loại tài liệu", "Ngày điều chỉnh"]
@@ -25,3 +27,4 @@ PERMISSION_TRANSLATIONS = {
     # Add more translations as needed
 }
 
+ID_ROLE = Qt.ItemDataRole.UserRole + 1
