@@ -25,7 +25,7 @@ class AssignmentModel(NativeSqlite3Model):
     ):
         super().__init__(database_name, table_create_sql)
 
-    def add_deadline(self, assignment_name, item_name, assigned_by_name, assigned_to_name, start_time, end_time):
+    def add_deadline(self, assignment_name, assigned_by_name, assigned_to_name, start_time, end_time, item_id):
         """
         Adds a deadline to the database after resolving user_id and item_id.
 
@@ -39,8 +39,6 @@ class AssignmentModel(NativeSqlite3Model):
         :raises Exception: For database-related issues.
         """
         try:
-            # Resolve item_id and user_ids
-            item_id = self.get_item_id_by_name(item_name)
             assigned_by = self.get_user_id_by_name(assigned_by_name)
             assigned_to = self.get_user_id_by_name(assigned_to_name)
 

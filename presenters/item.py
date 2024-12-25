@@ -90,6 +90,10 @@ class ItemPresenter(Presenter):
             return
 
         try:
+            parent_original_name = None
+            parent_id = None
+            selected_index = None
+
             # Open file dialog to select multiple files
             file_paths, _ = QFileDialog.getOpenFileNames(
                 self.view, "Chọn tài liệu", "", "All Files (*)"
@@ -97,38 +101,33 @@ class ItemPresenter(Presenter):
             if not file_paths:
                 return  # User canceled the dialog
 
-            # Get the selected index from the tree view
-            selected_index = self.view.treeView.currentIndex()
+            # Get the single selected index from the tree view
+            selected_indexes = self.view.treeView.selectedIndexes()
 
-            parent_original_name = None
-            parent_id = None
+            # Map the first selected index to column 0 if selection exists
+            if selected_indexes:
+                selected_index = selected_indexes[0].sibling(selected_indexes[0].row(), 0)
 
-            if selected_index.isValid():
-                # Validate the selected node
+            # Validate the selected index (if any)
+            if selected_index and selected_index.isValid():
+                # Retrieve metadata for the selected node
                 model = self.view.treeView.model()
-                # Retrieve the item's displayed name
                 parent_original_name = model.data(selected_index, Qt.ItemDataRole.DisplayRole)
-
-                # Retrieve the item's ID using the custom role
                 parent_id = model.data(selected_index, ID_ROLE)
-
-                # Retrieve the item's type or other metadata (e.g., UserRole if used for this purpose)
                 parent_node_type = model.data(selected_index, Qt.ItemDataRole.UserRole)
-
-                # Debugging outputs to verify the data retrieval
-                print(f"Name: {parent_original_name}, ID: {parent_id}, Type: {parent_node_type}")
 
                 if parent_node_type == "file":
                     # Files cannot act as parents
-                    self.view.display_error("không thể thêm tài liệu")
+                    self.view.display_error("Không thể thêm tài liệu vào một tài liệu khác.")
                     LogModel.write_log(
                         session.SESSION.get_username(),
-                        f"Lỗi không thể thêm các tài liệu dưới một tài liệu khác: {parent_original_name}",
+                        f"Lỗi: Thêm tài liệu vào một tài liệu: {parent_original_name}",
                     )
                     return
             else:
-                # If no valid node is selected, default to the root
+                # No valid selection, default to the root
                 parent_original_name = None
+                parent_id = 0
 
             # Add each file
             username = session.SESSION.get_username()
@@ -136,28 +135,30 @@ class ItemPresenter(Presenter):
                 self.model.create_file(username, file_path, parent_original_name, parent_id)
 
             # Notify the view about the success
-            self.view.display_success(
-                f"Tài liệu được thêm thành công {parent_original_name or 'root'}: {', '.join(file_paths)}."
+            success_message = (
+                f"Tài liệu được thêm thành công vào {parent_original_name or 'root'}: {', '.join(file_paths)}."
             )
+            self.view.display_success(success_message)
             LogModel.write_log(
                 username,
-                f"Các tài liệu được thêm {', '.join(file_paths)} tới {parent_original_name or 'root'}.",
+                f"Các tài liệu đã được thêm {', '.join(file_paths)} vào {parent_original_name or 'root'}.",
             )
 
             # Refresh the tree view
             self.view.refresh_tree_view()
+            self.expand_tree_view()
 
         except Exception as e:
-            # Notify the view about the failure
+            # Handle and log errors
             self.view.display_error(f"{ADD_FILE_ERROR}")
-            logging.error(f"lỗi trong lúc thêm tài liệu: {e}")
+            logging.error(f"Lỗi trong quá trình thêm tài liệu: {e}")
 
     def handle_remove_files(self):
         """Handle removing multiple selected files from the file system using QTreeView."""
         can_all_remove = session.SESSION.match_permissions(FILE_DELETE)
 
         try:
-            # Map all selected indexes to column 0 of their respective rows
+            # Step 1: Collect all selected indexes, mapped to column 0
             selected_indexes = list(
                 {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
             )
@@ -166,72 +167,74 @@ class ItemPresenter(Presenter):
                 self.view.display_error(SELECTED_FILE_ERROR)
                 return
 
-            # Collect unique file paths from selected indexes
-            file_paths = set()
-            not_deleted_files = set()
+            # Step 2: Classify files based on deletion permissions
+            files_to_delete = set()
+            files_not_allowed = set()
             model = self.view.treeView.model()
 
             for index in selected_indexes:
-                original_name = model.data(index)
-                if can_all_remove or session.SESSION.match_item_permissions(
-                        original_name, FILE_DELETE
-                ):
-                    file_paths.add(original_name)
+                original_name = model.data(index, Qt.ItemDataRole.DisplayRole)
+                item_id = model.data(index, ID_ROLE)
+
+                if can_all_remove or session.SESSION.match_item_permissions(original_name, FILE_DELETE):
+                    files_to_delete.add((original_name, item_id))
                 else:
-                    not_deleted_files.add(original_name)
+                    files_not_allowed.add(original_name)
 
-            # Display permission errors for files the user cannot delete
-            if not_deleted_files:
+            # Step 3: Notify user about files that cannot be deleted
+            if files_not_allowed:
                 self.view.display_error(
-                    f"Không thể xóa {', '.join(not_deleted_files)}: {PERMISSION_DENIED}"
+                    f"Không thể xóa: {', '.join(files_not_allowed)}. {PERMISSION_DENIED}"
                 )
 
-            if file_paths:
-                # Confirmation dialog for batch file deletion
-                reply = QMessageBox.question(
-                    self.view,
-                    "Xác nhận xóa",
-                    f"Bạn chắc chắn muốn xóa {', '.join(file_paths)}?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No,
-                )
+            if not files_to_delete:
+                # If no files are eligible for deletion, exit early
+                return
 
-                if reply == QMessageBox.StandardButton.Yes:
-                    for file_path in file_paths:
-                        try:
-                            # Remove each file
-                            self.model.delete_file(file_path)
-                            LogModel.write_log(
-                                session.SESSION.get_username(),
-                                f"{FILE_REMOVE_SUCCESS} cho {file_path}",
-                            )
-                        except Exception as e:
-                            # Log and display error for failed deletions
-                            LogModel.write_log(
-                                session.SESSION.get_username(),
-                                f"{FILE_REMOVE_FAIL} cho {file_path}: {e}",
-                            )
-                            self.view.display_error(
-                                f"{FILE_REMOVE_FAIL} cho '{file_path}': {e}"
-                            )
+            # Step 4: Confirmation dialog for eligible files
+            file_names_to_delete = [f[0] for f in files_to_delete]
+            reply = QMessageBox.question(
+                self.view,
+                "Xác nhận xóa",
+                f"Bạn có chắc chắn muốn xóa các tệp sau không?\n{', '.join(file_names_to_delete)}",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
 
-                    # Display success message for successfully deleted files
-                    self.view.display_success(
-                        f"{FILE_REMOVE_SUCCESS} cho {', '.join(file_paths)}"
+            if reply != QMessageBox.StandardButton.Yes:
+                self.view.display_error(FILE_REMOVE_FAIL)
+                LogModel.write_log(session.SESSION.get_username(), FILE_REMOVE_FAIL)
+                return
+
+            # Step 5: Delete files and handle exceptions
+            for original_name, item_id in files_to_delete:
+                try:
+                    self.model.delete_file(original_name, item_id)
+                    LogModel.write_log(
+                        session.SESSION.get_username(),
+                        f"{FILE_REMOVE_SUCCESS} cho {original_name}",
+                    )
+                except Exception as e:
+                    LogModel.write_log(
+                        session.SESSION.get_username(),
+                        f"{FILE_REMOVE_FAIL} cho {original_name}: {e}",
+                    )
+                    self.view.display_error(
+                        f"{FILE_REMOVE_FAIL} cho '{original_name}': {e}"
                     )
 
-                    # Refresh the view after deletion
-                    self.view.refresh_tree_view()
-                else:
-                    LogModel.write_log(session.SESSION.get_username(), FILE_REMOVE_FAIL)
-                    self.view.display_error(FILE_REMOVE_FAIL)
+            # Step 6: Notify user about successful deletion and refresh the view
+            self.view.display_success(
+                f"{FILE_REMOVE_SUCCESS} cho: {', '.join(file_names_to_delete)}."
+            )
+            self.view.refresh_tree_view()
+            self.expand_tree_view()
 
         except Exception as e:
             # Handle unexpected errors
-            LogModel.write_log(
-                session.SESSION.get_username(), f"{FILE_REMOVE_FAIL}: {e}"
-            )
-            self.view.display_error(f"{FILE_REMOVE_FAIL}")
+            error_message = f"{FILE_REMOVE_FAIL}: {e}"
+            LogModel.write_log(session.SESSION.get_username(), error_message)
+            self.view.display_error(error_message)
 
     def handle_download_items(self):
         """
@@ -274,6 +277,7 @@ class ItemPresenter(Presenter):
             for index in filtered_indexes:
                 model = self.view.treeView.model()
                 original_name = model.data(index)
+                item_id = model.data(index, ID_ROLE)
 
                 # Skip duplicates or invalid entries
                 if not original_name or original_name in processed_files:
@@ -295,7 +299,7 @@ class ItemPresenter(Presenter):
                     continue
 
                 # Retrieve the file data
-                data_bytes = self.model.get_file_bytes(original_name)
+                data_bytes = self.model.get_file_bytes(original_name,item_id)
                 if data_bytes is None:
                     self.view.display_error(f"'{original_name}' không phải là tệp đơn")
                     continue
@@ -339,12 +343,23 @@ class ItemPresenter(Presenter):
             return
 
         try:
-            # Get the selected index and model
-            selected_index = self.view.treeView.currentIndex()
-            model = self.view.treeView.model()
+            selected_indexes = list(
+                {index.sibling(index.row(), 0) for index in self.view.treeView.selectedIndexes()}
+            )
+
+            if len(selected_indexes) > 1:
+                self.view.display_error("Chỉ cho phép chọn 1 thư mục để xóa")
+                return
+
+            selected_index = None
+            # if selected_indexes :
+
 
             # Check if the selected index is valid
-            if selected_index.isValid():
+            if selected_index is not None and selected_index.isValid():
+                # Get the model and the selected index
+                model = self.view.treeView.model()
+                selected_index = selected_indexes[0]  # Only one index is allowed
                 # Retrieve the selected item
                 selected_item = model.itemFromIndex(selected_index)
 
@@ -354,12 +369,13 @@ class ItemPresenter(Presenter):
                     return
 
                 # Use the selected folder as the parent node
-                parent_original_name = selected_item.text()
+                parent_id = selected_item.data(ID_ROLE)
             else:
                 # Default to the root node if no valid selection
                 parent_original_name = "root"
+                parent_id = 0
                 if not parent_original_name:  # Ensure root node exists
-                    self.view.display_error("Không thể xác định thư mục gốc.")  # Thông báo lỗi
+                    self.view.display_error("Không thể xác định thư mục.")  # Thông báo lỗi
                     return
 
             # Use the custom dialog
@@ -381,9 +397,10 @@ class ItemPresenter(Presenter):
                     f"Thư mục '{folder_name}' đã được tạo thành công."
                 )  # Thông báo thành công
 
-                self.model.create_folder(username, folder_name, parent_original_name)
+                self.model.create_folder(username, folder_name, parent_id)
                 # Refresh the view to show the new folder
                 self.view.refresh_tree_view()
+                self.expand_tree_view()
             else:
                 LogModel.write_log(
                     session.SESSION.get_username(),
@@ -421,6 +438,7 @@ class ItemPresenter(Presenter):
 
         # Get the folder name
         original_name = model.data(index)
+        item_id = model.data(index, ID_ROLE)
         if not original_name:
             self.view.display_error("Không thể lấy thông tin của thư mục được chọn.")
             return
@@ -451,7 +469,7 @@ class ItemPresenter(Presenter):
         if reply == QMessageBox.StandardButton.Yes:
             try:
                 # Remove the folder
-                self.model.delete_folder(folder_path)
+                self.model.delete_folder(folder_path,item_id)
                 LogModel.write_log(
                     session.SESSION.get_username(),
                     f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .",
@@ -462,6 +480,7 @@ class ItemPresenter(Presenter):
 
                 # Refresh the view to remove the deleted folder
                 self.view.refresh_tree_view()
+                self.expand_tree_view()
             except Exception as e:
                 LogModel.write_log(
                     session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {e}"
@@ -495,6 +514,7 @@ class ItemPresenter(Presenter):
 
         # Get the original name of the selected item
         original_name = model.data(index)
+        item_id = model.data(index, ID_ROLE)
         if not original_name:
             self.view.display_error("Không thể lấy thông tin của mục được chọn.")
             return
@@ -508,7 +528,7 @@ class ItemPresenter(Presenter):
         # Check permissions
         if not (
                 can_all_rename
-                or session.SESSION.match_item_permissions(original_name, FILE_RENAME)
+                or session.SESSION.match_item_permissions(original_name, FILE_RENAME, item_id)
         ):
             self.view.display_error(
                 f"Cập nhật tên tệp {original_name}: {PERMISSION_DENIED}"
@@ -534,8 +554,9 @@ class ItemPresenter(Presenter):
 
             new_name = new_root_name + file_ext
             try:
-                self.model.rename_item(original_name.strip(), new_name.strip())
+                self.model.rename_item(original_name.strip(), new_name.strip(),item_id)
                 self.view.refresh_tree_view()
+                self.expand_tree_view()
             except Exception as e:
                 self.view.display_error(f"Không Cập nhật tên tệp {original_name}")
 
@@ -566,6 +587,7 @@ class ItemPresenter(Presenter):
 
         # Get the original name of the selected item
         original_name = model.data(index)
+        item_id = model.data(index, ID_ROLE)
         if not original_name:
             self.view.display_error("Không thể lấy thông tin của mục được chọn.")
             return
@@ -604,11 +626,12 @@ class ItemPresenter(Presenter):
                 return
 
             try:
-                self.model.rename_item(original_name.strip(), new_name.strip())
+                self.model.rename_item(original_name.strip(), new_name.strip(),item_id)
                 self.view.refresh_tree_view()
+                self.expand_tree_view()
             except Exception as e:
                 self.view.display_error(
-                    f"Cập nhật tên thư mục {original_name}"
+                    f"Không thể cập nhật tên thư mục {original_name}"
                 )
 
     def update_suggestions(self, text):
@@ -650,15 +673,15 @@ class ItemPresenter(Presenter):
     def expand_tree_view(self):
         self.view.treeView.expandAll()
 
-    def open_file(self, original_name):
+    def open_file(self, original_name, item_id):
         try:
             # Fetch the file details from the model
-            item_details = self.model.get_item_details(original_name)
+            item_details = self.model.get_item_details(item_id)
             if not item_details:
                 self.view.display_error(f"Không tìm thấy tệp: {original_name}")
                 return
 
-            item_id, code, file_type = item_details
+            code, file_type = item_details
             if file_type != "file":
                 self.view.display_error(f"'{original_name}' không phải là tệp đơn")
                 return

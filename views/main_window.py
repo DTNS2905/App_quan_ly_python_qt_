@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 
 from common import session
 from configs import DASHBOARD_UI_PATH, INSTRUCT_PATH
+from messages.contants import ID_ROLE
 from messages.messages import PERMISSION_DENIED
 from messages.permissions import (
     LOG_VIEW,
@@ -433,48 +434,52 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Retrieve the file name from the QStandardItemModel
         model = self.item_presenter.get_model_for_view()
-        original_name = model.itemFromIndex(first_column_index).text()
+        original_name = model.data(first_column_index)
+        item_id = model.data(first_column_index, ID_ROLE)
 
         # Call the Presenter to open the file
-        self.item_presenter.open_file(original_name)
+        self.item_presenter.open_file(original_name, item_id)
         self.clear_selection_and_index()
 
     def open_add_deadline_dialog(self, dialog_instance):
-        selected_indexes = self.treeView.selectionModel().selectedIndexes()
+        try:
+            selected_indexes = self.treeView.selectionModel().selectedIndexes()
 
-        # Validate if any item is selected
-        if not selected_indexes:
-            self.display_error("Không có tài liệu nào được chọn")
+            # Validate if any item is selected
+            if not selected_indexes:
+                self.display_error("Không có tài liệu nào được chọn")
+                return
+
+                # Get the first selected index (current column or any selected column)
+            selected_index = selected_indexes[0]
+
+            # Map the selected row to the first column
+            first_column_index = selected_index.siblingAtColumn(0)
+
+            # Validate if the mapped index is valid
+            if not first_column_index.isValid():
+                self.display_error("Không có tìa liệu được chọn")
+                return
+
+            model = self.treeView.model()
+            original_name = model.data(first_column_index)
+            item_id = model.data(first_column_index, ID_ROLE)
+
+            # Validate if the item exists
+            if first_column_index is None:
+                return  # Exit the method if the item is None
+
+            # Pass the name to the dialog instance or perform any logic
+            dialog_instance.set_selected_item_id_method(item_id)
+            dialog_instance.finished.connect(self.refresh_tree_view)
+
+            # Open the dialog
+            self.open_dialog(dialog_instance)
+        except Exception as e:
+            logging.error(f"Error: open add deadline dialog failed: {str(e)}")
+            self.display_error("Lỗi với việc thêm hạn chót cho tài liệu hoăc thư mục ")
+
             return
-
-            # Get the first selected index (current column or any selected column)
-        selected_index = selected_indexes[0]
-
-        # Map the selected row to the first column
-        first_column_index = selected_index.siblingAtColumn(0)
-
-        # Validate if the mapped index is valid
-        if not first_column_index.isValid():
-            self.display_error("Không có tìa liệu được chọn")
-            return
-
-        item = self.treeView.model().itemFromIndex(first_column_index)
-
-        # Validate if the item exists
-        if item is None:
-            return  # Exit the method if the item is None
-
-        # Extract the file or folder name
-        file_or_folder_name = item.text()
-
-        # Pass the name to the dialog instance or perform any logic
-        dialog_instance.set_selected_item(file_or_folder_name)
-
-        dialog_instance.finished.connect(self.refresh_tree_view)
-
-        # Open the dialog
-        self.open_dialog(dialog_instance)
-
     def eventFilter(self, source, event):
 
         # Check if the source is part of the tree view
@@ -506,10 +511,3 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)
-
-    def closeEvent(self, event):
-        # Ensure the application quits
-
-        QApplication.quit()
-        sys.exit(0)
-        super().closeEvent(event)

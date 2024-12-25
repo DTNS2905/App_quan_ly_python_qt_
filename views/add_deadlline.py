@@ -21,7 +21,7 @@ class AssignmentDialog(QtWidgets.QDialog):
         uic.loadUi(ADD_DEADLINE_PATH, self)
         self.setWindowTitle("Cửa sổ chỉnh giới hạn cho tài liệu")
 
-        self.selected_item = None  # Store the selected item name
+        self.set_selected_item_id = None
         self.assignment_presenter = AssignmentPresenter(self)
         self.profile_presenter = ProfilePresenter(self)
 
@@ -45,7 +45,7 @@ class AssignmentDialog(QtWidgets.QDialog):
         assignment_name = self.assignment_input.text()
         assigned_by_name = session.SESSION.get_username()
         assigned_to_name = self.username_input.text()
-        item_name = self.selected_item
+        item_id = self.set_selected_item_id
         start_time = self.start_time_input.dateTime().toString("d/M/yyyy h:m")
         end_time = self.end_time_input.dateTime().toString("d/M/yyyy h:m")
 
@@ -68,7 +68,7 @@ class AssignmentDialog(QtWidgets.QDialog):
 
             # Proceed to set the deadline
             self.assignment_presenter.set_deadline(
-                assignment_name, item_name, assigned_by_name, assigned_to_name, start_time_dt, end_time_dt
+                assignment_name, assigned_by_name, assigned_to_name, start_time_dt, end_time_dt, item_id
             )
             self.display_success(f"Hạn chót được thêm thành công cho '{assignment_name}'.")
             LogModel.write_log(
@@ -90,6 +90,7 @@ class AssignmentDialog(QtWidgets.QDialog):
             self.display_error("Có lỗi xảy ra")
             logging.error(f"Có lỗi xảy ra: {e}")
             LogModel.write_log(
+                session.SESSION.get_username(),
                 f"{assigned_by_name} đã thêm hạn chót thất bại cho '{assignment_name}' đối với '{assigned_to_name}': {e}"
             )
 
@@ -101,5 +102,6 @@ class AssignmentDialog(QtWidgets.QDialog):
         error_box = CustomMessageBox("error", message, QMessageBox.Icon.Warning, "Thử lại", self)
         error_box.exec()
 
-    def set_selected_item(self, item_name):
-        self.selected_item = item_name
+    def set_selected_item_id_method(self, item_id):
+        """Set the selected item ID."""
+        self.set_selected_item_id = item_id  # Assign item_id to the attribute

@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS assignments (
 '''
 
 ADD_DEADLINE_FOR_ITEM = '''
-INSERT INTO assignments (assignment_name,item_id, assigned_by, assigned_to, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO assignments (assignment_name,item_id, assigned_by, assigned_to, start_time, end_time) 
+VALUES (?, ?, ?, ?, ?, ?)
  '''
 
 

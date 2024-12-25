@@ -86,5 +86,5 @@ class LoginDialog(QtWidgets.QDialog):
         logging.info("closeEvent triggered: app is closing.")
         # Ensure the application quits
         QApplication.quit()
-        sys.exit(0)
+        sys.exit(1)
         super().closeEvent(event)

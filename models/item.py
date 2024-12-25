@@ -7,7 +7,7 @@ import traceback
 import uuid
 from dataclasses import dataclass
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QFileInfo
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QColor, QFont, QIcon, QBrush
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeView, QFileIconProvider
 
@@ -23,7 +23,7 @@ from sql_statements.item import (
     INIT_DATA, FETCH_NAME_FILE_OR_FOLDER_ON_TEXTCHANGED,
 )
 
-from messages.contants import ID_ROLE
+from messages.contants import ID_ROLE, image_extensions, video_extensions, document_extensions, audio_extensions
 
 
 @dataclass
@@ -151,7 +151,7 @@ class ItemModel(NativeSqlite3Model):
             logging.debug(f"Root children: {root_children}")
             font_size = 14
 
-            icon_provider = QFileIconProvider()
+            # icon_provider = QFileIconProvider()
 
             def create_item(content, font_size, icon_type, bold=False, color=QColor(0, 0, 0), user_role=None,
                             item_id=None):
@@ -159,7 +159,7 @@ class ItemModel(NativeSqlite3Model):
                 Helper to create a CustomItem with specific attributes.
                 """
                 item = CustomItem(content, font_size=font_size, bold=bold, color=color)
-                item.set_custom_icon(icon_provider.icon(icon_type))
+                item.set_custom_icon(icon_type)
                 # Store the ID in a custom role
                 if item_id is not None:
                     item.setData(item_id, ID_ROLE)  # Store the ID in ID_ROLE
@@ -220,6 +220,21 @@ class ItemModel(NativeSqlite3Model):
                     logging.error(traceback.format_exc())
                     return None
 
+            def get_icon_type(child):
+                icon_provider = QFileIconProvider()
+
+                # If the type is folder, return the folder icon
+                if child.type == "folder":
+                    return icon_provider.icon(QFileIconProvider.IconType.Folder)
+
+                # If the type is file, return the file-specific icon
+                elif child.type == "file":
+                    file_info = QFileInfo(child.original_name)  # Assuming full path or just name with extension
+                    return icon_provider.icon(file_info)
+
+                # Default icon
+                return icon_provider.icon(QFileIconProvider.IconType.File)
+
             def process_child(parent_node, child, font_size):
                 """
                 Process and append a child node (file or folder) to the parent node.
@@ -233,12 +248,10 @@ class ItemModel(NativeSqlite3Model):
                     ):
                         return
 
-                    # Determine icon type and user role
-                    icon_type = (
-                        QFileIconProvider.IconType.Folder
-                        if child.type == "folder"
-                        else QFileIconProvider.IconType.File
-                    )
+                    # init icon type
+                    icon_type = get_icon_type(child)
+
+                    # Determine and user role
                     user_role = "directory" if child.type == "folder" else "file"
 
                     # Create the item for the child
@@ -417,24 +430,24 @@ class ItemModel(NativeSqlite3Model):
             if cur:
                 cur.close()
 
-    def get_item_details(self, original_name):
+    def get_item_details(self, item_id):
         """
         Fetches the item details by the original name.
-        :param original_name: The original name of the file.
+        :param item_id: id of item
         :return: Tuple of (id, code, type) or None if not found.
         """
         cur = self.connection.cursor()
         cur.execute(
-            "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
+            "SELECT code, type FROM items WHERE id = ?", (item_id,)
         )
         return cur.fetchone()
 
-    def get_file_bytes(self, original_name):
+    def get_file_bytes(self, item_id):
         cur = self.connection.cursor()
         cur.execute(
-            "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
+            "SELECT code, type FROM items WHERE id =?", (item_id,)
         )
-        item_id, code, file_type = cur.fetchone()
+        code, file_type = cur.fetchone()
         if file_type != "file":
             return None
         file_path = os.path.join(self._root_path, code)
@@ -442,17 +455,11 @@ class ItemModel(NativeSqlite3Model):
             return f.read()
 
     def create_folder(
-            self, username: str, original_name: str, parent_original_name: str = None):
+            self, username: str, original_name: str, parent_id: int = None):
         cur = self.connection.cursor()
         cur.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = cur.fetchone()[0]
-        cur.execute(
-            "SELECT id FROM items WHERE original_name = ?", (parent_original_name,)
-        )
-        result = cur.fetchone()
-        if result:
-            parent_id = result[0]
-        else:
+        if parent_id is None:
             parent_id = 0
         code = str(uuid.uuid4())
         cur.execute(
@@ -469,34 +476,34 @@ class ItemModel(NativeSqlite3Model):
             cur.close()
             raise Exception(f"Error: folder file name '{original_name}' failed")
 
-    def delete_file(self, original_name):
+    def delete_file(self, original_name, file_id):
         cur = self.connection.cursor()
         cur.execute(
-            "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
+            "SELECT code, type FROM items WHERE id = ?", (file_id,)
         )
-        item_id, code, file_type = cur.fetchone()
+        code, file_type = cur.fetchone()
         if file_type != "file":
             cur.close()
             raise Exception(f"Error: this is not a file")
         file_path = os.path.join(self._root_path, code)
-        cur.execute("delete from items where id = ?", (item_id,))
+        cur.execute("delete from items where id = ?", (file_id,))
         if cur.rowcount == 1:
             self.connection.commit()
             cur.close()
             os.remove(file_path)
-            logging.info(f"Delete file with id '{item_id}' successfully")
-            return item_id
+            logging.info(f"Delete file {original_name} with id '{file_id}' successfully")
+            return file_id
         else:
             self.connection.rollback()
             cur.close()
-            raise Exception(f"Error: delete item with id '{item_id}' failed")
+            raise Exception(f"Error: delete item {original_name} with id '{file_id}' failed")
 
-    def delete_folder(self, original_name):
+    def delete_folder(self, original_name, item_id):
         cur = self.connection.cursor()
         cur.execute(
             "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
         )
-        item_id, code, file_type = cur.fetchone()
+        code, file_type = cur.fetchall()
         if file_type != "folder":
             cur.close()
             raise Exception(f"Error: this is not a folder")
@@ -548,7 +555,7 @@ class ItemModel(NativeSqlite3Model):
             # Close the connection
             cur.close()
 
-    def rename_item(self, old_name, new_name):
+    def rename_item(self, old_name, new_name, item_id):
         if old_name == new_name:
             return
 
@@ -558,7 +565,6 @@ class ItemModel(NativeSqlite3Model):
         if self.get_item_id_by_name(new_name) is not None:
             raise Exception("Tên đã tồn tại")
 
-        item_id = self.get_item_id_by_name(old_name)
         if item_id is None:
             raise Exception("Tệp/Thư mục không tồn tại")
 

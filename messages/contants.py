@@ -28,3 +28,8 @@ PERMISSION_TRANSLATIONS = {
 }
 
 ID_ROLE = Qt.ItemDataRole.UserRole + 1
+
+image_extensions = ["jpg", "jpeg", "png", "gif", "bmp"]
+document_extensions = ["doc", "docx", "pdf", "txt", "rtf"]
+video_extensions = ["mp4", "avi", "mov", "mkv"]
+audio_extensions = ["mp3", "wav", "ogg", "flac"]

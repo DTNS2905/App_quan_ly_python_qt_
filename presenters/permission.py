@@ -180,19 +180,19 @@ class PermissionPresenter(Presenter):
                 logging.error(f"Failed to assign permission '{permission}': {e}")
 
     def assign_permissions_to_users_for_file(
-            self, item_name: str, username: str, permissions: list[str]
+            self, item_id: int, item_name: str, username: str, permissions: list[str]
     ) -> None:
         """
         Assign multiple permissions to a user for a specific file.
-
         :param item_name: The name of the file (original_name in the items table).
+        :param item_id: The id of the file
         :param username: The username to assign permissions to.
         :param permissions: List of permissions to assign.
         :raises ValueError: If any of the inputs are invalid or empty.
         :raises Exception: If the operation fails for any reason.
         """
-        if not item_name:
-            raise ValueError("Tên tệp không được để trống.")
+        if not item_id:
+            raise ValueError("Tên tệp không tìm thấy")
         if not username:
             raise ValueError("Tên người dùng không được để trống")
         if not permissions or not all(isinstance(p, str) for p in permissions):
@@ -200,32 +200,32 @@ class PermissionPresenter(Presenter):
 
         try:
             logging.info(
-                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
             )
-            self.model.assign_permissions_to_users_for_file(item_name, username, permissions)
+            self.model.assign_permissions_to_users_for_file(item_id, username, permissions)
             logging.info(
-                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục'{item_name}'."
+                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục'{item_id}'."
             )
         except Exception as e:
             logging.error(
-                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
+                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}': {e}"
             )
             raise
 
     def unassign_permissions_to_users_for_file(
-            self, item_name: str, username: str, permissions: list[str]
+            self, item_id: int, item_name: str, username: str, permissions: list[str]
     ):
         """
                Assign multiple permissions to a user for a specific file.
-
                :param item_name: The name of the file (original_name in the items table).
+               :param item_id: The id of the file (original_name in the items table).
                :param username: The username to assign permissions to.
                :param permissions: List of permissions to assign.
                :raises ValueError: If any of the inputs are invalid or empty.
                :raises Exception: If the operation fails for any reason.
                """
-        if not item_name:
-            raise ValueError("Tên tệp không được để trống.")
+        if not item_id:
+            raise ValueError("Tên tệp không thẻ tìm thấy")
         if not username:
             raise ValueError("Tên người dùng không được để trống.")
         if not permissions or not all(isinstance(p, str) for p in permissions):
@@ -233,15 +233,15 @@ class PermissionPresenter(Presenter):
 
         try:
             logging.info(
-                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
             )
-            self.model.unassign_permissions_to_users_for_file(item_name, username, permissions)
+            self.model.unassign_permissions_to_users_for_file(item_id, username, permissions)
             logging.info(
-                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
+                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
             )
         except Exception as e:
             logging.error(
-                f"Không thể gỡ quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
+                f"Không thể gỡ quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}': {e}"
             )
             raise
 
