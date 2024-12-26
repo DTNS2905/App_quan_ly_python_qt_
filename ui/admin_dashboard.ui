@@ -1840,10 +1840,10 @@ color:black;
                      <bool>false</bool>
                     </property>
                     <property name="sortingEnabled">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                     <property name="animated">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                     <property name="allColumnsShowFocus">
                      <bool>true</bool>

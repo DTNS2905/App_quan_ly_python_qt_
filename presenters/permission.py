@@ -191,7 +191,7 @@ class PermissionPresenter(Presenter):
         :raises ValueError: If any of the inputs are invalid or empty.
         :raises Exception: If the operation fails for any reason.
         """
-        if not item_id:
+        if not item_id or not item_name:
             raise ValueError("Tên tệp không tìm thấy")
         if not username:
             raise ValueError("Tên người dùng không được để trống")
@@ -200,15 +200,15 @@ class PermissionPresenter(Presenter):
 
         try:
             logging.info(
-                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
+                f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}'."
             )
-            self.model.assign_permissions_to_users_for_file(item_id, username, permissions)
+            self.model.assign_permissions_to_users_for_file(item_id, item_name, username, permissions)
             logging.info(
-                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục'{item_id}'."
+                f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục'{item_name}'."
             )
         except Exception as e:
             logging.error(
-                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}': {e}"
+                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
             )
             raise
 
@@ -235,7 +235,7 @@ class PermissionPresenter(Presenter):
             logging.info(
                 f"Đang gán các quyền {permissions} cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
             )
-            self.model.unassign_permissions_to_users_for_file(item_id, username, permissions)
+            self.model.unassign_permissions_to_users_for_file(item_id, item_name, username, permissions)
             logging.info(
                 f"Đã gán quyền thành công cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}'."
             )

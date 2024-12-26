@@ -46,18 +46,20 @@ class PermissionItemDialog(QtWidgets.QDialog):
                 assign_username = self.lineEdit.text()
                 assign_permissions = self.process_selection()
                 translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
+                success_files_name = []
 
                 for item in selected_items:
+                    item_name, item_id = item
                     try:
                         self.presenter.assign_permissions_to_users_for_file(
-                            item,
-                            assign_username,
-                            assign_permissions,
+                            item_id, item_name, assign_username, assign_permissions
                         )
-                    except Exception:
+                    except Exception as e:
+                        logging.error(e)
                         logging.error(traceback.print_exc())
+                    success_files_name.append(item_name)
                 self.display_success(
-                    f"Gắn {', '.join(selected_items)} "
+                    f"Gắn {', '.join(success_files_name)} "
                     f"với các quyền {', '.join(translated_permissions_item)}"
                 )
                 self.accept()
@@ -69,18 +71,22 @@ class PermissionItemDialog(QtWidgets.QDialog):
                 assign_username = self.lineEdit.text()
                 assign_permissions = self.process_selection()
                 translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
+                success_files_name = []
 
                 for item in selected_items:
+
+                    item_name, item_id = item
                     try:
                         self.presenter.unassign_permissions_to_users_for_file(
-                            item,
-                            assign_username,
-                            assign_permissions,
+                            item_id, item_name, assign_username, assign_permissions
                         )
-                    except Exception:
+
+                    except Exception as e:
+                        logging.error(e)
                         logging.error(traceback.print_exc())
+                    success_files_name.append(item_name)
                 self.display_success(
-                    f"Gỡ {', '.join(selected_items)} "
+                    f"Gỡ {', '.join(success_files_name)} "
                     f"với các quyền {', '.join(translated_permissions_item)}"
                 )
                 self.accept()

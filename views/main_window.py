@@ -156,11 +156,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.display_error(f"{permission}: {PERMISSION_DENIED}")
                 return
 
-            items = [
-                self.treeView.model().data(value)
-                for index, value in enumerate(self.treeView.selectedIndexes())
-                if index % 4 == 0
-            ]
+            model = self.treeView.model()
+            items = []
+
+            selected_indexes = list(
+                {index.sibling(index.row(), 0) for index in self.treeView.selectedIndexes()}
+            )
+            if selected_indexes:
+                for selected_index in selected_indexes:
+                    original_name = model.data(selected_index)
+                    item_id = model.data(selected_index, ID_ROLE)
+
+                    items.append((original_name, item_id))
+
             if len(items) == 0:
                 self.display_error("Xin chọn 1 tệp")
             else:
@@ -420,7 +428,7 @@ class MainWindow(QtWidgets.QMainWindow):
         search_text = self.search_input.text()
 
         if (
-            not search_text.strip()
+                not search_text.strip()
         ):  # If input is empty, clear highlights and suggestions
             self.item_presenter.clear_highlights()  # Reset all highlights
             return
@@ -480,6 +488,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.display_error("Lỗi với việc thêm hạn chót cho tài liệu hoăc thư mục ")
 
             return
+
     def eventFilter(self, source, event):
 
         # Check if the source is part of the tree view
@@ -507,7 +516,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.treeView.selectionModel().clearSelection()  # Clear the selection
         self.treeView.setCurrentIndex(QModelIndex())  # Clear the current index
-
 
     def remind_assignment(self, username):
         self.assignment_presenter.remind_if_no_time_left(username)

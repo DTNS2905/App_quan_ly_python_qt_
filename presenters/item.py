@@ -63,7 +63,7 @@ class ItemPresenter(Presenter):
 
         self.view.treeView.setGraphicsEffect(effect)
         self.view.treeView.setHeaderHidden(False)
-        self.view.treeView.setAnimated(False)
+        self.view.treeView.setAnimated(True)
         self.view.treeView.setIndentation(20)
         self.view.treeView.setSortingEnabled(True)
         self.view.treeView.expandAll()

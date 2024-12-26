@@ -255,12 +255,12 @@ class PermissionModel(NativeSqlite3Model):
         return PermissionDTO(username, [r[0] for r in rows], "admin" in username)
 
     def assign_permissions_to_users_for_file(
-            self, item_name: str, username: str, permissions: list[str]
+            self, item_id: int, item_name: str, username: str, permissions: list[str]
     ):
         """
         Assign multiple permissions to a user for a single file.
-
-        :param item_name: Path to the SQLite database.
+        :param item_name: name of file or folder
+        :param item_id: id of file or folder
         :param username: The username to assign permissions to.
         :param permissions: List of permissions to assign.
         """
@@ -268,13 +268,6 @@ class PermissionModel(NativeSqlite3Model):
         cur = self.connection.cursor()
 
         try:
-            # Fetch item_id using the item's original name
-            cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
-            item = cur.fetchone()
-            if not item:
-                raise Exception(f"{INVALID_ITEM_NAME} cho '{item_name}'")
-            item_id = item[0]
-
             # Fetch user_id using the get_user_id_by_username method
             try:
                 user_id = self.get_user_id_by_username(username)
@@ -319,12 +312,12 @@ class PermissionModel(NativeSqlite3Model):
             cur.close()
 
     def unassign_permissions_to_users_for_file(
-            self, item_name: str, username: str, permissions: list[str]
+            self, item_id: int, item_name: str, username: str, permissions: list[str]
     ):
         """
         Unassign multiple permissions from a user for a single file.
-
-        :param item_name: Path to the SQLite database.
+        :param item_name: name of file or folder
+        :param item_id: id of file or folder
         :param username: The username to unassign permissions from.
         :param permissions: List of permissions to unassign.
         """
@@ -332,13 +325,6 @@ class PermissionModel(NativeSqlite3Model):
         cur = self.connection.cursor()
 
         try:
-            # Fetch item_id using the item's original name
-            cur.execute("SELECT id FROM items WHERE original_name = ?", (item_name,))
-            item = cur.fetchone()
-            if not item:
-                raise Exception(f"{INVALID_ITEM_NAME} cho '{item_name}'")
-            item_id = item[0]
-
             # Fetch user_id using the get_user_id_by_username method
             try:
                 user_id = self.get_user_id_by_username(username)

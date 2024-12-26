@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from appdirs import user_data_dir
 
-if getattr(sys, "frozen", False):
+if getattr(sys, "frozen", True):
     # If the application is run as a bundle, the PyInstaller bootloader
     # extends the sys module by a flag frozen=True and sets the app
     # path into variable _MEIPASS' for accessing bundled files.
@@ -49,6 +49,7 @@ TIMEZONE = "Asia/Bangkok"
 # Ensure directories exist
 os.makedirs(LOG_PATH, exist_ok=True)
 os.makedirs(FILES_ROOT_PATH, exist_ok=True)
+
 
 def setup_logging():
     log_filename = os.path.join(LOG_PATH, f"app_log_{time.strftime('%Y-%m-%d')}.log")
