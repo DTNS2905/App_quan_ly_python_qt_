@@ -210,6 +210,9 @@ class PermissionPresenter(Presenter):
             logging.error(
                 f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}': {e}"
             )
+            self.view.display_error(
+                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}"
+            )
             raise
 
     def unassign_permissions_to_users_for_file(
@@ -242,6 +245,9 @@ class PermissionPresenter(Presenter):
         except Exception as e:
             logging.error(
                 f"Không thể gỡ quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_id}': {e}"
+            )
+            self.view.display_error(
+                f"Không thể gán quyền cho người dùng '{username}' đối với tài liệu hoặc thư mục '{item_name}"
             )
             raise
 

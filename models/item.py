@@ -498,12 +498,12 @@ class ItemModel(NativeSqlite3Model):
             cur.close()
             raise Exception(f"Error: delete item {original_name} with id '{file_id}' failed")
 
-    def delete_folder(self, original_name, item_id):
+    def delete_folder(self, item_id):
         cur = self.connection.cursor()
         cur.execute(
-            "SELECT id, code, type FROM items WHERE original_name = ?", (original_name,)
+            "SELECT code, type FROM items WHERE id = ?", (item_id,)
         )
-        code, file_type = cur.fetchall()
+        code, file_type = cur.fetchone()
         if file_type != "folder":
             cur.close()
             raise Exception(f"Error: this is not a folder")

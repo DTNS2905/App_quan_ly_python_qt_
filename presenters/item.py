@@ -217,11 +217,12 @@ class ItemPresenter(Presenter):
                 except Exception as e:
                     LogModel.write_log(
                         session.SESSION.get_username(),
-                        f"{FILE_REMOVE_FAIL} cho {original_name}: {e}",
+                        f"{FILE_REMOVE_FAIL} cho {original_name} : {e}",
                     )
                     self.view.display_error(
-                        f"{FILE_REMOVE_FAIL} cho '{original_name}': {e}"
+                        f"{FILE_REMOVE_FAIL} cho '{original_name}'"
                     )
+                    return
 
             # Step 6: Notify user about successful deletion and refresh the view
             self.view.display_success(
@@ -351,15 +352,16 @@ class ItemPresenter(Presenter):
                 self.view.display_error("Chỉ cho phép chọn 1 thư mục để xóa")
                 return
 
-            selected_index = None
-            # if selected_indexes :
-
+            model = self.view.treeView.model()
+            if selected_indexes:
+                selected_index = selected_indexes[0]
+            else:
+                selected_index = None
 
             # Check if the selected index is valid
             if selected_index is not None and selected_index.isValid():
                 # Get the model and the selected index
-                model = self.view.treeView.model()
-                selected_index = selected_indexes[0]  # Only one index is allowed
+
                 # Retrieve the selected item
                 selected_item = model.itemFromIndex(selected_index)
 
@@ -374,6 +376,7 @@ class ItemPresenter(Presenter):
                 # Default to the root node if no valid selection
                 parent_original_name = "root"
                 parent_id = 0
+
                 if not parent_original_name:  # Ensure root node exists
                     self.view.display_error("Không thể xác định thư mục.")  # Thông báo lỗi
                     return
@@ -407,7 +410,7 @@ class ItemPresenter(Presenter):
                     "Người dùng đã hủy việc tạo thư mục.",
                 )  # Nhật ký khi hủy
         except Exception as e:
-            self.view.display_error(f"Lỗi tạo thư mục: {e}")  # Thông báo lỗi hệ thống
+            self.view.display_error(f"Lỗi tạo thư mục")  # Thông báo lỗi hệ thống
             LogModel.write_log(session.SESSION.get_username(), f"Lỗi tạo thư mục: {e}")
 
     def handle_remove_folder(self):
@@ -435,6 +438,11 @@ class ItemPresenter(Presenter):
         # Get the model and the selected index
         model = self.view.treeView.model()
         index = selected_indexes[0]  # Only one index is allowed
+        selected_item = model.itemFromIndex(index)
+
+        if selected_item.data(Qt.ItemDataRole.UserRole) != "directory":
+            self.view.display_error("Không thể thêm thư mục vào một tệp.")  # Thông báo lỗi
+            return
 
         # Get the folder name
         original_name = model.data(index)
@@ -457,6 +465,8 @@ class ItemPresenter(Presenter):
             )
             return
 
+
+
         # Confirmation dialog for folder deletion
         reply = QMessageBox.question(
             self.view,
@@ -469,7 +479,7 @@ class ItemPresenter(Presenter):
         if reply == QMessageBox.StandardButton.Yes:
             try:
                 # Remove the folder
-                self.model.delete_folder(folder_path,item_id)
+                self.model.delete_folder(item_id)
                 LogModel.write_log(
                     session.SESSION.get_username(),
                     f"{FOLDER_REMOVE_SUCCESS} cho '{folder_path}' .",
@@ -485,7 +495,8 @@ class ItemPresenter(Presenter):
                 LogModel.write_log(
                     session.SESSION.get_username(), f"{FOLDER_REMOVE_ERROR}: {e}"
                 )
-                self.view.display_error(f"{FOLDER_REMOVE_ERROR}: {e}")
+                self.view.display_error(f"{FOLDER_REMOVE_ERROR}")
+                return
 
     def handle_rename_file(self):
         can_all_rename = session.SESSION.match_permissions(FILE_RENAME)

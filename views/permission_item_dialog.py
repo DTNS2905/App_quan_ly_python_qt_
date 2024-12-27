@@ -44,6 +44,9 @@ class PermissionItemDialog(QtWidgets.QDialog):
 
             def assign_permissions_to_users_for_file():
                 assign_username = self.lineEdit.text()
+                if not assign_username:
+                    self.display_error("Thiếu Tên người dùng")
+                    return
                 assign_permissions = self.process_selection()
                 translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
                 success_files_name = []
@@ -69,6 +72,9 @@ class PermissionItemDialog(QtWidgets.QDialog):
 
             def unassign_permissions_to_users_for_file():
                 assign_username = self.lineEdit.text()
+                if not assign_username:
+                    self.display_error("Thiếu Tên người dùng")
+                    return
                 assign_permissions = self.process_selection()
                 translated_permissions_item = self.presenter.translate_permissions(assign_permissions)
                 success_files_name = []
