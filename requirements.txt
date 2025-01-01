@@ -7,3 +7,5 @@ sql~=2022.4.0
 PyQt6~=6.7.1
 pytz~=2024.2
 markdown~=3.7
+appdirs~=1.4.4
+python-magic

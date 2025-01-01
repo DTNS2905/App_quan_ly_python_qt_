@@ -1,8 +1,11 @@
 import logging
 import os
+import shutil
 import sys
+import tempfile
 import traceback
 
+# import magic
 from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QColor, QBrush
 from PyQt6.QtWidgets import (
@@ -300,7 +303,7 @@ class ItemPresenter(Presenter):
                     continue
 
                 # Retrieve the file data
-                data_bytes = self.model.get_file_bytes(original_name,item_id)
+                data_bytes = self.model.get_file_bytes(item_id)
                 if data_bytes is None:
                     self.view.display_error(f"'{original_name}' không phải là tệp đơn")
                     continue
@@ -465,8 +468,6 @@ class ItemPresenter(Presenter):
             )
             return
 
-
-
         # Confirmation dialog for folder deletion
         reply = QMessageBox.question(
             self.view,
@@ -565,7 +566,7 @@ class ItemPresenter(Presenter):
 
             new_name = new_root_name + file_ext
             try:
-                self.model.rename_item(original_name.strip(), new_name.strip(),item_id)
+                self.model.rename_item(original_name.strip(), new_name.strip(), item_id)
                 self.view.refresh_tree_view()
                 self.expand_tree_view()
             except Exception as e:
@@ -637,7 +638,7 @@ class ItemPresenter(Presenter):
                 return
 
             try:
-                self.model.rename_item(original_name.strip(), new_name.strip(),item_id)
+                self.model.rename_item(original_name.strip(), new_name.strip(), item_id)
                 self.view.refresh_tree_view()
                 self.expand_tree_view()
             except Exception as e:
@@ -701,11 +702,25 @@ class ItemPresenter(Presenter):
             files_storage_path = self.model.get_path_for_files_storage()
             file_path = os.path.join(files_storage_path, code)
 
+            # Restore file extension if original name is provided
+            if original_name:
+                extension = os.path.splitext(original_name)[1]
+
+            if not extension:
+                self.view.display_error("tệp không có phần đuôi mở rộng để mở")
+                logging.error("Original file name does not contain an extension.")
+                return
+            # Create a temporary file with the correct extension
+            temp_dir = tempfile.gettempdir()  # System temporary directory
+            temp_file_path = os.path.join(temp_dir, f"temp_{os.path.basename(file_path)}{extension}")
+
+            shutil.copy(file_path, temp_file_path)  # Copy the file to the temporary path
+
             # Open the file using platform-specific commands
-            self._open_file_platform(file_path)
+            self._open_file_platform(temp_file_path)
 
         except Exception as e:
-            self.view.display_error(f"Lỗi khi mở tệp")
+            self.view.display_error(f"Lỗi khi mở tệp: {e}")
 
     def _open_file_platform(self, file_path):
         """

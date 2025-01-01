@@ -445,7 +445,7 @@ class ItemModel(NativeSqlite3Model):
     def get_file_bytes(self, item_id):
         cur = self.connection.cursor()
         cur.execute(
-            "SELECT code, type FROM items WHERE id =?", (item_id,)
+            "SELECT code, type FROM items WHERE id = ?", (item_id,)
         )
         code, file_type = cur.fetchone()
         if file_type != "file":

@@ -1,12 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all
+
+datas = [('README.md', 'README.md'), ('common', 'common'), ('messages', 'messages'), ('models', 'models'), ('presenters', 'presenters'), ('sql_statements', 'sql_statements'), ('ui', 'ui'), ('ui_components', 'ui_components'), ('views', 'views'), ('configs.py', 'configs.py'), ('icon.ico', 'icon.ico'), ('resources.py', 'resources.py'), ('resources.qrc', 'resources.qrc')]
+binaries = []
+hiddenimports = ['pkg_resources.extern']
+tmp_ret = collect_all('appdirs')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
 a = Analysis(
     ['app.py'],
     pathex=['D:\\QT_app\\qt_project\\venv\\Lib\\site-packages'],
-    binaries=[],
-    datas=[('README.md', 'README.md'), ('common', 'common'), ('messages', 'messages'), ('models', 'models'), ('presenters', 'presenters'), ('sql_statements', 'sql_statements'), ('ui', 'ui'), ('ui_components', 'ui_components'), ('views', 'views'), ('configs.py', 'configs.py'), ('icon.ico', 'icon.ico'), ('resources.py', 'resources.py'), ('resources.qrc', 'resources.qrc')],
-    hiddenimports=['pkg_resources.extern'],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -12,10 +12,12 @@ if getattr(sys, "frozen", True):
     APP_PATH = sys._MEIPASS
     # default files_storage will be saved:
     # C:\Users\<User>\AppData\Local\Phần mềm quản lý hồ sơ công tác\Phần mềm quản lý hồ sơ công tác\1.0.1\files_storage
-    FILES_ROOT_PATH = Path(user_data_dir(appname="Phần mềm quản lý hồ sơ công tác", version="1.0.1")) / "files_storage"
+    FILES_ROOT_PATH = str(
+        Path(user_data_dir(appname="Phan_mem_quan_ly_ho_so_cong_tac", version="1.0.1")) / "files_storage"
+    )
     # default logs will be saved:
     # C:\Users\<User>\AppData\Local\Phần mềm quản lý hồ sơ công tác\Phần mềm quản lý hồ sơ công tác\1.0.1\logs
-    LOG_PATH = Path(user_data_dir(appname="Phần mềm quản lý hồ sơ công tác", version="1.0.1")) / "logs"
+    LOG_PATH = str(Path(user_data_dir(appname="Phan_mem_quan_ly_ho_so_cong_tac", version="1.0.1")) / "logs")
 
 else:
     APP_PATH = os.path.dirname(os.path.abspath(__file__))
