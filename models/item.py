@@ -400,7 +400,8 @@ class ItemModel(NativeSqlite3Model):
 
             # Prepare file details
             original_name = os.path.basename(file_path)
-            code = str(uuid.uuid4())
+            extension = os.path.splitext(original_name)[1]
+            code = str(uuid.uuid4()) + extension
 
             # Insert file record into the database
             cur.execute(

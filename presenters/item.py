@@ -702,24 +702,25 @@ class ItemPresenter(Presenter):
             files_storage_path = self.model.get_path_for_files_storage()
             file_path = os.path.join(files_storage_path, code)
 
-            # Restore file extension if original name is provided
-            if original_name:
-                extension = os.path.splitext(original_name)[1]
-
-            if not extension:
-                self.view.display_error("tệp không có phần đuôi mở rộng để mở")
-                logging.error("Original file name does not contain an extension.")
-                return
-            # Create a temporary file with the correct extension
-            temp_dir = tempfile.gettempdir()  # System temporary directory
-            temp_file_path = os.path.join(temp_dir, f"temp_{os.path.basename(file_path)}{extension}")
-
-            shutil.copy(file_path, temp_file_path)  # Copy the file to the temporary path
+            # # Restore file extension if original name is provided
+            # if original_name:
+            #     extension = os.path.splitext(original_name)[1]
+            #
+            # if not extension:
+            #     self.view.display_error("tệp không có phần đuôi mở rộng để mở")
+            #     logging.error("Original file name does not contain an extension.")
+            #     return
+            # # Create a temporary file with the correct extension
+            # temp_dir = tempfile.gettempdir()  # System temporary directory
+            # temp_file_path = os.path.join(temp_dir, f"temp_{os.path.basename(file_path)}{extension}")
+            #
+            # shutil.copy(file_path, temp_file_path)  # Copy the file to the temporary path
 
             # Open the file using platform-specific commands
-            self._open_file_platform(temp_file_path)
+            self._open_file_platform(file_path)
 
         except Exception as e:
+            logging.error(f"Lỗi khi mở tệp: {e}")
             self.view.display_error(f"Lỗi khi mở tệp: {e}")
 
     def _open_file_platform(self, file_path):
